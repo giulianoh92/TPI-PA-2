@@ -1,0 +1,33 @@
+# Directorios de construcción generados por Maven
+target/
+build/
+
+# Archivos y carpetas generados por IDEs
+.classpath
+.project
+.settings/
+.idea/
+.vscode/
+
+# Archivos temporales y de caché
+*.log
+*.tmp
+*.swp
+
+# Archivos de sistema operativo y editores
+.DS_Store
+Thumbs.db
+*.suo
+
+# Archivos de construcción y paquetes de Maven
+pom.xml.tag
+pom.xml.releaseBackup
+pom.xml.versionsBackup
+
+# Archivos de dependencias descargadas (opcional)
+.m2/repository/
+
+# Archivos generados por herramientas de análisis estático o cobertura
+*.coverage
+*.jacoco/
+*.cobertura/
