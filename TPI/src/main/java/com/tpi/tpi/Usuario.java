@@ -29,7 +29,7 @@ public class Usuario /*implements Serializable*/{
         this.emailUsuario= email;
         this.nombreUsuario = nombre;
         this.fecha_registro = fecha;
-        this.rol= 1; //ver
+        this.rol= 1; //ver que onda 
        
     }         
 }
