@@ -14,12 +14,12 @@ import java.sql.Date;
  */
 public class Usuario /*implements Serializable*/{
     
-     int idUsuario;
-     String password; 
-     String emailUsuario;
-     String nombreUsuario;
-     Date fecha_registro;
-     int rol; //No me acuerdo para que era
+    private int idUsuario;
+    private String password; 
+    private String emailUsuario;
+    private String nombreUsuario;
+    private Date fecha_registro;
+    private int rol; //No me acuerdo para que era
      
     
      
