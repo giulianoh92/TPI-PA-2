@@ -14,7 +14,7 @@ import java.sql.Date;
  */
 public class Cliente extends Usuario implements Serializable {
     
-    String direccion;
+    private String direccion;
 
     public Cliente(String direccion, int id, String password_, String email, String nombre, Date fecha, int rol) {
         super(id, password_, email, nombre, fecha, rol);
