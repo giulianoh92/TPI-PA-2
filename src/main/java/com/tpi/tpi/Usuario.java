@@ -3,7 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package com.tpi.tpi;
-//import java.io.Serializable;
+import java.io.Serializable;
 import java.sql.Date;
 
 
@@ -12,24 +12,24 @@ import java.sql.Date;
  *
  * @author anton
  */
-public class Usuario /*implements Serializable*/{
+public class Usuario implements Serializable{
     
-    private int idUsuario;
-    private String password; 
-    private String emailUsuario;
-    private String nombreUsuario;
-    private Date fecha_registro;
-    private int rol; //No me acuerdo para que era
+    protected int idUsuario;
+    protected String password; 
+    protected String emailUsuario;
+    protected String nombreUsuario;
+    protected Date fecha_registro;
+    protected int rol; //No me acuerdo para que era
      
     
      
-    public Usuario(int id, String password_, String email, String nombre, Date fecha ) {
+    public Usuario(int id, String password_, String email, String nombre, Date fecha, int rol ) {
         this.idUsuario = id;
         this.password = password_;
         this.emailUsuario= email;
         this.nombreUsuario = nombre;
         this.fecha_registro = fecha;
-        this.rol= 1; //ver que onda 
+        this.rol= rol; //ver que onda 
        
     }  
 
