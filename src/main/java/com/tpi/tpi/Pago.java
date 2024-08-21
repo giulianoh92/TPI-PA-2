@@ -13,11 +13,13 @@ public class Pago {
     private int idPago;
     private Date fechaDePago;
     private String metodoDePago;
+    private double monto; // pienso que esta clase se intanciaria al finalizar la compra, y el monto total se calcula a partir de la lista de items/productos
 
-    public Pago(int idPago, Date fechaDePag, String metodoDePago){
+    public Pago(int idPago, Date fechaDePag, String metodoDePago, double monto){
         this.idPago = idPago;
         this.fechaDePago = fechaDePag;
         this.metodoDePago = metodoDePago;
+        this.monto = monto; 
     }
 
     //getters y setters
@@ -38,5 +40,11 @@ public class Pago {
     }
     public void setMetodoDePago(String metodoDePago) {
         this.metodoDePago = metodoDePago;
+    }
+    public double getMonto() {
+        return monto;
+    }
+    public void setMonto(double monto) {
+        this.monto = monto;
     }
 }

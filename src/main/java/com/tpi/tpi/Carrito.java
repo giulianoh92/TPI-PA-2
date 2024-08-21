@@ -3,24 +3,26 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package com.tpi.tpi;
-import java.sql.Date;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  *
  * @author giu
  */
 public class Carrito {
-    private Date fechaCreacion;
+    private List<Item> items = new ArrayList<>();
 
-    Carrito(Date fechaCreacion){
-        this.fechaCreacion = fechaCreacion;
+    Carrito(){
     }
 
     //getters y setters
-    public Date getFechaCreacion() {
-        return fechaCreacion;
+
+    public List<Item> getItems() {
+        return items;
     }
 
-    public void setFechaCreacion(Date fechaCreacion) {
-        this.fechaCreacion = fechaCreacion;
+    public void addItem(Item item) {
+        this.items.add(item);
     }
 }

@@ -10,9 +10,11 @@ package com.tpi.tpi;
  */
 public class Item {
     private int cantidad;
-    
-    public Item(int cantidad){
+    private Producto producto;
+
+    public Item(int cantidad, Producto producto){
         this.cantidad = cantidad;
+        this.producto = producto;
     }
 
     //getters y setters
@@ -22,5 +24,10 @@ public class Item {
     public void setCantidad(int cantidad) {
         this.cantidad = cantidad;
     }
-
+    public Producto getProducto() {
+        return producto;
+    }
+    public void setProducto(Producto producto) {
+        this.producto = producto;
+    }
 }
