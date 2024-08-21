@@ -14,9 +14,9 @@ import java.sql.Date;
  */
 public class Cliente extends Usuario implements Serializable {
     
-    private String direccion;
-    private String emailUsuario;
-    private Carrito carrito = new Carrito();
+    private String direccion; // creo que solo nos interesa esta informacion si el usuario es un cliente...
+    private String emailUsuario; // 
+    private Carrito carrito = new Carrito(); // cada cliente tiene un solo carrito de compras, queda por verse como se lleva a cabo la compra.
 
     public Cliente(String direccion, int id, String password, String emailUsuario, String nombreUsuario, Date fechaRegistro) {
         super(id, password, nombreUsuario, fechaRegistro);

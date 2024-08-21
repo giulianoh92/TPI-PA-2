@@ -8,7 +8,7 @@ package com.tpi.tpi;
  *
  * @author giu
  */
-public class CategoriaDeProducto {
+public class CategoriaDeProducto { //queda por ver si es necesaria esta clase
     private int idCategoria;
     private String nombre;
     
