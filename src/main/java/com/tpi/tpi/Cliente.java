@@ -1,29 +1,25 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.tpi.tpi;
-import java.io.Serializable;
-//import javax.persistence.Basic;
-//import javax.persistence.Entity;
-import java.sql.Date;
 
-/**
- *
- * @author anton
- */
-public class Cliente extends Usuario implements Serializable {
-    
-    private String direccion; // creo que solo nos interesa esta informacion si el usuario es un cliente...
-    private String emailUsuario; // 
-    private Carrito carrito = new Carrito(); // cada cliente tiene un solo carrito de compras, queda por verse como se lleva a cabo la compra.
+import java.sql.Date;
+import java.util.ArrayList;
+import java.util.List;
+
+public class Cliente extends Usuario {
+
+    private String direccion;
+    private String emailUsuario;
+    private Carrito carrito;
+    private List<Pedido> pedidos;
 
     public Cliente(String direccion, int id, String password, String emailUsuario, String nombreUsuario, Date fechaRegistro) {
         super(id, password, nombreUsuario, fechaRegistro);
         this.direccion = direccion;
         this.emailUsuario = emailUsuario;
+        this.carrito = new Carrito(); 
+        this.pedidos = new ArrayList<>(); 
     }
 
+    // Getters y Setters
     public String getDireccion() {
         return direccion;
     }
@@ -47,5 +43,12 @@ public class Cliente extends Usuario implements Serializable {
     public void addToCarrito(Item item) {
         carrito.addItem(item);
     }
-    
+
+    public List<Pedido> getPedidos() {
+        return pedidos;
+    }
+
+    public void addPedido(Pedido pedido) {
+        this.pedidos.add(pedido);
+    }
 }
