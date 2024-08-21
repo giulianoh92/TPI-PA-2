@@ -15,12 +15,14 @@ import java.sql.Date;
 public class Cliente extends Usuario implements Serializable {
     
     private String direccion;
+    private String emailUsuario;
+    private Carrito carrito = new Carrito();
 
-    public Cliente(String direccion, int id, String password_, String email, String nombre, Date fecha, int rol) {
-        super(id, password_, email, nombre, fecha, rol);
+    public Cliente(String direccion, int id, String password, String emailUsuario, String nombreUsuario, Date fechaRegistro) {
+        super(id, password, nombreUsuario, fechaRegistro);
         this.direccion = direccion;
+        this.emailUsuario = emailUsuario;
     }
-   
 
     public String getDireccion() {
         return direccion;
@@ -28,6 +30,22 @@ public class Cliente extends Usuario implements Serializable {
 
     public void setDireccion(String direccion) {
         this.direccion = direccion;
-    }    
+    }
+
+    public String getEmail() {
+        return emailUsuario;
+    }
+
+    public void setEmail(String emailUsuario) {
+        this.emailUsuario = emailUsuario;
+    }
+
+    public Carrito getCarrito() {
+        return carrito;
+    }
+
+    public void addToCarrito(Item item) {
+        carrito.addItem(item);
+    }
     
 }

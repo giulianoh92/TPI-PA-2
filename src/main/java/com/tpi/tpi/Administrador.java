@@ -13,10 +13,7 @@ import java.sql.Date;
  * @author anton
  */
 public class Administrador extends Usuario implements Serializable {
-
-    public Administrador(int id, String password_, String email, String nombre, Date fecha, int rol) {
-        super(id, password_, email, nombre, fecha, rol);
+    public Administrador(int idUsuario, String password, String nombreUsuario, Date fechaRegistro) {
+        super(idUsuario, password, nombreUsuario, fechaRegistro);
     }
-    
-    
 }
