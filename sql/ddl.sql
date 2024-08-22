@@ -10,10 +10,6 @@ GRANT ALL PRIVILEGES ON tpi_db.* TO 'admin'@'localhost';
 FLUSH PRIVILEGES;
 
 -- Create Tables
-CREATE TABLE Roles (
-    role_id INT AUTO_INCREMENT PRIMARY KEY,
-    name VARCHAR(100) NOT NULL
-);
 
 CREATE TABLE Payment_methods (
     payment_met_id INT AUTO_INCREMENT PRIMARY KEY,
@@ -34,22 +30,19 @@ CREATE TABLE Users (
     user_id INT AUTO_INCREMENT PRIMARY KEY,
     password VARCHAR(255) NOT NULL,
     username VARCHAR(50) UNIQUE NOT NULL,
-    email VARCHAR(100) UNIQUE NOT NULL,
-    role_id INT,
-    reg_date DATE,
-    FOREIGN KEY (role_id) REFERENCES Roles(role_id) ON DELETE SET NULL
+    is_admin BOOLEAN,
+    reg_date DATE
 );
 
 CREATE TABLE Customers (
-    customer_id INT AUTO_INCREMENT PRIMARY KEY,
-    user_id INT,
+    customer_id INT PRIMARY KEY,
+    email VARCHAR(100) UNIQUE NOT NULL,
     address VARCHAR(255) NOT NULL,
-    FOREIGN KEY (user_id) REFERENCES Users(user_id) ON DELETE CASCADE
+    FOREIGN KEY (customer_id) REFERENCES Users(user_id) ON DELETE CASCADE
 );
 
 CREATE TABLE Carts (
     cart_id INT AUTO_INCREMENT PRIMARY KEY,
-    creation_date DATE NOT NULL,
     customer_id INT,
     FOREIGN KEY (customer_id) REFERENCES Customers(customer_id) ON DELETE SET NULL
 );
