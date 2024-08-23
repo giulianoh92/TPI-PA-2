@@ -33,10 +33,6 @@ El siguiente diagrama muestra la estructura de la base de datos del sistema, des
 
 ```mermaid
 erDiagram
-    Roles {
-        INT role_id PK
-        VARCHAR name
-    }
 
     Payment_methods {
         INT payment_met_id PK
@@ -57,20 +53,19 @@ erDiagram
         INT user_id PK
         VARCHAR password
         VARCHAR username
-        VARCHAR email
-        INT role_id FK
+        BOOLEN is_admin
         DATE reg_date
     }
 
     Customers {
         INT customer_id PK
         INT user_id FK
+        VARCHAR email
         VARCHAR address
     }
 
     Carts {
         INT cart_id PK
-        DATE creation_date
         INT customer_id FK
     }
 
@@ -93,6 +88,7 @@ erDiagram
         INT cart_id FK
         INT status_id FK
         INT payment_id FK
+        DATE creation_date
     }
 
     Items {
@@ -102,7 +98,6 @@ erDiagram
         INT order_id FK
     }
 
-    Users }o--|| Roles : "role_id"
     Customers ||--|| Users : "user_id"
     Carts }o--|| Customers : "customer_id"
     Payment }o--|| Payment_methods : "payment_met_id"
