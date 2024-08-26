@@ -14,13 +14,15 @@ public class Producto {
     private String descripcion;
     private float precioUnitario;
     private int stock;
+    private CategoriaDeProducto categoria;
     
-    public Producto(int idProducto, String nombre, String descripcion, float precioUnitario, int stock){
+    public Producto(int idProducto, String nombre, String descripcion, float precioUnitario, int stock, CategoriaDeProducto categoria){
         this.idProducto = idProducto;
         this.nombre = nombre;
         this.descripcion = descripcion;
         this.precioUnitario = precioUnitario;
         this.stock = stock;
+        this.categoria = categoria;
     }
 
     //getters y setters
@@ -53,5 +55,11 @@ public class Producto {
     }
     public void setStock(int stock) {
         this.stock = stock;
+    }
+    public CategoriaDeProducto getCategoria() {
+        return categoria;
+    }
+    public void setCategoria(CategoriaDeProducto categoria) {
+        this.categoria = categoria;
     }
 }

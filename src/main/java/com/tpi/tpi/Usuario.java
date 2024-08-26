@@ -3,7 +3,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
 package com.tpi.tpi;
-//import java.io.Serializable;
+import java.io.Serializable;
 import java.sql.Date;
 
 
@@ -12,25 +12,20 @@ import java.sql.Date;
  *
  * @author anton
  */
-public class Usuario /*implements Serializable*/{
+public class Usuario implements Serializable{
     
-    private int idUsuario;
-    private String password; 
-    private String emailUsuario;
-    private String nombreUsuario;
-    private Date fecha_registro;
-    private int rol; //No me acuerdo para que era
-     
+    protected int idUsuario;
+    protected String password; 
+    protected String nombreUsuario;
+    protected Date fechaRegistro;
+    // el rol lo define la clase
     
      
-    public Usuario(int id, String password_, String email, String nombre, Date fecha ) {
-        this.idUsuario = id;
-        this.password = password_;
-        this.emailUsuario= email;
-        this.nombreUsuario = nombre;
-        this.fecha_registro = fecha;
-        this.rol= 1; //ver que onda 
-       
+    public Usuario(int idUsuario, String password, String nombreUsuario, Date fechaRegistro) {
+        this.idUsuario = idUsuario;
+        this.password = password;
+        this.nombreUsuario = nombreUsuario;
+        this.fechaRegistro = fechaRegistro;
     }  
 
     public int getIdUsuario() {
@@ -49,14 +44,6 @@ public class Usuario /*implements Serializable*/{
         this.password = password;
     }
 
-    public String getEmailUsuario() {
-        return emailUsuario;
-    }
-
-    public void setEmailUsuario(String emailUsuario) {
-        this.emailUsuario = emailUsuario;
-    }
-
     public String getNombreUsuario() {
         return nombreUsuario;
     }
@@ -65,23 +52,13 @@ public class Usuario /*implements Serializable*/{
         this.nombreUsuario = nombreUsuario;
     }
 
-    public Date getFecha_registro() {
-        return fecha_registro;
+    public Date getfechaRegistro() {
+        return fechaRegistro;
     }
 
-    public void setFecha_registro(Date fecha_registro) {
-        this.fecha_registro = fecha_registro;
+    public void setfechaRegistro(Date fechaRegistro) {
+        this.fechaRegistro = fechaRegistro;
     }
-
-    public int getRol() {
-        return rol;
-    }
-
-    public void setRol(int rol) {
-        this.rol = rol;
-    }
-    
-    
 }
 
  
