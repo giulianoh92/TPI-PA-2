@@ -1,5 +1,7 @@
-package com.tpi.tpi;
+package com.tpi.tpi.repository;
 
+import com.tpi.tpi.model.ProductCategory;
+import com.tpi.tpi.model.Product;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -9,12 +11,12 @@ import java.sql.SQLException;
 import java.util.List;
 
 @Repository
-public class ProductoRepository {
+public class ProductRepository {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    public List<Producto> findAll() {
+    public List<Product> findAll() {
         String sql = "SELECT p.product_id, p.name, p.description, p.unit_price, p.stock, c.category_id, c.name as category_name " +
                      "FROM Products p " +
                      "JOIN Prod_categories c ON p.category_id = c.category_id";
@@ -22,12 +24,12 @@ public class ProductoRepository {
         return jdbcTemplate.query(sql, this::mapRowToProducto);
     }
 
-    private Producto mapRowToProducto(ResultSet rs, int rowNum) throws SQLException {
-        CategoriaDeProducto categoria = new CategoriaDeProducto(
+    private Product mapRowToProducto(ResultSet rs, int rowNum) throws SQLException {
+        ProductCategory categoria = new ProductCategory(
                 rs.getInt("category_id"),
                 rs.getString("category_name")
         );
-        return new Producto(
+        return new Product(
                 rs.getInt("product_id"),
                 rs.getString("name"),
                 rs.getString("description"),

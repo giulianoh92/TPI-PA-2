@@ -1,12 +1,12 @@
-package com.tpi.tpi;
+package com.tpi.tpi.model;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class Carrito {
+public class Cart {
     private List<Item> items = new ArrayList<>();
 
-    public Carrito() {
+    public Cart() {
     }
 
     // Getters y Setters

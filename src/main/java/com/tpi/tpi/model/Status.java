@@ -1,10 +1,10 @@
-package com.tpi.tpi;
+package com.tpi.tpi.model;
 // no se si esta clase es necesaria en realidad --por ver
-public class Estado {
+public class Status {
     private int id;
     private String estado;
 
-    public Estado(int id, String estado){
+    public Status(int id, String estado){
         this.id = id;
         this.estado = estado;
     }

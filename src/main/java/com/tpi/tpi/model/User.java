@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package com.tpi.tpi;
+package com.tpi.tpi.model;
 import java.io.Serializable;
 import java.sql.Date;
 
@@ -12,7 +12,7 @@ import java.sql.Date;
  *
  * @author anton
  */
-public class Usuario implements Serializable{
+public class User implements Serializable{
     
     protected int idUsuario;
     protected String password; 
@@ -21,7 +21,7 @@ public class Usuario implements Serializable{
     // el rol lo define la clase
     
      
-    public Usuario(int idUsuario, String password, String nombreUsuario, Date fechaRegistro) {
+    public User(int idUsuario, String password, String nombreUsuario, Date fechaRegistro) {
         this.idUsuario = idUsuario;
         this.password = password;
         this.nombreUsuario = nombreUsuario;

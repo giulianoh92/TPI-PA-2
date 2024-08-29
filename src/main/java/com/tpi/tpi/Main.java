@@ -1,5 +1,9 @@
 package com.tpi.tpi;
 
+import com.tpi.tpi.controller.ProductController;
+import com.tpi.tpi.repository.ProductRepository;
+import com.tpi.tpi.model.Product;
+import com.tpi.tpi.view.ProductView;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
@@ -12,7 +16,7 @@ import java.util.List;
 public class Main implements CommandLineRunner {
 
     @Autowired
-    private ProductoRepository productoRepository;
+    private ProductRepository productoRepository;
 
     public static void main(String[] args) {
         SpringApplication.run(Main.class, args);
@@ -20,15 +24,10 @@ public class Main implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        // Cargar todos los productos de la base de datos
-        List<Producto> productos = productoRepository.findAll();
-
-        // Convertir la lista a un ArrayList (si realmente necesitas un ArrayList)
-        ArrayList<Producto> productosArrayList = new ArrayList<>(productos);
-
-        // Imprimir la lista de productos para verificar
-        for (Producto producto : productosArrayList) {
-            System.out.println("Producto ID: " + producto.getIdProducto() + ", Nombre: " + producto.getNombre());
+        ProductView view = new ProductView();
+        for (Product producto : new ArrayList<>(productoRepository.findAll())) {
+            ProductController controller = new ProductController(producto, view);
+            controller.updateView();
         }
     }
 }

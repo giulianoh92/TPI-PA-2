@@ -2,21 +2,21 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package com.tpi.tpi;
+package com.tpi.tpi.model;
 
 /**
  *
  * @author giu
  */
-public class Producto {
+public class Product {
     private int idProducto;
     private String nombre;
     private String descripcion;
     private float precioUnitario;
     private int stock;
-    private CategoriaDeProducto categoria;
+    private ProductCategory categoria;
     
-    public Producto(int idProducto, String nombre, String descripcion, float precioUnitario, int stock, CategoriaDeProducto categoria){
+    public Product(int idProducto, String nombre, String descripcion, float precioUnitario, int stock, ProductCategory categoria){
         this.idProducto = idProducto;
         this.nombre = nombre;
         this.descripcion = descripcion;
@@ -56,10 +56,10 @@ public class Producto {
     public void setStock(int stock) {
         this.stock = stock;
     }
-    public CategoriaDeProducto getCategoria() {
+    public ProductCategory getCategoria() {
         return categoria;
     }
-    public void setCategoria(CategoriaDeProducto categoria) {
+    public void setCategoria(ProductCategory categoria) {
         this.categoria = categoria;
     }
 }

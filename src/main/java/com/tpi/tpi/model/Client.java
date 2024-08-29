@@ -1,21 +1,21 @@
-package com.tpi.tpi;
+package com.tpi.tpi.model;
 
 import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Cliente extends Usuario {
+public class Client extends User {
 
     private String direccion;
     private String emailUsuario;
-    private Carrito carrito;
-    private List<Pedido> pedidos;
+    private Cart carrito;
+    private List<Order> pedidos;
 
-    public Cliente(String direccion, int id, String password, String emailUsuario, String nombreUsuario, Date fechaRegistro) {
+    public Client(String direccion, int id, String password, String emailUsuario, String nombreUsuario, Date fechaRegistro) {
         super(id, password, nombreUsuario, fechaRegistro);
         this.direccion = direccion;
         this.emailUsuario = emailUsuario;
-        this.carrito = new Carrito(); 
+        this.carrito = new Cart(); 
         this.pedidos = new ArrayList<>(); 
     }
 
@@ -36,7 +36,7 @@ public class Cliente extends Usuario {
         this.emailUsuario = emailUsuario;
     }
 
-    public Carrito getCarrito() {
+    public Cart getCarrito() {
         return carrito;
     }
 
@@ -44,11 +44,11 @@ public class Cliente extends Usuario {
         carrito.addItem(item);
     }
 
-    public List<Pedido> getPedidos() {
+    public List<Order> getPedidos() {
         return pedidos;
     }
 
-    public void addPedido(Pedido pedido) {
+    public void addPedido(Order pedido) {
         this.pedidos.add(pedido);
     }
 }

@@ -2,20 +2,20 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package com.tpi.tpi;
+package com.tpi.tpi.model;
 import java.sql.Date;
 
 /**
  *
  * @author giu
  */
-public class Pago {
+public class Payment {
     private int idPago;
     private Date fechaDePago;
     private String metodoDePago;
     private double monto; // pienso que esta clase se intanciaria al finalizar la compra, y el monto total se calcula a partir de la lista de items/productos
 
-    public Pago(int idPago, Date fechaDePag, String metodoDePago, double monto){
+    public Payment(int idPago, Date fechaDePag, String metodoDePago, double monto){
         this.idPago = idPago;
         this.fechaDePago = fechaDePag;
         this.metodoDePago = metodoDePago;

@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package com.tpi.tpi;
+package com.tpi.tpi.model;
 
 /**
  *
@@ -10,9 +10,9 @@ package com.tpi.tpi;
  */
 public class Item {
     private int cantidad;
-    private Producto producto;
+    private Product producto;
 
-    public Item(int cantidad, Producto producto){
+    public Item(int cantidad, Product producto){
         this.cantidad = cantidad;
         this.producto = producto;
     }
@@ -24,10 +24,10 @@ public class Item {
     public void setCantidad(int cantidad) {
         this.cantidad = cantidad;
     }
-    public Producto getProducto() {
+    public Product getProducto() {
         return producto;
     }
-    public void setProducto(Producto producto) {
+    public void setProducto(Product producto) {
         this.producto = producto;
     }
 }

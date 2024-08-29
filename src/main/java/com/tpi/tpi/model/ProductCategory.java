@@ -2,17 +2,17 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package com.tpi.tpi;
+package com.tpi.tpi.model;
 
 /**
  *
  * @author giu
  */
-public class CategoriaDeProducto { //queda por ver si es necesaria esta clase
+public class ProductCategory { //queda por ver si es necesaria esta clase
     private int idCategoria;
     private String nombre;
     
-    public CategoriaDeProducto(int idCategoria, String nombre){
+    public ProductCategory(int idCategoria, String nombre){
         this.idCategoria = idCategoria;
         this.nombre = nombre;
     }

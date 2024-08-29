@@ -1,15 +1,15 @@
-package com.tpi.tpi;
+package com.tpi.tpi.model;
 
 import java.util.List;
 import java.util.ArrayList;
 
-public class Pedido {
+public class Order {
     private List<Item> items;
     private int id_pedido;
-    private Estado estado;
-    private Pago pago;
+    private Status estado;
+    private Payment pago;
 
-    public Pedido(int id_pedido, Estado estado, Pago pago) {
+    public Order(int id_pedido, Status estado, Payment pago) {
         this.id_pedido = id_pedido;
         this.estado = estado;
         this.pago = pago;
@@ -25,11 +25,11 @@ public class Pedido {
         this.items.add(item);
     }
 
-    public Estado getEstado() {
+    public Status getEstado() {
         return estado;
     }
 
-    public void setEstado(Estado estado) {
+    public void setEstado(Status estado) {
         this.estado = estado;
     }
 
@@ -41,11 +41,11 @@ public class Pedido {
         this.id_pedido = id_pedido;
     }
 
-    public Pago getPago() {
+    public Payment getPago() {
         return pago;
     }
 
-    public void setPago(Pago pago) {
+    public void setPago(Payment pago) {
         this.pago = pago;
     }
 }
