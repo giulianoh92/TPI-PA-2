@@ -1,22 +1,25 @@
 package com.tpi.tpi.controller;
-
+import com.tpi.tpi.repository.ProductRepository;
 import com.tpi.tpi.model.Product;
-import com.tpi.tpi.view.ProductView;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+
 import java.util.List;
 
-/**
- * Controlador para manejar la lógica de negocios de productos.
- */
+@Controller
 public class ProductController {
-    private ProductView view;
 
-    public ProductController(ProductView view) {
-        this.view = view;
+    private final ProductRepository productRepository;
+
+    public ProductController(ProductRepository productRepository) {
+        this.productRepository = productRepository;
     }
 
-    public void updateView(List<Product> products) {
-        for (Product product : products) {
-            view.printProductDetails(product.getIdProducto(), product.getNombre(), product.getDescripcion(), product.getPrecioUnitario(), product.getStock(), product.getCategoria());
-        }
+    @GetMapping("/products")
+    public String listProducts(Model model) {
+        List<Product> products = productRepository.findAll();
+        model.addAttribute("products", products);
+        return "products"; // This maps to src/main/resources/templates/products.html
     }
 }
