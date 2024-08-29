@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package com.tpi.tpi.controller;
 
 import com.tpi.tpi.model.Product;
@@ -9,19 +5,18 @@ import com.tpi.tpi.view.ProductView;
 import java.util.List;
 
 /**
- *
- * @author giu
+ * Controlador para manejar la lógica de negocios de productos.
  */
 public class ProductController {
-    private Product model;
     private ProductView view;
-    
-    public ProductController(Product model, ProductView view){
-        this.model = model;
+
+    public ProductController(ProductView view) {
         this.view = view;
     }
-    
-    public void updateView(){
-        view.printProductDetails(model.getIdProducto(), model.getNombre(), model.getDescripcion(), model.getPrecioUnitario(), model.getStock(), model.getCategoria());
+
+    public void updateView(List<Product> products) {
+        for (Product product : products) {
+            view.printProductDetails(product.getIdProducto(), product.getNombre(), product.getDescripcion(), product.getPrecioUnitario(), product.getStock(), product.getCategoria());
+        }
     }
 }
