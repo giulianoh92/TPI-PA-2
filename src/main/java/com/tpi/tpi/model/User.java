@@ -52,11 +52,11 @@ public class User implements Serializable{
         this.nombreUsuario = nombreUsuario;
     }
 
-    public Date getfechaRegistro() {
+    public Date getFechaRegistro() {
         return fechaRegistro;
     }
 
-    public void setfechaRegistro(Date fechaRegistro) {
+    public void setFechaRegistro(Date fechaRegistro) {
         this.fechaRegistro = fechaRegistro;
     }
 }

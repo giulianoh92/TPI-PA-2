@@ -14,11 +14,4 @@ public class ProductController {
         this.productService = productService;
         this.view = view;
     }
-
-    public void updateView() {
-        List<Product> products = productService.getAllProducts();
-        for (Product product : products) {
-            view.printProductDetails(product.getIdProducto(), product.getNombre(), product.getDescripcion(), product.getPrecioUnitario(), product.getStock(), product.getCategoria());
-        }
-    }
 }

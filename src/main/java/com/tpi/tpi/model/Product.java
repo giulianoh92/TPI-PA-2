@@ -8,6 +8,7 @@ package com.tpi.tpi.model;
  *
  * @author giu
  */
+
 public class Product {
     private int idProducto;
     private String nombre;

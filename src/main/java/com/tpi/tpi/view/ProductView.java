@@ -1,27 +1,41 @@
 package com.tpi.tpi.view;
 
+import com.tpi.tpi.model.Product;
 import com.tpi.tpi.model.ProductCategory;
 
-/**
- * Class responsible for displaying product details.
- */
+import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+import java.awt.*;
+import java.util.List;
+
 public class ProductView {
-    /**
-     * Prints product details to the console.
-     * 
-     * @param idProducto Product ID
-     * @param nombre Product name
-     * @param descripcion Product description
-     * @param precioUnitario Product unit price
-     * @param stock Product stock quantity
-     * @param categoria Product category
-     */
-    public void printProductDetails(int idProducto, String nombre, String descripcion, float precioUnitario, int stock, ProductCategory categoria){
-        System.out.println("Producto ID: " + idProducto +
-                           ", Nombre: " + nombre +
-                           ", Desc: " + descripcion +
-                           ", P/U: " + precioUnitario +
-                           ", Stock: " + stock +
-                           ", Cat: " + categoria.getNombre());
+
+    public void showProductDetails(List<Product> productList) {
+        if (GraphicsEnvironment.isHeadless()) {
+            return;
+        }
+
+        JFrame frame = new JFrame("Product List");
+        frame.setSize(800, 600);
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+
+        JPanel panel = new JPanel();
+        panel.setLayout(null);
+
+        String[] columnNames = {"ID", "Nombre", "Descripcion", "Precio Unitario", "Stock", "Categoria"};
+        DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
+        JTable table = new JTable(tableModel);
+
+        JScrollPane scrollPane = new JScrollPane(table);
+        scrollPane.setBounds(10, 10, 780, 580);
+        panel.add(scrollPane);
+
+        for (Product product : productList) {
+            Object[] rowData = {product.getIdProducto(), product.getNombre(), product.getDescripcion(), product.getPrecioUnitario(), product.getStock(), product.getCategoria().getNombre()};
+            tableModel.addRow(rowData);
+        }
+
+        frame.add(panel);
+        frame.setVisible(true);
     }
 }
