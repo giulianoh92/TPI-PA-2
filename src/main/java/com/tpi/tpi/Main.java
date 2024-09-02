@@ -1,44 +1,37 @@
 package com.tpi.tpi;
 
-import com.tpi.tpi.controller.AdminOperationsController;
-import com.tpi.tpi.service.AdminService;
-import com.tpi.tpi.service.ProductService;
-import com.tpi.tpi.view.AdminView;
-import com.tpi.tpi.view.ProductView;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
 
+import com.tpi.tpi.controller.AdminOperationsController;
+
+import org.springframework.beans.factory.annotation.Autowired;
+
 @SpringBootApplication
 public class Main implements CommandLineRunner {
-
-    @Autowired
-    private ProductService productService;
-
-    @Autowired
-    private AdminService adminService;
 
     @Autowired
     private ApplicationContext context;
 
     @Override
     public void run(String... args) throws Exception {
+        // Get the application mode from the environment properties
         String mode = context.getEnvironment().getProperty("app.mode");
 
+        // Check if the application is running in desktop mode
         if ("desktop".equalsIgnoreCase(mode)) {
+            // Check if the environment is headless
             if (System.getProperty("java.awt.headless").equals("true")) {
                 System.out.println("Cannot create GUI in a headless environment.");
                 return;
             }
 
-            ProductView productView = new ProductView();
-            AdminView adminView = new AdminView();
-            AdminOperationsController adminOperationsController = new AdminOperationsController(adminService, productService, adminView, productView);
-            adminView.setController(adminOperationsController);
-
-            adminOperationsController.displayAdminTable();
+            // Get the AdminOperationsController bean from the application context
+            AdminOperationsController adminOperationsController = context.getBean(AdminOperationsController.class);
+            // Display the admin table
+            adminOperationsController.displayTable("admin");
         } else {
             System.out.println("Running in web mode");
             // Web mode is handled by Spring Boot
@@ -46,7 +39,7 @@ public class Main implements CommandLineRunner {
     }
 
     public static void main(String[] args) {
-        // Set the system property before the Spring application context is initialized
+        // Set the system property to disable headless mode before the Spring application context is initialized
         System.setProperty("java.awt.headless", "false");
         SpringApplication.run(Main.class, args);
     }
