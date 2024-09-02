@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Cart {
+    private int cartId;
     private List<Item> items = new ArrayList<>();
 
     public Cart() {
@@ -16,6 +17,14 @@ public class Cart {
 
     public void addItem(Item item) {
         this.items.add(item);
+    }
+
+    public int getCartId() {
+        return cartId;
+    }
+
+    public void setCartId(int cartId) {
+        this.cartId = cartId;
     }
 
     // Opcional: métodos adicionales como toString(), equals(), hashCode()

@@ -1,6 +1,8 @@
 package com.tpi.tpi.view;
 
 import com.tpi.tpi.controller.AdminOperationsController;
+import com.tpi.tpi.model.Cart;
+import com.tpi.tpi.model.Item;
 
 import javax.swing.*;
 import java.awt.*;
@@ -49,10 +51,23 @@ public class AdminView implements TableView {
             }
         });
 
+        // Find Cart by id
+        JButton findCartButton = new JButton("Find Cart");
+        findCartButton.setBounds(490, 10, 150, 30);
+        findCartButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                System.out.println("Find Cart button clicked");
+                controller.displayTable("cartId");
+            }
+        });
+
         panel.add(productButton);
         panel.add(userButton);
+        panel.add(findCartButton); // Add the findCartButton to the panel
 
         frame.add(panel);
         frame.setVisible(true);
     }
+
 }

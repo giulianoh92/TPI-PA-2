@@ -1,4 +1,3 @@
--- Drop the database if it exists, then create it
 DROP DATABASE IF EXISTS tpi_db;
 CREATE DATABASE tpi_db;
 USE tpi_db;
@@ -26,6 +25,10 @@ CREATE TABLE Prod_categories (
     name VARCHAR(100) NOT NULL
 );
 
+CREATE TABLE Carts (
+    cart_id INT AUTO_INCREMENT PRIMARY KEY
+);
+
 CREATE TABLE Users (
     user_id INT AUTO_INCREMENT PRIMARY KEY,
     password VARCHAR(255) NOT NULL,
@@ -38,18 +41,16 @@ CREATE TABLE Customers (
     customer_id INT PRIMARY KEY,
     email VARCHAR(100) UNIQUE NOT NULL,
     address VARCHAR(255) NOT NULL,
+    cart_id INT,
+    FOREIGN KEY (cart_id) REFERENCES Carts(cart_id) ON DELETE SET NULL,
     FOREIGN KEY (customer_id) REFERENCES Users(user_id) ON DELETE CASCADE
-);
-
-CREATE TABLE Carts (
-    cart_id INT AUTO_INCREMENT PRIMARY KEY,
-    customer_id INT,
-    FOREIGN KEY (customer_id) REFERENCES Customers(customer_id) ON DELETE SET NULL
 );
 
 CREATE TABLE Payment (
     payment_id INT AUTO_INCREMENT PRIMARY KEY,
     payment_met_id INT,
+    amount DECIMAL(10, 2) NOT NULL,
+    date DATE NOT NULL,
     FOREIGN KEY (payment_met_id) REFERENCES Payment_methods(payment_met_id) ON DELETE SET NULL
 );
 
@@ -77,8 +78,7 @@ CREATE TABLE Items (
     item_id INT AUTO_INCREMENT PRIMARY KEY,
     product_id INT,
     amount INT NOT NULL,
-    order_id INT,
+    cart_id INT,
     FOREIGN KEY (product_id) REFERENCES Products(product_id),
-    FOREIGN KEY (order_id) REFERENCES Orders(order_id)
+    FOREIGN KEY (cart_id) REFERENCES Carts(cart_id)
 );
-
