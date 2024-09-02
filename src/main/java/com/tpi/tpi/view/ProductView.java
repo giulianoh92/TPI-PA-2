@@ -16,7 +16,7 @@ public class ProductView {
         }
 
         JFrame frame = new JFrame("Product List");
-        frame.setSize(800, 600);
+        frame.setSize(800, 600); // Set fixed size
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
         JPanel panel = new JPanel();

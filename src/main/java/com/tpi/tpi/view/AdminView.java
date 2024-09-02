@@ -27,7 +27,7 @@ public class AdminView {
         }
 
         JFrame frame = new JFrame("Admin Operations");
-        frame.setSize(800, 600);
+        frame.setSize(800, 600); // Set fixed size
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         JPanel panel = new JPanel();
@@ -60,7 +60,7 @@ public class AdminView {
 
     private void showAdminTable(List<Administrator> adminList) {
         JFrame frame = new JFrame("Admin List");
-        frame.setSize(600, 400);
+        frame.setSize(800, 600); // Set fixed size
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
         JPanel panel = new JPanel();
@@ -71,7 +71,7 @@ public class AdminView {
         JTable table = new JTable(tableModel);
 
         JScrollPane scrollPane = new JScrollPane(table);
-        scrollPane.setBounds(10, 10, 580, 380);
+        scrollPane.setBounds(10, 10, 780, 580);
         panel.add(scrollPane);
 
         for (Administrator admin : adminList) {

@@ -46,6 +46,8 @@ public class Main implements CommandLineRunner {
     }
 
     public static void main(String[] args) {
+        // Set the system property before the Spring application context is initialized
+        System.setProperty("java.awt.headless", "false");
         SpringApplication.run(Main.class, args);
     }
 }
