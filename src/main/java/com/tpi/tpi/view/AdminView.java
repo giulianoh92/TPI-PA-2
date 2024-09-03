@@ -9,12 +9,17 @@ import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class AdminView implements PanelView<AdminService> {
+public class AdminView extends AbstractView<Object, AdminService> implements PanelView<AdminService> {
     private AdminOperationsController controller;
 
     // Method to set the controller
     public void setController(AdminOperationsController controller) {
         this.controller = controller;
+    }
+
+    @Override
+    protected String getFrameTitle() {
+        return "Admin Operations";
     }
 
     // Method to show the details of the admin list
@@ -25,7 +30,7 @@ public class AdminView implements PanelView<AdminService> {
             return;
         }
 
-        JFrame frame = new JFrame("Admin Operations");
+        JFrame frame = new JFrame(getFrameTitle());
         frame.setSize(800, 600); // Set fixed size
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 

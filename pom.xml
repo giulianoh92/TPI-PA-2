@@ -56,6 +56,9 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <start-class>com.tpi.Main</start-class>
+                </configuration>
             </plugin>
         </plugins>
     </build>
