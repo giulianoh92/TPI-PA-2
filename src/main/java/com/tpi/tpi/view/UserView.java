@@ -27,4 +27,18 @@ public class UserView extends AbstractView<User, AdminOperationsController> impl
         List<User> users = controller.getUserService().getAllUserList();
         super.showPanel(users, columnNames, rowMapper);
     }
+
+    @Override
+    public void handleCommit(Object[][] data) {
+        // Specific commit logic for UserView
+        System.out.println("Committing user data:");
+        for (Object[] row : data) {
+            for (Object value : row) {
+                System.out.print(value + "\t");
+            }
+            System.out.println();
+        }
+
+        controller.commitUserData(data);
+    }
 }

@@ -40,7 +40,7 @@ INSERT INTO Customers (customer_id, email, address, cart_id) VALUES
 (3, 'alice.jones@example.com', '789 Pine St', 3);
 
 -- Insert data into Payment
-INSERT INTO Payment (payment_met_id, amount, date) VALUES 
+INSERT INTO Payments (payment_met_id, amount, date) VALUES 
 (1, 100.00, '2024-01-15'),
 (2, 50.00, '2024-02-20'),
 (3, 75.00, '2024-03-25'),

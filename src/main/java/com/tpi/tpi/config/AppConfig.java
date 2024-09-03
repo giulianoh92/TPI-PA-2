@@ -9,10 +9,13 @@ import com.tpi.tpi.service.AdminService;
 import com.tpi.tpi.service.ProductService;
 import com.tpi.tpi.service.UserService;
 import com.tpi.tpi.service.OrderService;
+import com.tpi.tpi.service.CustomerService;
 import com.tpi.tpi.view.AdminView;
 import com.tpi.tpi.view.ProductView;
 import com.tpi.tpi.view.PanelView;
 import com.tpi.tpi.view.UserView;
+import com.tpi.tpi.view.OrderView;
+import com.tpi.tpi.view.CustomerView;
 
 
 import java.util.HashMap;
@@ -29,13 +32,14 @@ public class AppConfig {
         views.put(ViewType.PRODUCT, new ProductView());
         views.put(ViewType.USER, new UserView());
         views.put(ViewType.ORDER, new OrderView());
+        views.put(ViewType.CUSTOMER, new CustomerView());
         return views;
     }
 
     // Define a bean for the AdminOperationsController
     @Bean
-    public AdminOperationsController adminOperationsController(AdminService adminService, ProductService productService, UserService userService, OrderService orderService, Map<ViewType, PanelView> views) {
-        AdminOperationsController controller = new AdminOperationsController(adminService, productService, userService, orderService, views);
+    public AdminOperationsController adminOperationsController(AdminService adminService, ProductService productService, UserService userService, OrderService orderService, CustomerService customerService, Map<ViewType, PanelView> views) {
+        AdminOperationsController controller = new AdminOperationsController(adminService, productService, userService, orderService, customerService, views);
         // Set the controller for the AdminView
         ((AdminView) views.get(ViewType.ADMIN)).setController(controller);
         return controller;

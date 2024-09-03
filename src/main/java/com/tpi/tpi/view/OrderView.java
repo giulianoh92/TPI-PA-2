@@ -1,4 +1,4 @@
-/*package com.tpi.tpi.view;
+package com.tpi.tpi.view;
 
 import com.tpi.tpi.controller.AdminOperationsController;
 import com.tpi.tpi.model.Order;
@@ -16,15 +16,32 @@ public class OrderView extends AbstractView<Order, AdminOperationsController> im
     @Override
     public void showPanel(AdminOperationsController controller) {
         setController(controller); // Set the controller
-
-        String[] columnNames = {"ID", "Customer", "Status", "Total"};
+    
+        String[] columnNames = {"ID", "Date", "Status", "Payment Method", "Total"};
         Function<Order, Object[]> rowMapper = order -> new Object[]{
             order.getId_pedido(),
-            order.get().getNombre(),
-            order.getEstado(),
-            order.getTotal()
+            order.getPago().getFechaDePago(),
+            order.getEstado().getEstado(),
+            order.getPago().getMetodoDePago(),
+            order.getPago().getMonto()
         };
-        List<Item> items = controller.getOrderService();
+    
+        List<Order> orders = controller.getOrderService().getAllOrders();
         super.showPanel(orders, columnNames, rowMapper);
     }
-}*/
+
+    @Override
+    public void handleCommit(Object[][] data) {
+        // Specific commit logic for OrderView
+        System.out.println("Committing order data:");
+        for (Object[] row : data) {
+            for (Object value : row) {
+                System.out.print(value + "\t");
+            }
+            System.out.println();
+        }
+    
+        // Example: Call a method on the controller to handle the commit
+        controller.commitOrderData(data);
+    }
+}

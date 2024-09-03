@@ -4,5 +4,6 @@ public enum ViewType {
     ADMIN,
     PRODUCT,
     USER,
-    ORDER
+    ORDER,
+    CUSTOMER
 }

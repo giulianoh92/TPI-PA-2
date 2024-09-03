@@ -82,13 +82,21 @@ public abstract class AbstractView<T, C> {
         int rowCount = table.getRowCount();
         int columnCount = table.getColumnCount();
 
+        Object[][] currentData = new Object[rowCount][columnCount];
         for (int row = 0; row < rowCount; row++) {
             for (int col = 0; col < columnCount; col++) {
-                System.out.print(table.getValueAt(row, col) + "\t");
+                currentData[row][col] = table.getValueAt(row, col);
+                System.out.print(currentData[row][col] + "\t");
             }
             System.out.println();
         }
+
+        // Call the abstract commit method
+        handleCommit(currentData);
     }
+
+    // Abstract method to be implemented by subclasses for specific commit logic
+    protected abstract void handleCommit(Object[][] data);
 
     // Method to refresh the table values to their initial state
     protected void onReset() {
