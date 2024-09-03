@@ -66,10 +66,10 @@ CREATE TABLE Products (
 
 CREATE TABLE Orders (
     order_id INT AUTO_INCREMENT PRIMARY KEY,
-    cart_id INT,
+    customer_id INT,
     status_id INT,
     payment_id INT,
-    FOREIGN KEY (cart_id) REFERENCES Carts(cart_id) ON DELETE SET NULL,
+    FOREIGN KEY (customer_id) REFERENCES Customers(customer_id) ON DELETE SET NULL,
     FOREIGN KEY (status_id) REFERENCES Statuses(status_id) ON DELETE SET NULL,
     FOREIGN KEY (payment_id) REFERENCES Payment(payment_id) ON DELETE SET NULL
 );
@@ -78,7 +78,34 @@ CREATE TABLE Items (
     item_id INT AUTO_INCREMENT PRIMARY KEY,
     product_id INT,
     amount INT NOT NULL,
-    cart_id INT,
+    cart_id INT NULL,
+    order_id INT NULL,
     FOREIGN KEY (product_id) REFERENCES Products(product_id),
-    FOREIGN KEY (cart_id) REFERENCES Carts(cart_id)
+    FOREIGN KEY (cart_id) REFERENCES Carts(cart_id) ON DELETE SET NULL,
+    FOREIGN KEY (order_id) REFERENCES Orders(order_id) ON DELETE SET NULL
 );
+
+-- Create triggers to enforce exclusivity
+DELIMITER //
+
+CREATE TRIGGER check_item_exclusive_before_insert
+BEFORE INSERT ON Items
+FOR EACH ROW
+BEGIN
+    IF (NEW.cart_id IS NOT NULL AND NEW.order_id IS NOT NULL) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Cannot have both cart_id and order_id set at the same time.';
+    END IF;
+END//
+
+CREATE TRIGGER check_item_exclusive_before_update
+BEFORE UPDATE ON Items
+FOR EACH ROW
+BEGIN
+    IF (NEW.cart_id IS NOT NULL AND NEW.order_id IS NOT NULL) THEN
+        SIGNAL SQLSTATE '45000'
+        SET MESSAGE_TEXT = 'Cannot have both cart_id and order_id set at the same time.';
+    END IF;
+END//
+
+DELIMITER ;

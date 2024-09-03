@@ -4,14 +4,14 @@ import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Client extends User {
+public class Customer extends User {
 
     private String direccion;
     private String emailUsuario;
     private Cart carrito;
     private List<Order> pedidos;
 
-    public Client(String direccion, int id, String password, String emailUsuario, String nombreUsuario, Date fechaRegistro) {
+    public Customer(String direccion, int id, String password, String emailUsuario, String nombreUsuario, Date fechaRegistro) {
         super(id, password, nombreUsuario, fechaRegistro);
         this.direccion = direccion;
         this.emailUsuario = emailUsuario;

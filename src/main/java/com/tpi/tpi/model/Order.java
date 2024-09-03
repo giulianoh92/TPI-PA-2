@@ -25,6 +25,10 @@ public class Order {
         this.items.add(item);
     }
 
+    public void addItemList(List<Item> items) {
+        this.items.addAll(items);
+    }
+
     public Status getEstado() {
         return estado;
     }

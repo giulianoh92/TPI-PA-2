@@ -50,6 +50,16 @@ public class AdminView extends AbstractView<Object, AdminOperationsController> i
             }
         });
 
+        JButton orderButton = new JButton("Orders CRUD");
+        userButton.setBounds(330, 10, 150, 30);
+        userButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                controller.displayView(ViewType.ORDER);
+            }
+        });
+
+        panel.add(orderButton);
         panel.add(productButton);
         panel.add(userButton);
 
