@@ -1,16 +1,15 @@
 package com.tpi.tpi.view;
 
 import com.tpi.tpi.controller.AdminOperationsController;
-import com.tpi.tpi.model.Cart;
-import com.tpi.tpi.model.Item;
+import com.tpi.tpi.controller.ViewType;
+import com.tpi.tpi.service.AdminService;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.util.List;
 
-public class AdminView implements TableView {
+public class AdminView implements PanelView<AdminService> {
     private AdminOperationsController controller;
 
     // Method to set the controller
@@ -20,7 +19,7 @@ public class AdminView implements TableView {
 
     // Method to show the details of the admin list
     @Override
-    public void showDetails(List<?> adminList) {
+    public void showPanel(AdminService adminService) {
         if (GraphicsEnvironment.isHeadless()) {
             System.out.println("Cannot create GUI in a headless environment.");
             return;
@@ -33,41 +32,28 @@ public class AdminView implements TableView {
         JPanel panel = new JPanel();
         panel.setLayout(null);
 
-        JButton productButton = new JButton("Show Products");
+        JButton productButton = new JButton("Products CRUD");
         productButton.setBounds(170, 10, 150, 30);
         productButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                controller.displayTable("product");
+                controller.displayView(ViewType.PRODUCT);
             }
         });
 
-        JButton userButton = new JButton("Show Users");
+        JButton userButton = new JButton("Users CRUD");
         userButton.setBounds(330, 10, 150, 30);
         userButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                controller.displayTable("user");
-            }
-        });
-
-        // Find Cart by id
-        JButton findCartButton = new JButton("Find Cart");
-        findCartButton.setBounds(490, 10, 150, 30);
-        findCartButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                System.out.println("Find Cart button clicked");
-                controller.displayTable("cartId");
+                controller.displayView(ViewType.USER);
             }
         });
 
         panel.add(productButton);
         panel.add(userButton);
-        panel.add(findCartButton); // Add the findCartButton to the panel
 
         frame.add(panel);
         frame.setVisible(true);
     }
-
 }

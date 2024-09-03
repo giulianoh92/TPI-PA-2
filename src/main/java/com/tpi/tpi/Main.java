@@ -6,6 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
 
 import com.tpi.tpi.controller.AdminOperationsController;
+import com.tpi.tpi.controller.ViewType;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -31,7 +32,7 @@ public class Main implements CommandLineRunner {
             // Get the AdminOperationsController bean from the application context
             AdminOperationsController adminOperationsController = context.getBean(AdminOperationsController.class);
             // Display the admin table
-            adminOperationsController.displayTable("admin");
+            adminOperationsController.displayView(ViewType.ADMIN);
         } else {
             System.out.println("Running in web mode");
             // Web mode is handled by Spring Boot
