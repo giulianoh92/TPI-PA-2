@@ -5,9 +5,15 @@ import java.awt.*;
 import java.util.List;
 import java.util.function.Function;
 
-public abstract class AbstractView<T, S> {
+public abstract class AbstractView<T, C> {
+    protected C controller;
 
-    public void showPanel(S service, Function<S, List<T>> dataProvider, String[] columnNames, Function<T, Object[]> rowMapper) {
+    // Method to set the controller
+    public void setController(C controller) {
+        this.controller = controller;
+    }
+
+    public void showPanel(List<T> data, String[] columnNames, Function<T, Object[]> rowMapper) {
         if (GraphicsEnvironment.isHeadless()) {
             return;
         }
@@ -18,7 +24,7 @@ public abstract class AbstractView<T, S> {
         JPanel panel = new JPanel(new BorderLayout());
 
         // Add the table to the panel
-        JScrollPane tableScrollPane = createTable(dataProvider.apply(service), columnNames, rowMapper);
+        JScrollPane tableScrollPane = createTable(data, columnNames, rowMapper);
         panel.add(tableScrollPane, BorderLayout.CENTER);
 
         frame.add(panel);

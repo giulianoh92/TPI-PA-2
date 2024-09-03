@@ -2,8 +2,6 @@ package com.tpi.tpi.controller;
 
 import java.util.Map;
 
-import javax.swing.JOptionPane;
-
 import com.tpi.tpi.service.AdminService;
 import com.tpi.tpi.service.ProductService;
 import com.tpi.tpi.service.UserService;
@@ -27,19 +25,19 @@ public class AdminOperationsController {
     public void displayView(ViewType viewType) {
         PanelView view = views.get(viewType);
         if (view != null) {
-            switch (viewType) {
-                case ADMIN:
-                    view.showPanel(adminService);
-                    break;
-                case PRODUCT:
-                    view.showPanel(productService);
-                    break;
-                case USER:
-                    view.showPanel(userService);
-                    break;
-                default:
-                    System.out.println("Invalid view type: " + viewType);
-            }
+            view.showPanel(this);
         }
+    }
+
+    public AdminService getAdminService() {
+        return adminService;
+    }
+
+    public ProductService getProductService() {
+        return productService;
+    }
+
+    public UserService getUserService() {
+        return userService;
     }
 }

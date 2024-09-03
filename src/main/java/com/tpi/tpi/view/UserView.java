@@ -1,12 +1,12 @@
 package com.tpi.tpi.view;
 
+import com.tpi.tpi.controller.AdminOperationsController;
 import com.tpi.tpi.model.User;
-import com.tpi.tpi.service.UserService;
 
 import java.util.List;
 import java.util.function.Function;
 
-public class UserView extends AbstractView<User, UserService> implements PanelView<UserService> {
+public class UserView extends AbstractView<User, AdminOperationsController> implements PanelView<AdminOperationsController> {
 
     @Override
     protected String getFrameTitle() {
@@ -14,7 +14,9 @@ public class UserView extends AbstractView<User, UserService> implements PanelVi
     }
 
     @Override
-    public void showPanel(UserService userService) {
+    public void showPanel(AdminOperationsController controller) {
+        setController(controller); // Set the controller
+
         String[] columnNames = {"ID", "Username", "Password", "Registered At"};
         Function<User, Object[]> rowMapper = user -> new Object[]{
             user.getIdUsuario(),
@@ -22,6 +24,7 @@ public class UserView extends AbstractView<User, UserService> implements PanelVi
             user.getPassword(),
             user.getFechaRegistro()
         };
-        super.showPanel(userService, UserService::getAllUserList, columnNames, rowMapper);
+        List<User> users = controller.getUserService().getAllUserList();
+        super.showPanel(users, columnNames, rowMapper);
     }
 }

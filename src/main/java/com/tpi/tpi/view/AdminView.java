@@ -2,20 +2,13 @@ package com.tpi.tpi.view;
 
 import com.tpi.tpi.controller.AdminOperationsController;
 import com.tpi.tpi.controller.ViewType;
-import com.tpi.tpi.service.AdminService;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-public class AdminView extends AbstractView<Object, AdminService> implements PanelView<AdminService> {
-    private AdminOperationsController controller;
-
-    // Method to set the controller
-    public void setController(AdminOperationsController controller) {
-        this.controller = controller;
-    }
+public class AdminView extends AbstractView<Object, AdminOperationsController> implements PanelView<AdminOperationsController> {
 
     @Override
     protected String getFrameTitle() {
@@ -24,7 +17,9 @@ public class AdminView extends AbstractView<Object, AdminService> implements Pan
 
     // Method to show the details of the admin list
     @Override
-    public void showPanel(AdminService adminService) {
+    public void showPanel(AdminOperationsController controller) {
+        setController(controller); // Set the controller
+
         if (GraphicsEnvironment.isHeadless()) {
             System.out.println("Cannot create GUI in a headless environment.");
             return;

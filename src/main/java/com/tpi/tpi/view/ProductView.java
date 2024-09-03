@@ -1,12 +1,12 @@
 package com.tpi.tpi.view;
 
+import com.tpi.tpi.controller.AdminOperationsController;
 import com.tpi.tpi.model.Product;
-import com.tpi.tpi.service.ProductService;
 
 import java.util.List;
 import java.util.function.Function;
 
-public class ProductView extends AbstractView<Product, ProductService> implements PanelView<ProductService> {
+public class ProductView extends AbstractView<Product, AdminOperationsController> implements PanelView<AdminOperationsController> {
 
     @Override
     protected String getFrameTitle() {
@@ -14,7 +14,9 @@ public class ProductView extends AbstractView<Product, ProductService> implement
     }
 
     @Override
-    public void showPanel(ProductService productService) {
+    public void showPanel(AdminOperationsController controller) {
+        setController(controller); // Set the controller
+
         String[] columnNames = {"ID", "Name", "Description", "Unit Price", "Stock"};
         Function<Product, Object[]> rowMapper = product -> new Object[]{
             product.getIdProducto(),
@@ -23,6 +25,7 @@ public class ProductView extends AbstractView<Product, ProductService> implement
             product.getPrecioUnitario(),
             product.getStock()
         };
-        super.showPanel(productService, ProductService::getAllProducts, columnNames, rowMapper);
+        List<Product> products = controller.getProductService().getAllProducts();
+        super.showPanel(products, columnNames, rowMapper);
     }
 }
