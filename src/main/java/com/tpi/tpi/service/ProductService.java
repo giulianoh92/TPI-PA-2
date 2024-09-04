@@ -17,6 +17,7 @@ public class ProductService {
         return productRepository.findAll();
     }
 
-    // Add additional business logic here
-    // For example, methods to add, update, or delete products, or to perform calculations
+    public void updateProduct(Product product) {
+        productRepository.updateProduct(product);
+    }
 }

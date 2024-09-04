@@ -14,6 +14,7 @@ import com.tpi.tpi.model.Customer;
 import com.tpi.tpi.model.Order;
 import com.tpi.tpi.model.Product;
 import com.tpi.tpi.model.User;
+import com.tpi.tpi.model.ProductCategory;
 import com.tpi.tpi.view.PanelView;
 
 public class AdminOperationsController {
@@ -94,14 +95,14 @@ public class AdminOperationsController {
  
     // Métodos de conversión
     private Product convertToProduct(Object[] row) {
-
-
-        return new Product((int) row[0], // id
-                        (String) row[1], // name
-                        (String) row[2], // description
-                        (float) row[3], // unitPrice
-                        (int) row[4], // stock
-                        new ProductCategory((int) row[5], (String) row[6])); // category
+        return new Product(
+            (int) row[0], // id
+            (String) row[1], // name
+            (String) row[2], // description
+            row[3] instanceof String ? Float.parseFloat((String) row[3]) : (Float) row[3], // unitPrice
+            row[4] instanceof String ? Integer.parseInt((String) row[4]) : (Integer) row[4], // stock
+            new ProductCategory((int) row[5], (String) row[6]) // category
+        );
     }
 
     private User convertToUser(Object[] row) {
@@ -136,8 +137,8 @@ public class AdminOperationsController {
     public void commitProductData(Object[][] data) {
         System.out.println("Committing product data:");
         for (Object[] row : data) {
-            //Product product = convertToProduct(row);
-            //productService.updateProduct(product);
+            Product product = convertToProduct(row);
+            productService.updateProduct(product);
         }
     }
 

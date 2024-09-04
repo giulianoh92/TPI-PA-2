@@ -222,7 +222,7 @@ public abstract class AbstractView<T, C> extends JPanel {
         int result = JOptionPane.showConfirmDialog(this, panel, "Edit Row", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
         if (result == JOptionPane.OK_OPTION) {
             for (int col = 0; col < columnCount; col++) {
-                if (col != 0 && !table.getColumnName(col).equalsIgnoreCase("Registered At")) { // Skip the "ID" column and "Registered At" column
+                if (col != 0 && !table.getColumnName(col).equalsIgnoreCase("Registered At") && !table.getColumnName(col).equalsIgnoreCase("CatId") && !table.getColumnName(col).equalsIgnoreCase("Category")) { // Skip the "ID" column and "Registered At" column
                     table.setValueAt(textFields[col].getText(), row, col);
                 }
             }
