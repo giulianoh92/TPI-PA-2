@@ -30,19 +30,19 @@ public class CustomerRepository {
         String sql = 
             "UPDATE Customers c " +
             "JOIN Users u ON c.customer_id = u.user_id " +
-            "SET c.address = ?, c.email = ?, u.username = ?, u.password = ? " +
+            "SET c.address = ?, c.email = ?, u.username = ?, u.password = ?" +
             "WHERE c.customer_id = ?";
         jdbcTemplate.update(sql, customer.getDireccion(), customer.getEmail(), customer.getNombreUsuario(), customer.getPassword(), customer.getIdUsuario());
     }
 
     private Customer mapRowToCustomer(ResultSet rs, int rowNum) throws SQLException {
         return new Customer(
-            rs.getString("address"),        // direccion
-            rs.getInt("customer_id"),       // id
-            rs.getString("password"),       // password
-            rs.getString("email"),          // emailUsuario
-            rs.getString("username"),       // nombreUsuario
-            rs.getDate("reg_date")          // fechaRegistro
+            rs.getInt("customer_id"),
+            rs.getString("username"),
+            rs.getString("email"),
+            rs.getString("password"),
+            rs.getString("address"),
+            rs.getDate("reg_date")
         );
     }
     

@@ -1,6 +1,8 @@
 package com.tpi.tpi.controller;
 
 import java.sql.Date;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Map;
 
 import com.tpi.tpi.service.AdminService;
@@ -13,12 +15,12 @@ import com.tpi.tpi.model.Customer;
 import com.tpi.tpi.view.PanelView;
 
 public class AdminOperationsController {
-    private final AdminService adminService;
-    private final ProductService productService;
-    private final UserService userService;
-    private final OrderService orderService;
-    private final CustomerService customerService;
-    private final Map<ViewType, PanelView> views;
+    private AdminService adminService;
+    private ProductService productService;
+    private UserService userService;
+    private OrderService orderService;
+    private CustomerService customerService;
+    private Map<ViewType, PanelView> views;
 
     // Constructor to initialize the services and views
     public AdminOperationsController(AdminService adminService, ProductService productService, UserService userService, OrderService orderService, CustomerService customerService, Map<ViewType, PanelView> views) {
@@ -32,8 +34,20 @@ public class AdminOperationsController {
 
     // Helper method to convert Object[] to Customer
     private Customer convertToCustomer(Object[] row) {
-        return new Customer((String) row[4], (int) row[0], (String) row[3], (String) row[2], (String) row[1], (Date) row[5]);
+        Date regDate = null;
+        if (row[5] instanceof String) {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            try {
+                regDate = new Date(dateFormat.parse((String) row[5]).getTime());
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        } else if (row[5] instanceof Date) {
+            regDate = (Date) row[5];
+        }
+        return new Customer((int) row[0], (String) row[1], (String) row[2], (String) row[3], (String) row[4], regDate);
     }
+
 
     // Method to display the table based on the view type
     public void displayView(ViewType viewType) {

@@ -1,39 +1,53 @@
 package com.tpi.tpi.view;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.JTableHeader;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 
-public abstract class AbstractView<T, C> extends javax.swing.JPanel {
+public abstract class AbstractView<T, C> extends JPanel {
     protected C controller;
     private JTable table;
     private Object[][] initialTableData;
 
-    // Constructor sin parámetros para compatibilidad con NetBeans
     public AbstractView() {
-        initComponents();  // Llamada para inicializar los componentes gráficos
+        initComponents();
     }
 
-    // Método para inicializar componentes gráficos - necesario para NetBeans
     private void initComponents() {
-        // Inicialización básica del panel
         setLayout(new BorderLayout());
 
-        // Panel de botones (botones vacíos por ahora, se llenarán en la subclase)
         JPanel buttonPanel = new JPanel();
-        JButton resetButton = new JButton("Reset");
-        JButton commitButton = new JButton("Commit");
+        JButton resetButton = createStyledButton("Reset");
+        JButton commitButton = createStyledButton("Commit");
+        JButton editRowButton = createStyledButton("Edit Row"); // New button
+
+        resetButton.addActionListener(e -> onReset());
+        commitButton.addActionListener(e -> onCommit());
+        editRowButton.addActionListener(e -> onEditRow()); // Add action listener
 
         buttonPanel.add(resetButton);
         buttonPanel.add(commitButton);
+        buttonPanel.add(editRowButton); // Add button to panel
 
-        // Agrega el panel de botones al panel principal
         add(buttonPanel, BorderLayout.SOUTH);
     }
 
-    // Método para configurar el controlador
+    private JButton createStyledButton(String text) {
+        JButton button = new JButton(text);
+        button.setBackground(new Color(70, 130, 180));
+        button.setForeground(Color.WHITE);
+        button.setFocusPainted(false);
+        button.setFont(new Font("Tahoma", Font.BOLD, 12));
+        return button;
+    }
+
     public void setController(C controller) {
         this.controller = controller;
     }
@@ -48,24 +62,22 @@ public abstract class AbstractView<T, C> extends javax.swing.JPanel {
 
         JPanel panel = new JPanel(new BorderLayout());
 
-        // Añade la tabla al panel
         JScrollPane tableScrollPane = createTable(data, columnNames, rowMapper);
         panel.add(tableScrollPane, BorderLayout.CENTER);
 
-        // Crea un panel para los botones
         JPanel buttonPanel = new JPanel();
-        JButton resetButton = new JButton("Reset");
-        JButton commitButton = new JButton("Commit");
+        JButton resetButton = createStyledButton("Reset");
+        JButton commitButton = createStyledButton("Commit");
+        JButton editRowButton = createStyledButton("Edit Row"); // New button
 
-        // Añadir listeners de acción a los botones
         resetButton.addActionListener(e -> onReset());
         commitButton.addActionListener(e -> onCommit());
+        editRowButton.addActionListener(e -> onEditRow()); // Add action listener
 
-        // Añade los botones al panel de botones
         buttonPanel.add(resetButton);
         buttonPanel.add(commitButton);
+        buttonPanel.add(editRowButton); // Add button to panel
 
-        // Añade el panel de botones al panel principal
         panel.add(buttonPanel, BorderLayout.SOUTH);
 
         frame.add(panel);
@@ -74,18 +86,52 @@ public abstract class AbstractView<T, C> extends javax.swing.JPanel {
     }
 
     private JScrollPane createTable(List<T> data, String[] columnNames, Function<T, Object[]> rowMapper) {
-        // Almacena una copia de los datos iniciales
         initialTableData = storeInitialData(data, columnNames, rowMapper);
 
-        // Usa una copia de los datos iniciales para la tabla
         Object[][] tableData = Arrays.copyOf(initialTableData, initialTableData.length);
         for (int i = 0; i < tableData.length; i++) {
             tableData[i] = Arrays.copyOf(initialTableData[i], initialTableData[i].length);
         }
 
-        // Crea la tabla con una copia de los datos iniciales
-        table = new JTable(tableData, columnNames);
+        // Create a custom table model
+        DefaultTableModel tableModel = new DefaultTableModel(tableData, columnNames) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false; // Make all cells uneditable
+            }
+        };
+
+        table = new JTable(tableModel);
+        styleTable(table);
+
+        // Add mouse listener for double-click events
+        table.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 2 && table.getSelectedRow() != -1) {
+                    onEditRow();
+                }
+            }
+        });
+
         return new JScrollPane(table);
+    }
+
+    private void styleTable(JTable table) {
+        table.setFillsViewportHeight(true);
+        table.setRowHeight(25);
+        table.setFont(new Font("Tahoma", Font.PLAIN, 12));
+        table.setSelectionBackground(new Color(70, 130, 180));
+        table.setSelectionForeground(Color.WHITE);
+
+        JTableHeader header = table.getTableHeader();
+        header.setFont(new Font("Tahoma", Font.BOLD, 12));
+        header.setBackground(new Color(70, 130, 180));
+        header.setForeground(Color.WHITE);
+
+        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
+        centerRenderer.setHorizontalAlignment(JLabel.CENTER);
+        table.setDefaultRenderer(Object.class, centerRenderer);
     }
 
     private Object[][] storeInitialData(List<T> data, String[] columnNames, Function<T, Object[]> rowMapper) {
@@ -98,7 +144,6 @@ public abstract class AbstractView<T, C> extends javax.swing.JPanel {
 
     protected abstract String getFrameTitle();
 
-    // Método para imprimir el contenido actual de la tabla
     protected void onCommit() {
         System.out.println("Current table values:");
         int rowCount = table.getRowCount();
@@ -113,35 +158,65 @@ public abstract class AbstractView<T, C> extends javax.swing.JPanel {
             System.out.println();
         }
 
-        // Llama al método abstracto de commit
         handleCommit(currentData);
     }
 
-    // Método abstracto para que las subclases implementen la lógica específica de commit
     protected abstract void handleCommit(Object[][] data);
 
-    // Método para refrescar los valores de la tabla a su estado inicial
     protected void onReset() {
         if (initialTableData == null) {
             System.out.println("No initial data available to reset.");
             return;
         }
-        
+
         System.out.println("Resetting table values to initial state");
-        
-        // Verifica si el tamaño de los datos actuales coincide con el tamaño de los datos iniciales
+
         int rowCount = table.getRowCount();
         int columnCount = table.getColumnCount();
-    
+
         if (rowCount != initialTableData.length || columnCount != initialTableData[0].length) {
             System.out.println("Mismatch in data size. Cannot reset.");
             return;
         }
-    
-        // Restaura los datos de la tabla a su estado inicial
+
         for (int row = 0; row < rowCount; row++) {
             for (int col = 0; col < columnCount; col++) {
                 table.setValueAt(initialTableData[row][col], row, col);
+            }
+        }
+    }
+
+    private void onEditRow() {
+        int row = table.getSelectedRow();
+    
+        if (row == -1) {
+            JOptionPane.showMessageDialog(this, "Please select a row to edit.", "No Row Selected", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+    
+        int columnCount = table.getColumnCount();
+        Object[] rowData = new Object[columnCount];
+        for (int col = 0; col < columnCount; col++) {
+            rowData[col] = table.getValueAt(row, col);
+        }
+    
+        JTextField[] textFields = new JTextField[columnCount];
+        JPanel panel = new JPanel(new GridLayout(columnCount, 2));
+        for (int col = 0; col < columnCount; col++) {
+            panel.add(new JLabel(table.getColumnName(col)));
+            textFields[col] = new JTextField(rowData[col].toString());
+            if (col == 0 || table.getColumnName(col).equalsIgnoreCase("Registered At")) { // Assuming the "ID" column is the first column and "Registered At" is the column name for the registration date
+                textFields[col].setEditable(false);
+            }
+            panel.add(textFields[col]);
+        }
+    
+        int result = JOptionPane.showConfirmDialog(this, panel, "Edit Row", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+        if (result == JOptionPane.OK_OPTION) {
+            for (int col = 0; col < columnCount; col++) {
+                if (col != 0 && !table.getColumnName(col).equalsIgnoreCase("Registered At")) { // Skip the "ID" column and "Registered At" column
+                    table.setValueAt(textFields[col].getText(), row, col);
+                }
             }
         }
     }

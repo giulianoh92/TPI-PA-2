@@ -11,7 +11,7 @@ public class Customer extends User {
     private Cart carrito;
     private List<Order> pedidos;
 
-    public Customer(String direccion, int id, String password, String emailUsuario, String nombreUsuario, Date fechaRegistro) {
+    public Customer(int id, String nombreUsuario, String emailUsuario, String password, String direccion, Date fechaRegistro) {
         super(id, password, nombreUsuario, fechaRegistro);
         this.direccion = direccion;
         this.emailUsuario = emailUsuario;
