@@ -53,25 +53,26 @@ erDiagram
         INT user_id PK
         VARCHAR password
         VARCHAR username
-        BOOLEN is_admin
+        BOOLEAN is_admin
         DATE reg_date
     }
 
     Customers {
         INT customer_id PK
-        INT user_id FK
         VARCHAR email
         VARCHAR address
+        INT cart_id FK
     }
 
     Carts {
         INT cart_id PK
-        INT customer_id FK
     }
 
-    Payment {
+    Payments {
         INT payment_id PK
         INT payment_met_id FK
+        DECIMAL amount
+        DATE date
     }
 
     Products {
@@ -85,26 +86,27 @@ erDiagram
 
     Orders {
         INT order_id PK
-        INT cart_id FK
+        INT customer_id FK
         INT status_id FK
         INT payment_id FK
-        DATE creation_date
     }
 
     Items {
         INT item_id PK
         INT product_id FK
         INT amount
+        INT cart_id FK
         INT order_id FK
     }
 
-    Customers ||--|| Users : "user_id"
-    Carts }o--|| Customers : "customer_id"
-    Payment }o--|| Payment_methods : "payment_met_id"
-    Orders ||--|| Carts : "cart_id"
+    Customers ||--|| Users : "customer_id"
+    Customers }o--|| Carts : "cart_id"
+    Payments }o--|| Payment_methods : "payment_met_id"
+    Orders }o--|| Customers : "customer_id"
     Orders }o--|| Statuses : "status_id"
-    Orders ||--|| Payment : "payment_id"
+    Orders }o--|| Payments : "payment_id"
     Items }o--|| Products : "product_id"
+    Items }o--|| Carts : "cart_id"
     Items }o--|| Orders : "order_id"
     Products }o--|| Prod_categories : "category_id"
 
