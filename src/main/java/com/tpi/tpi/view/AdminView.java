@@ -4,6 +4,7 @@ import com.tpi.tpi.controller.AdminOperationsController;
 import com.tpi.tpi.controller.ViewType;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
 public class AdminView extends AbstractView<Object, AdminOperationsController> implements PanelView<AdminOperationsController> {
@@ -12,34 +13,47 @@ public class AdminView extends AbstractView<Object, AdminOperationsController> i
     private JButton userButton;
     private JButton orderButton;
     private JButton customerButton;
-    
+
     public AdminView() {
         initComponents();
     }
-    
+
     private void initComponents() {
-        setLayout(null);
+        setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10); // Add padding between components
+        gbc.fill = GridBagConstraints.HORIZONTAL;
 
         productButton = new JButton("Products CRUD");
-        productButton.setBounds(30, 10, 150, 30);
         productButton.addActionListener(e -> controller.displayView(ViewType.PRODUCT));
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        add(productButton, gbc);
 
         userButton = new JButton("Users CRUD");
-        userButton.setBounds(170, 10, 150, 30);
         userButton.addActionListener(e -> controller.displayView(ViewType.USER));
+        gbc.gridx = 1;
+        gbc.gridy = 0;
+        add(userButton, gbc);
 
         orderButton = new JButton("Orders CRUD");
-        orderButton.setBounds(30, 50, 150, 30);
         orderButton.addActionListener(e -> controller.displayView(ViewType.ORDER));
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        add(orderButton, gbc);
 
         customerButton = new JButton("Customers CRUD");
-        customerButton.setBounds(170, 50, 150, 30);
         customerButton.addActionListener(e -> controller.displayView(ViewType.CUSTOMER));
+        gbc.gridx = 1;
+        gbc.gridy = 1;
+        add(customerButton, gbc);
 
-        add(productButton);
-        add(userButton);
-        add(orderButton);
-        add(customerButton);
+        setBorder(new EmptyBorder(20, 20, 20, 20)); // Add padding around the panel
+    }
+
+    @Override
+    protected boolean shouldShowDefaultButtons() {
+        return false;
     }
 
     @Override
@@ -51,10 +65,10 @@ public class AdminView extends AbstractView<Object, AdminOperationsController> i
     public void showPanel(AdminOperationsController controller) {
         setController(controller); // Set the controller
         JFrame frame = new JFrame(getFrameTitle());
-        frame.setSize(800, 600); // Set fixed size
+        frame.setSize(400, 200); // Set fixed size
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        frame.add(this);  // Añadir el panel directamente
+        frame.add(this);  // Add the panel directly
         frame.setVisible(true);
     }
 

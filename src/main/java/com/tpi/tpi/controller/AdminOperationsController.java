@@ -10,8 +10,10 @@ import com.tpi.tpi.service.ProductService;
 import com.tpi.tpi.service.UserService;
 import com.tpi.tpi.service.OrderService;
 import com.tpi.tpi.service.CustomerService;
-import com.tpi.tpi.controller.ViewType;
 import com.tpi.tpi.model.Customer;
+import com.tpi.tpi.model.Order;
+import com.tpi.tpi.model.Product;
+import com.tpi.tpi.model.User;
 import com.tpi.tpi.view.PanelView;
 
 public class AdminOperationsController {
@@ -32,32 +34,15 @@ public class AdminOperationsController {
         this.views = views;
     }
 
-    // Helper method to convert Object[] to Customer
-    private Customer convertToCustomer(Object[] row) {
-        Date regDate = null;
-        if (row[5] instanceof String) {
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-            try {
-                regDate = new Date(dateFormat.parse((String) row[5]).getTime());
-            } catch (ParseException e) {
-                e.printStackTrace();
-            }
-        } else if (row[5] instanceof Date) {
-            regDate = (Date) row[5];
-        }
-        return new Customer((int) row[0], (String) row[1], (String) row[2], (String) row[3], (String) row[4], regDate);
-    }
-
-
     // Method to display the table based on the view type
     public void displayView(ViewType viewType) {
-        
         PanelView view = views.get(viewType);
         if (view != null) {
             view.showPanel(this);
         }
     }
 
+    // Getters for the services
     public AdminService getAdminService() {
         return adminService;
     }
@@ -85,62 +70,106 @@ public class AdminOperationsController {
             view.handleCommit(data);
         }
     }
+ 
+    // Helper method to convert Object[] to Customer
+    private Customer convertToCustomer(Object[] row) {
+        Date regDate = null;
+        if (row[5] instanceof String) {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            try {
+                regDate = new Date(dateFormat.parse((String) row[5]).getTime());
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        } else if (row[5] instanceof Date) {
+            regDate = (Date) row[5];
+        }
+        return new Customer((int) row[0], // id
+                (String) row[1], // name
+                (String) row[2], // email
+                (String) row[3], // password
+                (String) row[4], // address
+                regDate); // regDate
+    }
+ 
+    // Métodos de conversión
+    private Product convertToProduct(Object[] row) {
 
-    // Method to handle the commit for product data
+
+        return new Product((int) row[0], // id
+                        (String) row[1], // name
+                        (String) row[2], // description
+                        (float) row[3], // unitPrice
+                        (int) row[4], // stock
+                        new ProductCategory((int) row[5], (String) row[6])); // category
+    }
+
+    private User convertToUser(Object[] row) {
+        Date regDate = null;
+        if (row[3] instanceof String) {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+            try {
+                regDate = new Date(dateFormat.parse((String) row[3]).getTime());
+            } catch (ParseException e) {
+                e.printStackTrace();
+            }
+        } else if (row[3] instanceof Date) {
+            regDate = (Date) row[3];
+        }
+        return new User((int) row[0], // id
+                        (String) row[1], // name
+                        (String) row[2], // password
+                        regDate); // regDate
+    }
+/* 
+    private Order convertToOrder(Object[] row) {
+        // Implementar lógica de conversión para Orden
+        return new Order();
+    }*/
+/* 
+    private Admin convertToAdmin(Object[] row) {
+        // Implementar lógica de conversión para Admin
+        return new Admin((int) row[0], (String) row[1], (String) row[2]);
+    }
+*/
+    // Métodos de commit actualizados
     public void commitProductData(Object[][] data) {
-        // Specific commit logic for product data
         System.out.println("Committing product data:");
         for (Object[] row : data) {
-            for (Object value : row) {
-                System.out.print(value + "\t");
-            }
-            System.out.println();
+            //Product product = convertToProduct(row);
+            //productService.updateProduct(product);
         }
     }
 
-    // Method to handle the commit for user data
     public void commitUserData(Object[][] data) {
-        // Specific commit logic for user data
         System.out.println("Committing user data:");
         for (Object[] row : data) {
-            for (Object value : row) {
-                System.out.print(value + "\t");
-            }
-            System.out.println();
+            //User user = convertToUser(row);
+            //userService.updateUser(user);
         }
     }
-
-    // Method to handle the commit for order data
+      
     public void commitOrderData(Object[][] data) {
-        // Specific commit logic for order data
         System.out.println("Committing order data:");
         for (Object[] row : data) {
-            for (Object value : row) {
-                System.out.print(value + "\t");
-            }
-
+            //Order order = convertToOrder(row);
+            //orderService.updateOrder(order);
         }
     }
 
-    // Method to handle the commit for customer data
+    public void commitAdminData(Object[][] data) {
+        System.out.println("Committing admin data:");
+        for (Object[] row : data) {
+            //Admin admin = convertToAdmin(row);
+            //adminService.updateAdmin(admin);
+        }
+    }
+
     public void commitCustomerData(Object[][] data) {
-        // Specific commit logic for customer data
         System.out.println("Committing customer data:");
         for (Object[] row : data) {
             Customer customer = convertToCustomer(row);
             customerService.updateCustomer(customer);
-        }
-    }
-
-    // Method to handle the commit for admin data
-    public void commitAdminData(Object[][] data) {
-        // Specific commit logic for admin data
-        System.out.println("Committing admin data:");
-        for (Object[] row : data) {
-            for (Object value : row) {
-                System.out.print(value + "\t");
-            }
-            System.out.println();
         }
     }
 

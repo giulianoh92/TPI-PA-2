@@ -23,20 +23,26 @@ public abstract class AbstractView<T, C> extends JPanel {
     private void initComponents() {
         setLayout(new BorderLayout());
 
-        JPanel buttonPanel = new JPanel();
-        JButton resetButton = createStyledButton("Reset");
-        JButton commitButton = createStyledButton("Commit");
-        JButton editRowButton = createStyledButton("Edit Row"); // New button
+        if (shouldShowDefaultButtons()) {
+            JPanel buttonPanel = new JPanel();
+            JButton resetButton = createStyledButton("Reset");
+            JButton commitButton = createStyledButton("Commit");
+            JButton editRowButton = createStyledButton("Edit Row"); // New button
 
-        resetButton.addActionListener(e -> onReset());
-        commitButton.addActionListener(e -> onCommit());
-        editRowButton.addActionListener(e -> onEditRow()); // Add action listener
+            resetButton.addActionListener(e -> onReset());
+            commitButton.addActionListener(e -> onCommit());
+            editRowButton.addActionListener(e -> onEditRow()); // Add action listener
 
-        buttonPanel.add(resetButton);
-        buttonPanel.add(commitButton);
-        buttonPanel.add(editRowButton); // Add button to panel
+            buttonPanel.add(resetButton);
+            buttonPanel.add(commitButton);
+            buttonPanel.add(editRowButton); // Add button to panel
 
-        add(buttonPanel, BorderLayout.SOUTH);
+            add(buttonPanel, BorderLayout.SOUTH);
+        }
+    }
+
+    protected boolean shouldShowDefaultButtons() {
+        return true;
     }
 
     private JButton createStyledButton(String text) {
@@ -65,20 +71,22 @@ public abstract class AbstractView<T, C> extends JPanel {
         JScrollPane tableScrollPane = createTable(data, columnNames, rowMapper);
         panel.add(tableScrollPane, BorderLayout.CENTER);
 
-        JPanel buttonPanel = new JPanel();
-        JButton resetButton = createStyledButton("Reset");
-        JButton commitButton = createStyledButton("Commit");
-        JButton editRowButton = createStyledButton("Edit Row"); // New button
+        if (shouldShowDefaultButtons()) {
+            JPanel buttonPanel = new JPanel();
+            JButton resetButton = createStyledButton("Reset");
+            JButton commitButton = createStyledButton("Commit");
+            JButton editRowButton = createStyledButton("Edit Row"); // New button
 
-        resetButton.addActionListener(e -> onReset());
-        commitButton.addActionListener(e -> onCommit());
-        editRowButton.addActionListener(e -> onEditRow()); // Add action listener
+            resetButton.addActionListener(e -> onReset());
+            commitButton.addActionListener(e -> onCommit());
+            editRowButton.addActionListener(e -> onEditRow()); // Add action listener
 
-        buttonPanel.add(resetButton);
-        buttonPanel.add(commitButton);
-        buttonPanel.add(editRowButton); // Add button to panel
+            buttonPanel.add(resetButton);
+            buttonPanel.add(commitButton);
+            buttonPanel.add(editRowButton); // Add button to panel
 
-        panel.add(buttonPanel, BorderLayout.SOUTH);
+            panel.add(buttonPanel, BorderLayout.SOUTH);
+        }
 
         frame.add(panel);
         frame.pack();
@@ -205,7 +213,7 @@ public abstract class AbstractView<T, C> extends JPanel {
         for (int col = 0; col < columnCount; col++) {
             panel.add(new JLabel(table.getColumnName(col)));
             textFields[col] = new JTextField(rowData[col].toString());
-            if (col == 0 || table.getColumnName(col).equalsIgnoreCase("Registered At")) { // Assuming the "ID" column is the first column and "Registered At" is the column name for the registration date
+            if (col == 0 || table.getColumnName(col).equalsIgnoreCase("Registered At") || table.getColumnName(col).equalsIgnoreCase("CatId") || table.getColumnName(col).equalsIgnoreCase("Category")) { // Assuming the "ID" column is the first column and "Registered At" is the column name for the registration date
                 textFields[col].setEditable(false);
             }
             panel.add(textFields[col]);

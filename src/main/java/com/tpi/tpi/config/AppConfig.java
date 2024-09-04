@@ -13,10 +13,11 @@ import com.tpi.tpi.service.CustomerService;
 import com.tpi.tpi.view.AdminView;
 import com.tpi.tpi.view.ProductView;
 import com.tpi.tpi.view.PanelView;
+
+
 import com.tpi.tpi.view.UserView;
 import com.tpi.tpi.view.OrderView;
 import com.tpi.tpi.view.CustomerView;
-
 
 import java.util.HashMap;
 import java.util.Map;
@@ -24,15 +25,41 @@ import java.util.Map;
 @Configuration
 public class AppConfig {
 
+    // Define beans for each view
+    @Bean
+    public AdminView adminView() {
+        return new AdminView();
+    }
+
+    @Bean
+    public ProductView productView() {
+        return new ProductView();
+    }
+
+    @Bean
+    public UserView userView() {
+        return new UserView();
+    }
+
+    @Bean
+    public OrderView orderView() {
+        return new OrderView();
+    }
+
+    @Bean
+    public CustomerView customerView() {
+        return new CustomerView();
+    }
+
     // Define a bean for the views map
     @Bean
-    public Map<ViewType, PanelView> views() {
+    public Map<ViewType, PanelView> views(AdminView adminView, ProductView productView, UserView userView, OrderView orderView, CustomerView customerView) {
         Map<ViewType, PanelView> views = new HashMap<>();
-        views.put(ViewType.ADMIN, new AdminView());
-        views.put(ViewType.PRODUCT, new ProductView());
-        views.put(ViewType.USER, new UserView());
-        views.put(ViewType.ORDER, new OrderView());
-        views.put(ViewType.CUSTOMER, new CustomerView());
+        views.put(ViewType.ADMIN, adminView);
+        views.put(ViewType.PRODUCT, productView);
+        views.put(ViewType.USER, userView);
+        views.put(ViewType.ORDER, orderView);
+        views.put(ViewType.CUSTOMER, customerView);
         return views;
     }
 
