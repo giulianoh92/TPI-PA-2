@@ -6,12 +6,34 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 
-public abstract class AbstractView<T, C> {
+public abstract class AbstractView<T, C> extends javax.swing.JPanel {
     protected C controller;
     private JTable table;
     private Object[][] initialTableData;
 
-    // Method to set the controller
+    // Constructor sin parámetros para compatibilidad con NetBeans
+    public AbstractView() {
+        initComponents();  // Llamada para inicializar los componentes gráficos
+    }
+
+    // Método para inicializar componentes gráficos - necesario para NetBeans
+    private void initComponents() {
+        // Inicialización básica del panel
+        setLayout(new BorderLayout());
+
+        // Panel de botones (botones vacíos por ahora, se llenarán en la subclase)
+        JPanel buttonPanel = new JPanel();
+        JButton resetButton = new JButton("Reset");
+        JButton commitButton = new JButton("Commit");
+
+        buttonPanel.add(resetButton);
+        buttonPanel.add(commitButton);
+
+        // Agrega el panel de botones al panel principal
+        add(buttonPanel, BorderLayout.SOUTH);
+    }
+
+    // Método para configurar el controlador
     public void setController(C controller) {
         this.controller = controller;
     }
@@ -26,24 +48,24 @@ public abstract class AbstractView<T, C> {
 
         JPanel panel = new JPanel(new BorderLayout());
 
-        // Add the table to the panel
+        // Añade la tabla al panel
         JScrollPane tableScrollPane = createTable(data, columnNames, rowMapper);
         panel.add(tableScrollPane, BorderLayout.CENTER);
 
-        // Create a panel for buttons
+        // Crea un panel para los botones
         JPanel buttonPanel = new JPanel();
         JButton resetButton = new JButton("Reset");
         JButton commitButton = new JButton("Commit");
 
-        // Add action listeners to the buttons
+        // Añadir listeners de acción a los botones
         resetButton.addActionListener(e -> onReset());
         commitButton.addActionListener(e -> onCommit());
 
-        // Add buttons to the button panel
+        // Añade los botones al panel de botones
         buttonPanel.add(resetButton);
         buttonPanel.add(commitButton);
 
-        // Add the button panel to the main panel
+        // Añade el panel de botones al panel principal
         panel.add(buttonPanel, BorderLayout.SOUTH);
 
         frame.add(panel);
@@ -52,16 +74,16 @@ public abstract class AbstractView<T, C> {
     }
 
     private JScrollPane createTable(List<T> data, String[] columnNames, Function<T, Object[]> rowMapper) {
-        // Store a hard copy of the initial data
+        // Almacena una copia de los datos iniciales
         initialTableData = storeInitialData(data, columnNames, rowMapper);
 
-        // Use a copy of the initial data for the table
+        // Usa una copia de los datos iniciales para la tabla
         Object[][] tableData = Arrays.copyOf(initialTableData, initialTableData.length);
         for (int i = 0; i < tableData.length; i++) {
             tableData[i] = Arrays.copyOf(initialTableData[i], initialTableData[i].length);
         }
 
-        // Create the table with a copy of the initial data
+        // Crea la tabla con una copia de los datos iniciales
         table = new JTable(tableData, columnNames);
         return new JScrollPane(table);
     }
@@ -76,7 +98,7 @@ public abstract class AbstractView<T, C> {
 
     protected abstract String getFrameTitle();
 
-    // Method to print the current content of the table
+    // Método para imprimir el contenido actual de la tabla
     protected void onCommit() {
         System.out.println("Current table values:");
         int rowCount = table.getRowCount();
@@ -91,14 +113,14 @@ public abstract class AbstractView<T, C> {
             System.out.println();
         }
 
-        // Call the abstract commit method
+        // Llama al método abstracto de commit
         handleCommit(currentData);
     }
 
-    // Abstract method to be implemented by subclasses for specific commit logic
+    // Método abstracto para que las subclases implementen la lógica específica de commit
     protected abstract void handleCommit(Object[][] data);
 
-    // Method to refresh the table values to their initial state
+    // Método para refrescar los valores de la tabla a su estado inicial
     protected void onReset() {
         if (initialTableData == null) {
             System.out.println("No initial data available to reset.");
@@ -107,7 +129,7 @@ public abstract class AbstractView<T, C> {
         
         System.out.println("Resetting table values to initial state");
         
-        // Check if the current table data size matches the initial data size
+        // Verifica si el tamaño de los datos actuales coincide con el tamaño de los datos iniciales
         int rowCount = table.getRowCount();
         int columnCount = table.getColumnCount();
     
@@ -116,7 +138,7 @@ public abstract class AbstractView<T, C> {
             return;
         }
     
-        // Restore table data to initial state
+        // Restaura los datos de la tabla a su estado inicial
         for (int row = 0; row < rowCount; row++) {
             for (int col = 0; col < columnCount; col++) {
                 table.setValueAt(initialTableData[row][col], row, col);
