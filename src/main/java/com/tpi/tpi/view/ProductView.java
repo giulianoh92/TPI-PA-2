@@ -3,7 +3,7 @@ package com.tpi.tpi.view;
 import com.tpi.tpi.controller.AdminOperationsController;
 import com.tpi.tpi.model.Product;
 import com.tpi.tpi.model.ProductCategory;
-import com.tpi.tpi.view.AbstractView; // Corrected import statement
+import com.tpi.tpi.view.AbstractView;
 
 import javax.swing.*;
 import java.awt.*;
@@ -11,7 +11,13 @@ import java.util.List;
 import java.util.function.Function;
 
 public class ProductView extends AbstractView<Product, AdminOperationsController> implements PanelView<AdminOperationsController> {
-    
+
+    private static final int ID_COLUMN = 0;
+    private static final int CAT_ID_COLUMN = 5;
+    private static final int CATEGORY_COLUMN = 6;
+
+    private List<ProductCategory> categories;
+
     public ProductView() {
         initComponents();
     }
@@ -19,7 +25,7 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
     private void initComponents() {
         setLayout(new BorderLayout());
     }
-    
+
     @Override
     protected String getFrameTitle() {
         return "Product Management";
@@ -27,10 +33,10 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
 
     @Override
     public void showPanel(AdminOperationsController controller) {
-        setController(controller); // Set the controller
+        setController(controller);
 
         String[] columnNames = {"ID", "Name", "Description", "Unit Price", "Stock", "CatId", "Category"};
-   
+
         Function<Product, Object[]> rowMapper = product -> new Object[]{
             product.getIdProducto(),
             product.getNombre(),
@@ -40,14 +46,22 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
             product.getCategoria().getIdCategoria(),
             product.getCategoria().getNombre()
         };
-        
+
         List<Product> products = controller.getProductService().getAllProducts();
+        categories = controller.getProductService().getAllCategories();
+
         super.showPanel(products, columnNames, rowMapper);
+
+        JTable table = getTable();
+        if (table != null) {
+            table.getColumnModel().getColumn(CAT_ID_COLUMN).setMinWidth(0);
+            table.getColumnModel().getColumn(CAT_ID_COLUMN).setMaxWidth(0);
+            table.getColumnModel().getColumn(CAT_ID_COLUMN).setPreferredWidth(0);
+        }
     }
 
     @Override
     public void handleCommit(Object[][] data) {
-        // Specific commit logic for ProductView
         System.out.println("Committing product data:");
         for (Object[] row : data) {
             for (Object value : row) {
@@ -56,7 +70,91 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
             System.out.println();
         }
 
-        // Example: Call a method on the controller to handle the commit
         controller.commitProductData(data);
+    }
+
+    @Override
+    protected void onEditRow() {
+        int row = getTable().getSelectedRow();
+        if (row == -1) {
+            JOptionPane.showMessageDialog(this, "Please select a row to edit.", "No Row Selected", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        int columnCount = getTable().getColumnCount();
+        Object[] rowData = getRowData(row, columnCount);
+        JTextField[] textFields = new JTextField[columnCount];
+        JComboBox<ProductCategory> categoryComboBox = new JComboBox<>();
+        JPanel panel = createEditPanel(columnCount, rowData, textFields, categoryComboBox);
+
+        populateCategoryComboBox(categoryComboBox);
+        selectCurrentCategory(row, categoryComboBox);
+
+        int result = JOptionPane.showConfirmDialog(this, panel, "Edit Row", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+        if (result == JOptionPane.OK_OPTION) {
+            updateTableData(row, columnCount, textFields, categoryComboBox);
+        }
+    }
+
+    private Object[] getRowData(int row, int columnCount) {
+        Object[] rowData = new Object[columnCount];
+        for (int col = 0; col < columnCount; col++) {
+            rowData[col] = getTable().getValueAt(row, col);
+        }
+        return rowData;
+    }
+
+    private JPanel createEditPanel(int columnCount, Object[] rowData, JTextField[] textFields, JComboBox<ProductCategory> categoryComboBox) {
+        JPanel panel = new JPanel(new GridLayout(columnCount, 2));
+        for (int col = 0; col < columnCount; col++) {
+            if (col == CAT_ID_COLUMN) {
+                continue;
+            }
+
+            panel.add(new JLabel(getTable().getColumnName(col)));
+            if (col == CATEGORY_COLUMN) {
+                panel.add(categoryComboBox);
+            } else {
+                textFields[col] = new JTextField(rowData[col] != null ? rowData[col].toString() : "");
+                if (col == ID_COLUMN) {
+                    textFields[col].setEditable(false);
+                }
+                panel.add(textFields[col]);
+            }
+        }
+        return panel;
+    }
+
+    private void populateCategoryComboBox(JComboBox<ProductCategory> categoryComboBox) {
+        for (ProductCategory category : categories) {
+            categoryComboBox.addItem(category);
+        }
+    }
+
+    private void selectCurrentCategory(int row, JComboBox<ProductCategory> categoryComboBox) {
+        int currentCategoryId = (Integer) getTable().getValueAt(row, CAT_ID_COLUMN);
+        ProductCategory currentCategory = categories.stream()
+                .filter(cat -> cat.getIdCategoria() == currentCategoryId)
+                .findFirst()
+                .orElse(null);
+        categoryComboBox.setSelectedItem(currentCategory);
+    }
+
+    private void updateTableData(int row, int columnCount, JTextField[] textFields, JComboBox<ProductCategory> categoryComboBox) {
+        for (int col = 0; col < columnCount; col++) {
+            if (col != ID_COLUMN && col != CAT_ID_COLUMN) {
+                if (col == CATEGORY_COLUMN) {
+                    ProductCategory selectedCategory = (ProductCategory) categoryComboBox.getSelectedItem();
+                    if (selectedCategory != null) {
+                        getTable().setValueAt(selectedCategory.getIdCategoria(), row, CAT_ID_COLUMN);
+                        getTable().setValueAt(selectedCategory.getNombre(), row, CATEGORY_COLUMN);
+                    }
+                } else {
+                    if (textFields[col] != null) {
+                        getTable().setValueAt(textFields[col].getText(), row, col);
+                    }
+                }
+            }
+        }
     }
 }

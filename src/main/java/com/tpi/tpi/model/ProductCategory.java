@@ -27,4 +27,9 @@ public class ProductCategory {
     public void setNombre(String nombre) {
         this.nombre = nombre;
     }
+
+    @Override
+    public String toString() {
+        return nombre; // Return only the name for display in JComboBox
+    }
 }

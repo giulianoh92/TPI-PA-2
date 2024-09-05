@@ -194,7 +194,7 @@ public abstract class AbstractView<T, C> extends JPanel {
         }
     }
 
-    private void onEditRow() {
+    protected void onEditRow() {
         int row = table.getSelectedRow();
     
         if (row == -1) {
@@ -213,7 +213,7 @@ public abstract class AbstractView<T, C> extends JPanel {
         for (int col = 0; col < columnCount; col++) {
             panel.add(new JLabel(table.getColumnName(col)));
             textFields[col] = new JTextField(rowData[col].toString());
-            if (col == 0 || table.getColumnName(col).equalsIgnoreCase("Registered At") || table.getColumnName(col).equalsIgnoreCase("CatId") || table.getColumnName(col).equalsIgnoreCase("Category")) { // Assuming the "ID" column is the first column and "Registered At" is the column name for the registration date
+            if (col == 0 ) { // Assuming the "ID" column is the first column
                 textFields[col].setEditable(false);
             }
             panel.add(textFields[col]);
@@ -222,10 +222,17 @@ public abstract class AbstractView<T, C> extends JPanel {
         int result = JOptionPane.showConfirmDialog(this, panel, "Edit Row", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
         if (result == JOptionPane.OK_OPTION) {
             for (int col = 0; col < columnCount; col++) {
-                if (col != 0 && !table.getColumnName(col).equalsIgnoreCase("Registered At") && !table.getColumnName(col).equalsIgnoreCase("CatId") && !table.getColumnName(col).equalsIgnoreCase("Category")) { // Skip the "ID" column and "Registered At" column
+                if (col != 0) { // Skip the ID column
                     table.setValueAt(textFields[col].getText(), row, col);
                 }
             }
         }
+    }
+    public JTable getTable() {
+        return table;
+    }
+    
+    public void setTable(JTable table) {
+        this.table = table;
     }
 }

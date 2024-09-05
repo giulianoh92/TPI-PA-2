@@ -29,7 +29,14 @@ public class ProductRepository {
                      "JOIN Prod_categories c ON p.category_id = c.category_id";
         return jdbcTemplate.query(sql, this::mapRowToProduct);
     }
-
+    /**
+     * Finds all Categories.
+     * @return a list of categories.
+     */
+    public List<ProductCategory> findAllCategories() {
+        String sql = "SELECT category_id, name FROM Prod_categories";
+        return jdbcTemplate.query(sql, (rs, rowNum) -> new ProductCategory(rs.getInt("category_id"), rs.getString("name")));
+    }
     /**
      * Updates a product.
      * @param product the product to update.
