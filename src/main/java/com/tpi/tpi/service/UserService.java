@@ -11,9 +11,13 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserService {
     @Autowired
-    private UserRepository adminRepository;
+    private UserRepository userRepository;
 
     public List<User> getAllUserList() {
-        return adminRepository.findAll();
+        return userRepository.findAll();
+    }
+
+    public void updateUser(User row) {
+        userRepository.updateUser(row);
     }
 }

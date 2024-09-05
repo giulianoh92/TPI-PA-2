@@ -28,6 +28,26 @@ public class UserRepository {
     }
 
     /**
+     * Finds a user by its ID.
+     * @param id the user ID.
+     * @return the user.
+     */
+    public User findById(int id) {
+        String sql = "SELECT * FROM Users WHERE user_id = ?";
+        return jdbcTemplate.queryForObject(sql, this::mapRowToUser, id);
+    }
+
+    /**
+     * Updates a user.
+     * @param user the user to update.
+     */
+    public void updateUser(User user) {
+        String sql = "UPDATE Users SET username = ?, password = ? WHERE user_id = ?";
+        jdbcTemplate.update(sql, user.getNombreUsuario(), user.getPassword(), user.getIdUsuario());
+    }
+
+
+    /**
      * Maps a row from the ResultSet to a User object.
      * @param rs the ResultSet.
      * @param rowNum the row number.

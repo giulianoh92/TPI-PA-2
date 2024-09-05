@@ -19,7 +19,7 @@ public class OrderView extends AbstractView<Order, AdminOperationsController> im
 
         String[] columnNames = {"ID", "Date", "Status", "Payment Method", "Total"};
         Function<Order, Object[]> rowMapper = order -> new Object[]{
-            order.getId_pedido(),
+            order.getIdPedido(),
             order.getPago().getFechaDePago(),
             order.getEstado().getEstado(),
             order.getPago().getMetodoDePago(),

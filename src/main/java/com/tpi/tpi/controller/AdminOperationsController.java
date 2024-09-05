@@ -145,8 +145,10 @@ public class AdminOperationsController {
     public void commitUserData(Object[][] data) {
         System.out.println("Committing user data:");
         for (Object[] row : data) {
-            //User user = convertToUser(row);
-            //userService.updateUser(user);
+            User user = convertToUser(row);
+            //print user
+            System.out.println(user.getIdUsuario() + " " + user.getNombreUsuario() + " " + user.getPassword() + " " + user.getFechaRegistro());
+            userService.updateUser(user);
         }
     }
       

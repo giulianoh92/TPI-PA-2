@@ -21,7 +21,7 @@ public class CustomerView extends AbstractView<Customer, AdminOperationsControll
         Function<Customer, Object[]> rowMapper = customer -> new Object[]{
             customer.getIdUsuario(),
             customer.getNombreUsuario(),
-            customer.getEmail(),
+            customer.getEmailUsuario(),
             customer.getPassword(),
             customer.getDireccion(),
             customer.getFechaRegistro()

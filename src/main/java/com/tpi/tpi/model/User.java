@@ -8,14 +8,14 @@ import java.sql.Date;
  */
 public class User implements Serializable {
     private int idUsuario;
-    private String password;
     private String nombreUsuario;
+    private String password;
     private Date fechaRegistro;
 
-    public User(int idUsuario, String password, String nombreUsuario, Date fechaRegistro) {
+    public User(int idUsuario, String nombreUsuario, String password, Date fechaRegistro) {
         this.idUsuario = idUsuario;
-        this.password = password;
         this.nombreUsuario = nombreUsuario;
+        this.password = password;
         this.fechaRegistro = fechaRegistro;
     }
 
