@@ -3,10 +3,20 @@ package com.tpi.tpi.view;
 import com.tpi.tpi.controller.AdminOperationsController;
 import com.tpi.tpi.model.Customer;
 
+import javax.swing.*;
+import java.awt.*;
 import java.util.List;
 import java.util.function.Function;
 
 public class CustomerView extends AbstractView<Customer, AdminOperationsController> implements PanelView<AdminOperationsController> {
+    
+    public CustomerView() {
+        initComponents();
+    }
+
+    private void initComponents() {
+        setLayout(new BorderLayout());
+    }
 
     @Override
     protected String getFrameTitle() {

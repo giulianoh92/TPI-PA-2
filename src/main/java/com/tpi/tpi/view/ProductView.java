@@ -5,11 +5,21 @@ import com.tpi.tpi.model.Product;
 import com.tpi.tpi.model.ProductCategory;
 import com.tpi.tpi.view.AbstractView; // Corrected import statement
 
+import javax.swing.*;
+import java.awt.*;
 import java.util.List;
 import java.util.function.Function;
 
 public class ProductView extends AbstractView<Product, AdminOperationsController> implements PanelView<AdminOperationsController> {
+    
+    public ProductView() {
+        initComponents();
+    }
 
+    private void initComponents() {
+        setLayout(new BorderLayout());
+    }
+    
     @Override
     protected String getFrameTitle() {
         return "Product Management";

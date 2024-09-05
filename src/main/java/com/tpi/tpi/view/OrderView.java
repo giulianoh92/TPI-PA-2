@@ -2,11 +2,22 @@ package com.tpi.tpi.view;
 
 import com.tpi.tpi.controller.AdminOperationsController;
 import com.tpi.tpi.model.Order;
+import com.tpi.tpi.view.PanelView;
 
 import java.util.List;
 import java.util.function.Function;
+import javax.swing.*;
+import java.awt.*;
 
 public class OrderView extends AbstractView<Order, AdminOperationsController> implements PanelView<AdminOperationsController> {
+    
+    public OrderView() {
+        initComponents();
+    }
+
+    private void initComponents() {
+        setLayout(new BorderLayout());
+    }
 
     @Override
     protected String getFrameTitle() {
