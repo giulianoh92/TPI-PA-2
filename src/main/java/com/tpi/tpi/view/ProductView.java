@@ -3,7 +3,6 @@ package com.tpi.tpi.view;
 import com.tpi.tpi.controller.AdminOperationsController;
 import com.tpi.tpi.model.Product;
 import com.tpi.tpi.model.ProductCategory;
-import com.tpi.tpi.view.AbstractView;
 
 import javax.swing.*;
 import java.awt.*;
@@ -87,7 +86,7 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
         JComboBox<ProductCategory> categoryComboBox = new JComboBox<>();
         JPanel panel = createEditPanel(columnCount, rowData, textFields, categoryComboBox);
 
-        populateCategoryComboBox(categoryComboBox);
+        populateComboBox(categoryComboBox, categories);
         selectCurrentCategory(row, categoryComboBox);
 
         int result = JOptionPane.showConfirmDialog(this, panel, "Edit Row", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
@@ -125,19 +124,13 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
         return panel;
     }
 
-    private void populateCategoryComboBox(JComboBox<ProductCategory> categoryComboBox) {
-        for (ProductCategory category : categories) {
-            categoryComboBox.addItem(category);
-        }
-    }
-
     private void selectCurrentCategory(int row, JComboBox<ProductCategory> categoryComboBox) {
         int currentCategoryId = (Integer) getTable().getValueAt(row, CAT_ID_COLUMN);
         ProductCategory currentCategory = categories.stream()
                 .filter(cat -> cat.getIdCategoria() == currentCategoryId)
                 .findFirst()
                 .orElse(null);
-        categoryComboBox.setSelectedItem(currentCategory);
+        selectCurrentItem(categoryComboBox, currentCategory);
     }
 
     private void updateTableData(int row, int columnCount, JTextField[] textFields, JComboBox<ProductCategory> categoryComboBox) {

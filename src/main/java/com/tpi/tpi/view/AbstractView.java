@@ -27,15 +27,15 @@ public abstract class AbstractView<T, C> extends JPanel {
             JPanel buttonPanel = new JPanel();
             JButton resetButton = createStyledButton("Reset");
             JButton commitButton = createStyledButton("Commit");
-            JButton editRowButton = createStyledButton("Edit Row"); // New button
+            JButton editRowButton = createStyledButton("Edit Row");
 
             resetButton.addActionListener(e -> onReset());
             commitButton.addActionListener(e -> onCommit());
-            editRowButton.addActionListener(e -> onEditRow()); // Add action listener
+            editRowButton.addActionListener(e -> onEditRow());
 
             buttonPanel.add(resetButton);
             buttonPanel.add(commitButton);
-            buttonPanel.add(editRowButton); // Add button to panel
+            buttonPanel.add(editRowButton);
 
             add(buttonPanel, BorderLayout.SOUTH);
         }
@@ -75,15 +75,15 @@ public abstract class AbstractView<T, C> extends JPanel {
             JPanel buttonPanel = new JPanel();
             JButton resetButton = createStyledButton("Reset");
             JButton commitButton = createStyledButton("Commit");
-            JButton editRowButton = createStyledButton("Edit Row"); // New button
+            JButton editRowButton = createStyledButton("Edit Row");
 
             resetButton.addActionListener(e -> onReset());
             commitButton.addActionListener(e -> onCommit());
-            editRowButton.addActionListener(e -> onEditRow()); // Add action listener
+            editRowButton.addActionListener(e -> onEditRow());
 
             buttonPanel.add(resetButton);
             buttonPanel.add(commitButton);
-            buttonPanel.add(editRowButton); // Add button to panel
+            buttonPanel.add(editRowButton);
 
             panel.add(buttonPanel, BorderLayout.SOUTH);
         }
@@ -101,18 +101,16 @@ public abstract class AbstractView<T, C> extends JPanel {
             tableData[i] = Arrays.copyOf(initialTableData[i], initialTableData[i].length);
         }
 
-        // Create a custom table model
         DefaultTableModel tableModel = new DefaultTableModel(tableData, columnNames) {
             @Override
             public boolean isCellEditable(int row, int column) {
-                return false; // Make all cells uneditable
+                return false;
             }
         };
 
         table = new JTable(tableModel);
         styleTable(table);
 
-        // Add mouse listener for double-click events
         table.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -228,11 +226,24 @@ public abstract class AbstractView<T, C> extends JPanel {
             }
         }
     }
+
     public JTable getTable() {
         return table;
     }
-    
+
     public void setTable(JTable table) {
         this.table = table;
+    }
+
+    // Universal method to populate JComboBox
+    protected <E> void populateComboBox(JComboBox<E> comboBox, List<E> items) {
+        for (E item : items) {
+            comboBox.addItem(item);
+        }
+    }
+
+    // Universal method to select current item in JComboBox
+    protected <E> void selectCurrentItem(JComboBox<E> comboBox, E currentItem) {
+        comboBox.setSelectedItem(currentItem);
     }
 }
