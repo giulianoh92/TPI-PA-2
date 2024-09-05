@@ -211,7 +211,7 @@ public abstract class AbstractView<T, C> extends JPanel {
         for (int col = 0; col < columnCount; col++) {
             panel.add(new JLabel(table.getColumnName(col)));
             textFields[col] = new JTextField(rowData[col].toString());
-            if (col == 0 ) { // Assuming the "ID" column is the first column
+            if (col == 0 || "Registered At".equals(table.getColumnName(col)) || "Date".equals(table.getColumnName(col)) || "Total".equals(table.getColumnName(col)) || "Payment Method".equals(table.getColumnName(col)) || "Username".equals(table.getColumnName(col)) || "Password".equals(table.getColumnName(col)) || "Email".equals(table.getColumnName(col))) { // Make "ID" and "Registered At" columns uneditable
                 textFields[col].setEditable(false);
             }
             panel.add(textFields[col]);
@@ -220,7 +220,7 @@ public abstract class AbstractView<T, C> extends JPanel {
         int result = JOptionPane.showConfirmDialog(this, panel, "Edit Row", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
         if (result == JOptionPane.OK_OPTION) {
             for (int col = 0; col < columnCount; col++) {
-                if (col != 0) { // Skip the ID column
+                if (col != 0 && !"Registered At".equals(table.getColumnName(col))) { // Skip the ID and "Registered At" columns
                     table.setValueAt(textFields[col].getText(), row, col);
                 }
             }
