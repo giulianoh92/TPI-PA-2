@@ -4,32 +4,32 @@ package com.tpi.tpi.model;
  * Represents a product category.
  */
 public class ProductCategory {
-    private int idCategoria;
-    private String nombre;
+    private int categoryId;
+    private String category;
 
-    public ProductCategory(int idCategoria, String nombre) {
-        this.idCategoria = idCategoria;
-        this.nombre = nombre;
+    public ProductCategory(int categoryId, String category) {
+        this.categoryId = categoryId;
+        this.category = category;
     }
 
-    public int getIdCategoria() {
-        return idCategoria;
+    public int getCategoryId() {
+        return categoryId;
     }
 
-    public void setIdCategoria(int idCategoria) {
-        this.idCategoria = idCategoria;
+    public void setCategoryId(int categoryId) {
+        this.categoryId = categoryId;
     }
 
-    public String getNombre() {
-        return nombre;
+    public String getCategory() {
+        return category;
     }
 
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
+    public void setCategory(String category) {
+        this.category = category;
     }
 
     @Override
     public String toString() {
-        return nombre; // Return only the name for display in JComboBox
+        return category; // Return only the name for display in JComboBox
     }
 }

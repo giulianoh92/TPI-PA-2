@@ -38,13 +38,13 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
         String[] columnNames = {"ID", "Name", "Description", "Unit Price", "Stock", "CatId", "Category"};
 
         Function<Product, Object[]> rowMapper = product -> new Object[]{
-            product.getIdProducto(),
-            product.getNombre(),
-            product.getDescripcion(),
-            product.getPrecioUnitario(),
+            product.getProductId(),
+            product.getName(),
+            product.getDescription(),
+            product.getUnitPrice(),
             product.getStock(),
-            product.getCategoria().getIdCategoria(),
-            product.getCategoria().getNombre()
+            product.getCategory().getCategoryId(),
+            product.getCategory().getCategory()
         };
 
         products = controller.getProductService().getAllProducts();
@@ -125,7 +125,7 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
     private void selectCurrentCategory(int row, JComboBox<ProductCategory> categoryComboBox) {
         int currentCategoryId = (Integer) getTable().getValueAt(row, CAT_ID_COLUMN);
         ProductCategory currentCategory = categories.stream()
-                .filter(cat -> cat.getIdCategoria() == currentCategoryId)
+                .filter(cat -> cat.getCategoryId() == currentCategoryId)
                 .findFirst()
                 .orElse(null);
         selectCurrentItem(categoryComboBox, currentCategory);
@@ -138,21 +138,21 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
                 if (col == CATEGORY_COLUMN) {
                     ProductCategory selectedCategory = (ProductCategory) categoryComboBox.getSelectedItem();
                     if (selectedCategory != null) {
-                        product.setCategoria(selectedCategory);
-                        getTable().setValueAt(selectedCategory.getIdCategoria(), row, CAT_ID_COLUMN);
-                        getTable().setValueAt(selectedCategory.getNombre(), row, CATEGORY_COLUMN);
+                        product.setCategory(selectedCategory);
+                        getTable().setValueAt(selectedCategory.getCategoryId(), row, CAT_ID_COLUMN);
+                        getTable().setValueAt(selectedCategory.getCategory(), row, CATEGORY_COLUMN);
                     }
                 } else {
                     if (textFields[col] != null) {
                         switch (col) {
                             case 1:
-                                product.setNombre(textFields[col].getText());
+                                product.setName(textFields[col].getText());
                                 break;
                             case 2:
-                                product.setDescripcion(textFields[col].getText());
+                                product.setDescription(textFields[col].getText());
                                 break;
                             case 3:
-                                product.setPrecioUnitario(Float.parseFloat(textFields[col].getText()));
+                                product.setUnitPrice(Float.parseFloat(textFields[col].getText()));
                                 break;
                             case 4:
                                 product.setStock(Integer.parseInt(textFields[col].getText()));

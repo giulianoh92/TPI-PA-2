@@ -8,48 +8,48 @@ import java.util.List;
  * Represents a customer in the system.
  */
 public class Customer extends User {
-    private String direccion;
-    private String emailUsuario;
-    private Cart carrito;
-    private List<Order> pedidos;
+    private String address;
+    private String email;
+    private final Cart cart;
+    private final List<Order> orders;
 
-    public Customer(int id, String nombreUsuario, String emailUsuario, String password, String direccion, Date fechaRegistro) {
-        super(id, password, nombreUsuario, fechaRegistro);
-        this.direccion = direccion;
-        this.emailUsuario = emailUsuario;
-        this.carrito = new Cart();
-        this.pedidos = new ArrayList<>();
+    public Customer(int userId, String username, String email, String password, String address, Date registerDate) {
+        super(userId, password, username, registerDate);
+        this.address = address;
+        this.email = email;
+        this.cart = new Cart();
+        this.orders = new ArrayList<>();
     }
 
-    public String getDireccion() {
-        return direccion;
+    public String getAddress() {
+        return address;
     }
 
-    public void setDireccion(String direccion) {
-        this.direccion = direccion;
+    public void setAddress(String address) {
+        this.address = address;
     }
 
-    public String getEmailUsuario() {
-        return emailUsuario;
+    public String getEmail() {
+        return email;
     }
 
-    public void setEmailUsuario(String emailUsuario) {
-        this.emailUsuario = emailUsuario;
+    public void setEmail(String email) {
+        this.email = email;
     }
 
-    public Cart getCarrito() {
-        return carrito;
+    public Cart getCart() {
+        return cart;
     }
 
     public void addToCarrito(Item item) {
-        carrito.addItem(item);
+        cart.addItem(item);
     }
 
-    public List<Order> getPedidos() {
-        return pedidos;
+    public List<Order> getOrders() {
+        return orders;
     }
 
     public void addPedido(Order pedido) {
-        this.pedidos.add(pedido);
+        this.orders.add(pedido);
     }
 }

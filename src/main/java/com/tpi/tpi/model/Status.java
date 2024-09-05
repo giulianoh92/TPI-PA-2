@@ -4,32 +4,32 @@ package com.tpi.tpi.model;
  * Represents the status of an order.
  */
 public class Status {
-    private int id;
-    private String estado;
+    private int userId;
+    private String status;
 
-    public Status(int id, String estado) {
-        this.id = id;
-        this.estado = estado;
+    public Status(int userId, String status) {
+        this.userId = userId;
+        this.status = status;
     }
 
-    public int getId() {
-        return id;
+    public int getUserId() {
+        return userId;
     }
 
-    public void setId(int id) {
-        this.id = id;
+    public void setUserId(int userId) {
+        this.userId = userId;
     }
 
-    public String getEstado() {
-        return estado;
+    public String getStatus() {
+        return status;
     }
 
-    public void setEstado(String estado) {
-        this.estado = estado;
+    public void setStatus(String status) {
+        this.status = status;
     }
 
     @Override
     public String toString() {
-        return estado;
+        return status;
     }
 }

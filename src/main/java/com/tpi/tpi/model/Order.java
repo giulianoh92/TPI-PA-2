@@ -7,40 +7,40 @@ import java.util.List;
  * Represents an order.
  */
 public class Order {
-    private int idPedido;
-    private Status estado;
-    private Payment pago;
-    private List<Item> items;
+    private int orderId;
+    private Status status;
+    private Payment payment;
+    private final List<Item> items;
 
-    public Order(int idPedido, Status estado, Payment pago) {
-        this.idPedido = idPedido;
-        this.estado = estado;
-        this.pago = pago;
+    public Order(int orderId, Status status, Payment payment) {
+        this.orderId = orderId;
+        this.status = status;
+        this.payment = payment;
         this.items = new ArrayList<>();
     }
 
-    public int getIdPedido() {
-        return idPedido;
+    public int getOrderId() {
+        return orderId;
     }
 
-    public void setIdPedido(int idPedido) {
-        this.idPedido = idPedido;
+    public void setOrderId(int orderId) {
+        this.orderId = orderId;
     }
 
-    public Status getEstado() {
-        return estado;
+    public Status getStatus() {
+        return status;
     }
 
-    public void setEstado(Status estado) {
-        this.estado = estado;
+    public void setStatus(Status status) {
+        this.status = status;
     }
 
-    public Payment getPago() {
-        return pago;
+    public Payment getPayment() {
+        return payment;
     }
 
-    public void setPago(Payment pago) {
-        this.pago = pago;
+    public void setPayment(Payment payment) {
+        this.payment = payment;
     }
 
     public List<Item> getItems() {
@@ -55,12 +55,12 @@ public class Order {
         this.items.addAll(items);
     }
 
-    public void printAtributes() {
+    public void printAttributes() {
         /*System.out.println("Order ID: " + idPedido);
         System.out.println("Status ID: " + estado.getId());
         System.out.println("Status: " + estado.getEstado());
         System.out.println("Payment: " + pago.getMetodoDePago());
         System.out.println("Date: " + pago.getFechaDePago());*/ //in a single line
-        System.out.println(idPedido + estado.getId() + estado.getEstado() + pago.getMetodoDePago() + pago.getFechaDePago());
+        System.out.println(orderId + status.getUserId() + status.getStatus() + payment.getPaymentMethod() + payment.getPaymentDate());
     }
 }

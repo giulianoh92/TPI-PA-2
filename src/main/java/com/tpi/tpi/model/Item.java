@@ -4,27 +4,27 @@ package com.tpi.tpi.model;
  * Represents an item in the cart.
  */
 public class Item {
-    private int cantidad;
-    private Product producto;
+    private int amount;
+    private Product product;
 
-    public Item(int cantidad, Product producto) {
-        this.cantidad = cantidad;
-        this.producto = producto;
+    public Item(int amount, Product product) {
+        this.amount = amount;
+        this.product = product;
     }
 
-    public int getCantidad() {
-        return cantidad;
+    public int getAmount() {
+        return amount;
     }
 
-    public void setCantidad(int cantidad) {
-        this.cantidad = cantidad;
+    public void setAmount(int amount) {
+        this.amount = amount;
     }
 
-    public Product getProducto() {
-        return producto;
+    public Product getProduct() {
+        return product;
     }
 
-    public void setProducto(Product producto) {
-        this.producto = producto;
+    public void setProduct(Product product) {
+        this.product = product;
     }
 }

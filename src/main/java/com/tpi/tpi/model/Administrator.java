@@ -7,7 +7,7 @@ import java.sql.Date;
  * Represents an administrator in the system.
  */
 public class Administrator extends User implements Serializable {
-    public Administrator(int idUsuario, String password, String nombreUsuario, Date fechaRegistro) {
-        super(idUsuario, password, nombreUsuario, fechaRegistro);
+    public Administrator(int UserId, String password, String username, Date registerDate) {
+        super(UserId, password, username, registerDate);
     }
 }

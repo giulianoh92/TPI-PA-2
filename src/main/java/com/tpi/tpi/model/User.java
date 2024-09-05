@@ -7,24 +7,24 @@ import java.sql.Date;
  * Represents a user in the system.
  */
 public class User implements Serializable {
-    private int idUsuario;
-    private String nombreUsuario;
+    private int userId;
+    private String username;
     private String password;
-    private Date fechaRegistro;
+    private Date registerDate;
 
-    public User(int idUsuario, String nombreUsuario, String password, Date fechaRegistro) {
-        this.idUsuario = idUsuario;
-        this.nombreUsuario = nombreUsuario;
+    public User(int UserId, String username, String password, Date registerDate) {
+        this.userId = UserId;
+        this.username = username;
         this.password = password;
-        this.fechaRegistro = fechaRegistro;
+        this.registerDate = registerDate;
     }
 
-    public int getIdUsuario() {
-        return idUsuario;
+    public int getUserId() {
+        return userId;
     }
 
-    public void setIdUsuario(int idUsuario) {
-        this.idUsuario = idUsuario;
+    public void setUserId(int userId) {
+        this.userId = userId;
     }
 
     public String getPassword() {
@@ -35,19 +35,19 @@ public class User implements Serializable {
         this.password = password;
     }
 
-    public String getNombreUsuario() {
-        return nombreUsuario;
+    public String getUsername() {
+        return username;
     }
 
-    public void setNombreUsuario(String nombreUsuario) {
-        this.nombreUsuario = nombreUsuario;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
-    public Date getFechaRegistro() {
-        return fechaRegistro;
+    public Date getRegisterDate() {
+        return registerDate;
     }
 
-    public void setFechaRegistro(Date fechaRegistro) {
-        this.fechaRegistro = fechaRegistro;
+    public void setRegisterDate(Date registerDate) {
+        this.registerDate = registerDate;
     }
 }

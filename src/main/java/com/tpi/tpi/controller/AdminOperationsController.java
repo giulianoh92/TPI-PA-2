@@ -1,8 +1,5 @@
 package com.tpi.tpi.controller;
 
-import java.sql.Date;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Map;
 
@@ -15,7 +12,6 @@ import com.tpi.tpi.model.Customer;
 import com.tpi.tpi.model.Order;
 import com.tpi.tpi.model.Product;
 import com.tpi.tpi.model.User;
-import com.tpi.tpi.model.ProductCategory;
 import com.tpi.tpi.view.PanelView;
 
 public class AdminOperationsController {
@@ -84,7 +80,7 @@ public class AdminOperationsController {
     public void commitUserData(List<User> users) {
         System.out.println("Committing user data:");
         for (User user : users) {
-            System.out.println(user.getIdUsuario() + " " + user.getNombreUsuario() + " " + user.getPassword() + " " + user.getFechaRegistro());
+            System.out.println(user.getUserId() + " " + user.getUsername() + " " + user.getPassword() + " " + user.getRegisterDate());
             userService.updateUser(user);
         }
     }
@@ -92,7 +88,7 @@ public class AdminOperationsController {
     public void commitOrderData(List<Order> orders) {
         System.out.println("Committing order data:");
         for (Order order : orders) {
-            order.printAtributes();
+            order.printAttributes();
             orderService.updateOrder(order);
         }
     }

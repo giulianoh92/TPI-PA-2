@@ -47,7 +47,7 @@ public class CustomerRepository {
             "JOIN Users u ON c.customer_id = u.user_id " +
             "SET c.address = ?, c.email = ?, u.username = ?, u.password = ? " +
             "WHERE c.customer_id = ?";
-        jdbcTemplate.update(sql, customer.getDireccion(), customer.getEmailUsuario(), customer.getNombreUsuario(), customer.getPassword(), customer.getIdUsuario());
+        jdbcTemplate.update(sql, customer.getAddress(), customer.getEmail(), customer.getUsername(), customer.getPassword(), customer.getUserId());
     }
 
     /**

@@ -3,7 +3,6 @@ package com.tpi.tpi.view;
 import com.tpi.tpi.controller.AdminOperationsController;
 import com.tpi.tpi.model.User;
 
-import javax.swing.*;
 import java.awt.*;
 import java.util.List;
 import java.util.function.Function;
@@ -31,10 +30,10 @@ public class UserView extends AbstractView<User, AdminOperationsController> impl
 
         String[] columnNames = {"ID", "Username", "Password", "Registered At"};
         Function<User, Object[]> rowMapper = user -> new Object[]{
-            user.getIdUsuario(),
-            user.getNombreUsuario(),
+            user.getUserId(),
+            user.getUsername(),
             user.getPassword(),
-            user.getFechaRegistro()
+            user.getRegisterDate()
         };
         users = controller.getUserService().getAllUserList();
         super.showPanel(users, columnNames, rowMapper);

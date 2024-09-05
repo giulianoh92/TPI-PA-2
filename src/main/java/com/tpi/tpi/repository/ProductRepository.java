@@ -43,7 +43,7 @@ public class ProductRepository {
      */
     public void updateProduct(Product product) {
         String sql = "UPDATE Products SET name = ?, description = ?, unit_price = ?, stock = ?, category_id = ? WHERE product_id = ?";
-        jdbcTemplate.update(sql, product.getNombre(), product.getDescripcion(), product.getPrecioUnitario(), product.getStock(), product.getCategoria().getIdCategoria(), product.getIdProducto());
+        jdbcTemplate.update(sql, product.getName(), product.getDescription(), product.getUnitPrice(), product.getStock(), product.getCategory().getCategoryId(), product.getProductId());
     }
 
     /**

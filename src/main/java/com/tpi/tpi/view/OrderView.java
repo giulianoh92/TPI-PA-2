@@ -3,7 +3,6 @@ package com.tpi.tpi.view;
 import com.tpi.tpi.controller.AdminOperationsController;
 import com.tpi.tpi.model.Order;
 import com.tpi.tpi.model.Status;
-import com.tpi.tpi.view.PanelView;
 
 import java.sql.Date; // Add this import
 import java.util.List;
@@ -38,11 +37,11 @@ public class OrderView extends AbstractView<Order, AdminOperationsController> im
     
         String[] columnNames = {"ID", "Date", "Status", "Payment Method", "Total"};
         Function<Order, Object[]> rowMapper = order -> new Object[]{
-            order.getIdPedido(),
-            order.getPago().getFechaDePago(),
-            order.getEstado().getEstado(),
-            order.getPago().getMetodoDePago(),
-            order.getPago().getMonto()
+            order.getOrderId(),
+            order.getPayment().getPaymentDate(),
+            order.getStatus().getStatus(),
+            order.getPayment().getPaymentMethod(),
+            order.getPayment().getAmount()
         };
     
         orders = controller.getOrderService().getAllOrders();
@@ -51,7 +50,7 @@ public class OrderView extends AbstractView<Order, AdminOperationsController> im
         // Debug: Print orders list
         System.out.println("Orders List:");
         for (Order order : orders) {
-            System.out.println(order.getIdPedido() + " " + order.getPago().getFechaDePago() + " " + order.getEstado().getEstado() + " " + order.getPago().getMetodoDePago() + " " + order.getPago().getMonto());
+            System.out.println(order.getOrderId() + " " + order.getPayment().getPaymentDate() + " " + order.getStatus().getStatus() + " " + order.getPayment().getPaymentMethod() + " " + order.getPayment().getAmount());
         }
     
         super.showPanel(orders, columnNames, rowMapper);
@@ -61,7 +60,7 @@ public class OrderView extends AbstractView<Order, AdminOperationsController> im
     public void handleCommit(Object[][] data) {
         System.out.println("Committing order data:");
         for (Order order : orders) {
-            order.printAtributes();
+            order.printAttributes();
         }
 
         controller.commitOrderData(orders);
@@ -118,7 +117,7 @@ public class OrderView extends AbstractView<Order, AdminOperationsController> im
     private void selectCurrentStatus(int row, JComboBox<Status> statusComboBox) {
         String currentStatusValue = (String) getTable().getValueAt(row, STATUS_COLUMN);
         Status currentStatus = statuses.stream()
-                .filter(status -> status.getEstado().equals(currentStatusValue))
+                .filter(status -> status.getStatus().equals(currentStatusValue))
                 .findFirst()
                 .orElse(null);
         selectCurrentItem(statusComboBox, currentStatus);
@@ -131,20 +130,20 @@ public class OrderView extends AbstractView<Order, AdminOperationsController> im
                 if (col == STATUS_COLUMN) {
                     Status selectedStatus = (Status) statusComboBox.getSelectedItem();
                     if (selectedStatus != null) {
-                        order.setEstado(selectedStatus);
-                        getTable().setValueAt(selectedStatus.getEstado(), row, STATUS_COLUMN);
+                        order.setStatus(selectedStatus);
+                        getTable().setValueAt(selectedStatus.getStatus(), row, STATUS_COLUMN);
                     }
                 } else {
                     if (textFields[col] != null) {
                         switch (col) {
                             case 1:
-                                order.getPago().setFechaDePago(Date.valueOf(textFields[col].getText()));
+                                order.getPayment().setPaymentDate(Date.valueOf(textFields[col].getText()));
                                 break;
                             case 3:
-                                order.getPago().setMetodoDePago(textFields[col].getText());
+                                order.getPayment().setPaymentMethod(textFields[col].getText());
                                 break;
                             case 4:
-                                order.getPago().setMonto(Float.parseFloat(textFields[col].getText()));
+                                order.getPayment().setAmount(Float.parseFloat(textFields[col].getText()));
                                 break;
                         }
                         getTable().setValueAt(textFields[col].getText(), row, col);

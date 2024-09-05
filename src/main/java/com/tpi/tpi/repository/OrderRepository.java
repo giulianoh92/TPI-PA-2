@@ -13,7 +13,6 @@ import org.springframework.stereotype.Repository;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -38,7 +37,7 @@ public class OrderRepository {
 
         // Fetch items for each order
         for (Order order : orders) {
-            List<Item> items = findItemsByOrderId(order.getIdPedido());
+            List<Item> items = findItemsByOrderId(order.getOrderId());
             order.addItemList(items);
         }
 
@@ -60,7 +59,7 @@ public class OrderRepository {
 
         // Fetch items for each order
         for (Order order : orders) {
-            List<Item> items = findItemsByOrderId(order.getIdPedido());
+            List<Item> items = findItemsByOrderId(order.getOrderId());
             order.addItemList(items);
         }
 
@@ -93,7 +92,7 @@ public class OrderRepository {
         Order order = jdbcTemplate.queryForObject(sql, this::mapRowToOrder, orderId);
 
         // Fetch items for the order
-        List<Item> items = findItemsByOrderId(order.getIdPedido());
+        List<Item> items = findItemsByOrderId(order.getOrderId());
         order.addItemList(items);
 
         return order;
@@ -105,7 +104,7 @@ public class OrderRepository {
      */
     public void updateOrder(Order order) {
         String sql = "UPDATE Orders SET status_id = ? WHERE order_id = ?";
-        jdbcTemplate.update(sql, order.getEstado().getId(), order.getIdPedido());
+        jdbcTemplate.update(sql, order.getStatus().getUserId(), order.getOrderId());
     }
 
     /**

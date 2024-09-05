@@ -6,47 +6,47 @@ import java.sql.Date;
  * Represents a payment.
  */
 public class Payment {
-    private int idPago;
-    private Date fechaDePago;
-    private String metodoDePago;
-    private double monto;
+    private int paymentId;
+    private Date paymentDate;
+    private String paymentMethod;
+    private double amount;
 
-    public Payment(int idPago, Date fechaDePago, String metodoDePago, double monto) {
-        this.idPago = idPago;
-        this.fechaDePago = fechaDePago;
-        this.metodoDePago = metodoDePago;
-        this.monto = monto;
+    public Payment(int paymentId, Date paymentDate, String paymentMethod, double amount) {
+        this.paymentId = paymentId;
+        this.paymentDate = paymentDate;
+        this.paymentMethod = paymentMethod;
+        this.amount = amount;
     }
 
-    public int getIdPago() {
-        return idPago;
+    public int getPaymentId() {
+        return paymentId;
     }
 
-    public void setIdPago(int idPago) {
-        this.idPago = idPago;
+    public void setPaymentId(int paymentId) {
+        this.paymentId = paymentId;
     }
 
-    public Date getFechaDePago() {
-        return fechaDePago;
+    public Date getPaymentDate() {
+        return paymentDate;
     }
 
-    public void setFechaDePago(Date fechaDePago) {
-        this.fechaDePago = fechaDePago;
+    public void setPaymentDate(Date paymentDate) {
+        this.paymentDate = paymentDate;
     }
 
-    public String getMetodoDePago() {
-        return metodoDePago;
+    public String getPaymentMethod() {
+        return paymentMethod;
     }
 
-    public void setMetodoDePago(String metodoDePago) {
-        this.metodoDePago = metodoDePago;
+    public void setPaymentMethod(String paymentMethod) {
+        this.paymentMethod = paymentMethod;
     }
 
-    public double getMonto() {
-        return monto;
+    public double getAmount() {
+        return amount;
     }
 
-    public void setMonto(double monto) {
-        this.monto = monto;
+    public void setAmount(double amount) {
+        this.amount = amount;
     }
 }

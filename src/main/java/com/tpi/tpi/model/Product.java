@@ -4,52 +4,52 @@ package com.tpi.tpi.model;
  * Represents a product.
  */
 public class Product {
-    private int idProducto;
-    private String nombre;
-    private String descripcion;
-    private float precioUnitario;
+    private int productId;
+    private String name;
+    private String description;
+    private float unitPrice;
     private int stock;
-    private ProductCategory categoria;
+    private ProductCategory category;
 
-    public Product(int idProducto, String nombre, String descripcion, float precioUnitario, int stock, ProductCategory categoria) {
-        this.idProducto = idProducto;
-        this.nombre = nombre;
-        this.descripcion = descripcion;
-        this.precioUnitario = precioUnitario;
+    public Product(int productId, String name, String description, float unitPrice, int stock, ProductCategory category) {
+        this.productId = productId;
+        this.name = name;
+        this.description = description;
+        this.unitPrice = unitPrice;
         this.stock = stock;
-        this.categoria = categoria;
+        this.category = category;
     }
 
-    public int getIdProducto() {
-        return idProducto;
+    public int getProductId() {
+        return productId;
     }
 
-    public void setIdProducto(int idProducto) {
-        this.idProducto = idProducto;
+    public void setProductId(int productId) {
+        this.productId = productId;
     }
 
-    public String getNombre() {
-        return nombre;
+    public String getName() {
+        return name;
     }
 
-    public void setNombre(String nombre) {
-        this.nombre = nombre;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public String getDescripcion() {
-        return descripcion;
+    public String getDescription() {
+        return description;
     }
 
-    public void setDescripcion(String descripcion) {
-        this.descripcion = descripcion;
+    public void setDescription(String description) {
+        this.description = description;
     }
 
-    public float getPrecioUnitario() {
-        return precioUnitario;
+    public float getUnitPrice() {
+        return unitPrice;
     }
 
-    public void setPrecioUnitario(float precioUnitario) {
-        this.precioUnitario = precioUnitario;
+    public void setUnitPrice(float unitPrice) {
+        this.unitPrice = unitPrice;
     }
 
     public int getStock() {
@@ -60,11 +60,11 @@ public class Product {
         this.stock = stock;
     }
 
-    public ProductCategory getCategoria() {
-        return categoria;
+    public ProductCategory getCategory() {
+        return category;
     }
 
-    public void setCategoria(ProductCategory categoria) {
-        this.categoria = categoria;
+    public void setCategory(ProductCategory category) {
+        this.category = category;
     }
 }
