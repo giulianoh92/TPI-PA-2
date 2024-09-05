@@ -3,20 +3,15 @@ package com.tpi.tpi.model;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Represents a shopping cart.
+ */
 public class Cart {
     private int cartId;
-    private List<Item> items = new ArrayList<>();
+    private List<Item> items;
 
     public Cart() {
-    }
-
-    // Getters y Setters
-    public List<Item> getItems() {
-        return items;
-    }
-
-    public void addItem(Item item) {
-        this.items.add(item);
+        this.items = new ArrayList<>();
     }
 
     public int getCartId() {
@@ -27,5 +22,11 @@ public class Cart {
         this.cartId = cartId;
     }
 
-    // Opcional: métodos adicionales como toString(), equals(), hashCode()
+    public List<Item> getItems() {
+        return items;
+    }
+
+    public void addItem(Item item) {
+        this.items.add(item);
+    }
 }

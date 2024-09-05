@@ -4,8 +4,10 @@ import java.sql.Date;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Represents a customer in the system.
+ */
 public class Customer extends User {
-
     private String direccion;
     private String emailUsuario;
     private Cart carrito;
@@ -15,11 +17,10 @@ public class Customer extends User {
         super(id, password, nombreUsuario, fechaRegistro);
         this.direccion = direccion;
         this.emailUsuario = emailUsuario;
-        this.carrito = new Cart(); 
-        this.pedidos = new ArrayList<>(); 
+        this.carrito = new Cart();
+        this.pedidos = new ArrayList<>();
     }
 
-    // Getters y Setters
     public String getDireccion() {
         return direccion;
     }
@@ -28,11 +29,11 @@ public class Customer extends User {
         this.direccion = direccion;
     }
 
-    public String getEmail() {
+    public String getEmailUsuario() {
         return emailUsuario;
     }
 
-    public void setEmail(String emailUsuario) {
+    public void setEmailUsuario(String emailUsuario) {
         this.emailUsuario = emailUsuario;
     }
 
