@@ -10,27 +10,44 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
+/**
+ * Repository for managing Product entities.
+ */
 @Repository
 public class ProductRepository {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
+    /**
+     * Finds all products.
+     * @return a list of products.
+     */
     public List<Product> findAll() {
         String sql = "SELECT p.product_id, p.name, p.description, p.unit_price, p.stock, c.category_id, c.name as category_name " +
                      "FROM Products p " +
                      "JOIN Prod_categories c ON p.category_id = c.category_id";
-
-        return jdbcTemplate.query(sql, this::mapRowToProducto);
+        return jdbcTemplate.query(sql, this::mapRowToProduct);
     }
 
+    /**
+     * Updates a product.
+     * @param product the product to update.
+     */
     public void updateProduct(Product product) {
         String sql = "UPDATE Products SET name = ?, description = ?, unit_price = ?, stock = ?, category_id = ? WHERE product_id = ?";
         jdbcTemplate.update(sql, product.getNombre(), product.getDescripcion(), product.getPrecioUnitario(), product.getStock(), product.getCategoria().getIdCategoria(), product.getIdProducto());
     }
 
-    private Product mapRowToProducto(ResultSet rs, int rowNum) throws SQLException {
-        ProductCategory categoria = new ProductCategory(
+    /**
+     * Maps a row from the ResultSet to a Product object.
+     * @param rs the ResultSet.
+     * @param rowNum the row number.
+     * @return a Product object.
+     * @throws SQLException if a database access error occurs.
+     */
+    private Product mapRowToProduct(ResultSet rs, int rowNum) throws SQLException {
+        ProductCategory category = new ProductCategory(
                 rs.getInt("category_id"),
                 rs.getString("category_name")
         );
@@ -40,7 +57,7 @@ public class ProductRepository {
                 rs.getString("description"),
                 rs.getFloat("unit_price"),
                 rs.getInt("stock"),
-                categoria
+                category
         );
     }
 }

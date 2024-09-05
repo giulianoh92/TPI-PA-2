@@ -16,50 +16,71 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Repository for managing Order entities.
+ */
 @Repository
 public class OrderRepository {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
+    /**
+     * Finds all orders.
+     * @return a list of orders.
+     */
     public List<Order> findAll() {
-        String sql = "SELECT o.*, s.*, i.*, p.*, pc.*, py.*, pm.*  FROM Orders o " +
+        String sql = "SELECT o.*, s.*, i.*, p.*, pc.*, py.*, pm.* FROM Orders o " +
                 "JOIN Statuses s ON o.status_id = s.status_id " +
                 "JOIN Items i ON o.order_id = i.order_id " +
                 "JOIN Products p ON i.product_id = p.product_id " +
                 "JOIN Prod_categories pc ON p.category_id = pc.category_id " +
                 "JOIN Payments py ON o.payment_id = py.payment_id " +
                 "JOIN Payment_methods pm ON py.payment_met_id = pm.payment_met_id";
-
         return jdbcTemplate.query(sql, this::mapRowToOrder);
     }
 
-    public List<Order> findByUserId(int id) {
-        String sql = "SELECT o.*, s.*, i.*, p.*, pc.*, py.*, pm.*  FROM Orders o " +
+    /**
+     * Finds orders by user ID.
+     * @param userId the user ID.
+     * @return a list of orders.
+     */
+    public List<Order> findByUserId(int userId) {
+        String sql = "SELECT o.*, s.*, i.*, p.*, pc.*, py.*, pm.* FROM Orders o " +
                 "JOIN Statuses s ON o.status_id = s.status_id " +
                 "JOIN Items i ON o.order_id = i.order_id " +
                 "JOIN Products p ON i.product_id = p.product_id " +
                 "JOIN Prod_categories pc ON p.category_id = pc.category_id " +
                 "JOIN Payments py ON o.payment_id = py.payment_id " +
-                "JOIN Payment_methods pm ON py.payment_met_id = pm.payment_met_id" +
+                "JOIN Payment_methods pm ON py.payment_met_id = pm.payment_met_id " +
                 "WHERE o.user_id = ?";
-
-        return jdbcTemplate.query(sql, this::mapRowToOrder);
+        return jdbcTemplate.query(sql, this::mapRowToOrder, userId);
     }
 
-    public Order findOrderById(int id){
-        String sql = "SELECT o.*, s.*, i.*, p.*, pc.*, py.*, pm.*  FROM Orders o " +
+    /**
+     * Finds an order by its ID.
+     * @param orderId the order ID.
+     * @return the order.
+     */
+    public Order findOrderById(int orderId) {
+        String sql = "SELECT o.*, s.*, i.*, p.*, pc.*, py.*, pm.* FROM Orders o " +
                 "JOIN Statuses s ON o.status_id = s.status_id " +
                 "JOIN Items i ON o.order_id = i.order_id " +
                 "JOIN Products p ON i.product_id = p.product_id " +
                 "JOIN Prod_categories pc ON p.category_id = pc.category_id " +
                 "JOIN Payments py ON o.payment_id = py.payment_id " +
-                "JOIN Payment_methods pm ON py.payment_met_id = pm.payment_met_id" +
+                "JOIN Payment_methods pm ON py.payment_met_id = pm.payment_met_id " +
                 "WHERE o.order_id = ? LIMIT 1";
-
-        return jdbcTemplate.queryForObject(sql, this::mapRowToOrder, id);
+        return jdbcTemplate.queryForObject(sql, this::mapRowToOrder, orderId);
     }
 
+    /**
+     * Maps a row from the ResultSet to an Order object.
+     * @param rs the ResultSet.
+     * @param rowNum the row number.
+     * @return an Order object.
+     * @throws SQLException if a database access error occurs.
+     */
     private Order mapRowToOrder(ResultSet rs, int rowNum) throws SQLException {
         Status status = new Status(
                 rs.getInt("s.status_id"),
@@ -93,6 +114,7 @@ public class OrderRepository {
                 status,
                 payment
         );
+        order.addItemList(items);
         return order;
     }
 }
