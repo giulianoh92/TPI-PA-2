@@ -35,7 +35,7 @@ public class OrderView extends AbstractView<Order, AdminOperationsController> im
     @Override
     public void showPanel(AdminOperationsController controller) {
         setController(controller); // Set the controller
-
+    
         String[] columnNames = {"ID", "Date", "Status", "Payment Method", "Total"};
         Function<Order, Object[]> rowMapper = order -> new Object[]{
             order.getIdPedido(),
@@ -44,10 +44,16 @@ public class OrderView extends AbstractView<Order, AdminOperationsController> im
             order.getPago().getMetodoDePago(),
             order.getPago().getMonto()
         };
-
+    
         orders = controller.getOrderService().getAllOrders();
         statuses = controller.getOrderService().getAllStatuses();
-
+    
+        // Debug: Print orders list
+        System.out.println("Orders List:");
+        for (Order order : orders) {
+            System.out.println(order.getIdPedido() + " " + order.getPago().getFechaDePago() + " " + order.getEstado().getEstado() + " " + order.getPago().getMetodoDePago() + " " + order.getPago().getMonto());
+        }
+    
         super.showPanel(orders, columnNames, rowMapper);
     }
 

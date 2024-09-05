@@ -30,14 +30,19 @@ public class OrderRepository {
      * @return a list of orders.
      */
     public List<Order> findAll() {
-        String sql = "SELECT o.*, s.*, i.*, p.*, pc.*, py.*, pm.* FROM Orders o " +
+        String sql = "SELECT o.*, s.*, py.*, pm.* FROM Orders o " +
                 "JOIN Statuses s ON o.status_id = s.status_id " +
-                "JOIN Items i ON o.order_id = i.order_id " +
-                "JOIN Products p ON i.product_id = p.product_id " +
-                "JOIN Prod_categories pc ON p.category_id = pc.category_id " +
                 "JOIN Payments py ON o.payment_id = py.payment_id " +
                 "JOIN Payment_methods pm ON py.payment_met_id = pm.payment_met_id";
-        return jdbcTemplate.query(sql, this::mapRowToOrder);
+        List<Order> orders = jdbcTemplate.query(sql, this::mapRowToOrder);
+
+        // Fetch items for each order
+        for (Order order : orders) {
+            List<Item> items = findItemsByOrderId(order.getIdPedido());
+            order.addItemList(items);
+        }
+
+        return orders;
     }
 
     /**
@@ -46,25 +51,33 @@ public class OrderRepository {
      * @return a list of orders.
      */
     public List<Order> findByUserId(int userId) {
-        String sql = "SELECT o.*, s.*, i.*, p.*, pc.*, py.*, pm.* FROM Orders o " +
+        String sql = "SELECT o.*, s.*, py.*, pm.* FROM Orders o " +
                 "JOIN Statuses s ON o.status_id = s.status_id " +
-                "JOIN Items i ON o.order_id = i.order_id " +
-                "JOIN Products p ON i.product_id = p.product_id " +
-                "JOIN Prod_categories pc ON p.category_id = pc.category_id " +
                 "JOIN Payments py ON o.payment_id = py.payment_id " +
                 "JOIN Payment_methods pm ON py.payment_met_id = pm.payment_met_id " +
                 "WHERE o.user_id = ?";
-        return jdbcTemplate.query(sql, this::mapRowToOrder, userId);
+        List<Order> orders = jdbcTemplate.query(sql, this::mapRowToOrder, userId);
+
+        // Fetch items for each order
+        for (Order order : orders) {
+            List<Item> items = findItemsByOrderId(order.getIdPedido());
+            order.addItemList(items);
+        }
+
+        return orders;
     }
 
-    //findAllStatuses
-public List<Status> findAllStatuses() {
+    /**
+     * Finds all statuses.
+     * @return a list of statuses.
+     */
+    public List<Status> findAllStatuses() {
         String sql = "SELECT * FROM Statuses";
         return jdbcTemplate.query(sql, (rs, rowNum) -> new Status(
                 rs.getInt("status_id"),
                 rs.getString("name")
         ));
-}
+    }
 
     /**
      * Finds an order by its ID.
@@ -72,15 +85,40 @@ public List<Status> findAllStatuses() {
      * @return the order.
      */
     public Order findOrderById(int orderId) {
-        String sql = "SELECT o.*, s.*, i.*, p.*, pc.*, py.*, pm.* FROM Orders o " +
+        String sql = "SELECT o.*, s.*, py.*, pm.* FROM Orders o " +
                 "JOIN Statuses s ON o.status_id = s.status_id " +
-                "JOIN Items i ON o.order_id = i.order_id " +
-                "JOIN Products p ON i.product_id = p.product_id " +
-                "JOIN Prod_categories pc ON p.category_id = pc.category_id " +
                 "JOIN Payments py ON o.payment_id = py.payment_id " +
                 "JOIN Payment_methods pm ON py.payment_met_id = pm.payment_met_id " +
                 "WHERE o.order_id = ? LIMIT 1";
-        return jdbcTemplate.queryForObject(sql, this::mapRowToOrder, orderId);
+        Order order = jdbcTemplate.queryForObject(sql, this::mapRowToOrder, orderId);
+
+        // Fetch items for the order
+        List<Item> items = findItemsByOrderId(order.getIdPedido());
+        order.addItemList(items);
+
+        return order;
+    }
+
+    /**
+     * Updates an order.
+     * @param order the order to update.
+     */
+    public void updateOrder(Order order) {
+        String sql = "UPDATE Orders SET status_id = ? WHERE order_id = ?";
+        jdbcTemplate.update(sql, order.getEstado().getId(), order.getIdPedido());
+    }
+
+    /**
+     * Finds items by order ID.
+     * @param orderId the order ID.
+     * @return a list of items.
+     */
+    private List<Item> findItemsByOrderId(int orderId) {
+        String sql = "SELECT i.*, p.*, pc.* FROM Items i " +
+                "JOIN Products p ON i.product_id = p.product_id " +
+                "JOIN Prod_categories pc ON p.category_id = pc.category_id " +
+                "WHERE i.order_id = ?";
+        return jdbcTemplate.query(sql, this::mapRowToItem, orderId);
     }
 
     /**
@@ -95,6 +133,27 @@ public List<Status> findAllStatuses() {
                 rs.getInt("s.status_id"),
                 rs.getString("s.name")
         );
+        Payment payment = new Payment(
+                rs.getInt("py.payment_id"),
+                rs.getDate("py.date"),
+                rs.getString("pm.name"),
+                rs.getDouble("py.amount")
+        );
+        return new Order(
+                rs.getInt("o.order_id"),
+                status,
+                payment
+        );
+    }
+
+    /**
+     * Maps a row from the ResultSet to an Item object.
+     * @param rs the ResultSet.
+     * @param rowNum the row number.
+     * @return an Item object.
+     * @throws SQLException if a database access error occurs.
+     */
+    private Item mapRowToItem(ResultSet rs, int rowNum) throws SQLException {
         ProductCategory productCategory = new ProductCategory(
                 rs.getInt("pc.category_id"),
                 rs.getString("pc.name")
@@ -107,23 +166,9 @@ public List<Status> findAllStatuses() {
                 rs.getInt("p.stock"),
                 productCategory
         );
-        List<Item> items = new ArrayList<>();
-        items.add(new Item(
+        return new Item(
                 rs.getInt("i.amount"),
                 product
-        ));
-        Payment payment = new Payment(
-                rs.getInt("py.payment_id"),
-                rs.getDate("py.date"),
-                rs.getString("pm.name"),
-                rs.getDouble("py.amount")
         );
-        Order order = new Order(
-                rs.getInt("o.order_id"),
-                status,
-                payment
-        );
-        order.addItemList(items);
-        return order;
     }
 }

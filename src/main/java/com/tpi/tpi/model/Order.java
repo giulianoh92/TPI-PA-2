@@ -56,9 +56,11 @@ public class Order {
     }
 
     public void printAtributes() {
-        System.out.println("Order ID: " + idPedido);
+        /*System.out.println("Order ID: " + idPedido);
+        System.out.println("Status ID: " + estado.getId());
         System.out.println("Status: " + estado.getEstado());
         System.out.println("Payment: " + pago.getMetodoDePago());
-        System.out.println("Date: " + pago.getFechaDePago());
+        System.out.println("Date: " + pago.getFechaDePago());*/ //in a single line
+        System.out.println(idPedido + estado.getId() + estado.getEstado() + pago.getMetodoDePago() + pago.getFechaDePago());
     }
 }

@@ -93,7 +93,7 @@ public class AdminOperationsController {
         System.out.println("Committing order data:");
         for (Order order : orders) {
             order.printAtributes();
-            //orderService.updateOrder(order);
+            orderService.updateOrder(order);
         }
     }
 

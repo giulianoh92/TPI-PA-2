@@ -145,6 +145,13 @@ public abstract class AbstractView<T, C> extends JPanel {
         for (int i = 0; i < data.size(); i++) {
             dataCopy[i] = Arrays.copyOf(rowMapper.apply(data.get(i)), columnNames.length);
         }
+    
+        // Debug: Print initialTableData
+        System.out.println("Initial Table Data:");
+        for (Object[] row : dataCopy) {
+            System.out.println(Arrays.toString(row));
+        }
+    
         return dataCopy;
     }
 

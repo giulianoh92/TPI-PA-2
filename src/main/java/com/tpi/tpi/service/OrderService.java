@@ -25,4 +25,8 @@ public class OrderService {
     public List<Status> getAllStatuses() {
         return orderRepository.findAllStatuses();
     }
+
+    public void updateOrder(Order order) {
+        orderRepository.updateOrder(order);
+    }
 }
