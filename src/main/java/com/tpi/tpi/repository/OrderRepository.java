@@ -57,6 +57,15 @@ public class OrderRepository {
         return jdbcTemplate.query(sql, this::mapRowToOrder, userId);
     }
 
+    //findAllStatuses
+public List<Status> findAllStatuses() {
+        String sql = "SELECT * FROM Statuses";
+        return jdbcTemplate.query(sql, (rs, rowNum) -> new Status(
+                rs.getInt("status_id"),
+                rs.getString("name")
+        ));
+}
+
     /**
      * Finds an order by its ID.
      * @param orderId the order ID.

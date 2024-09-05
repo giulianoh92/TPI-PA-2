@@ -16,6 +16,7 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
     private static final int CATEGORY_COLUMN = 6;
 
     private List<ProductCategory> categories;
+    private List<Product> products;
 
     public ProductView() {
         initComponents();
@@ -46,7 +47,7 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
             product.getCategoria().getNombre()
         };
 
-        List<Product> products = controller.getProductService().getAllProducts();
+        products = controller.getProductService().getAllProducts();
         categories = controller.getProductService().getAllCategories();
 
         super.showPanel(products, columnNames, rowMapper);
@@ -62,14 +63,11 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
     @Override
     public void handleCommit(Object[][] data) {
         System.out.println("Committing product data:");
-        for (Object[] row : data) {
-            for (Object value : row) {
-                System.out.print(value + "\t");
-            }
-            System.out.println();
+        for (Product product : products) {
+            System.out.println(product);
         }
 
-        controller.commitProductData(data);
+        controller.commitProductData(products);
     }
 
     @Override
@@ -134,16 +132,32 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
     }
 
     private void updateTableData(int row, int columnCount, JTextField[] textFields, JComboBox<ProductCategory> categoryComboBox) {
+        Product product = products.get(row);
         for (int col = 0; col < columnCount; col++) {
             if (col != ID_COLUMN && col != CAT_ID_COLUMN) {
                 if (col == CATEGORY_COLUMN) {
                     ProductCategory selectedCategory = (ProductCategory) categoryComboBox.getSelectedItem();
                     if (selectedCategory != null) {
+                        product.setCategoria(selectedCategory);
                         getTable().setValueAt(selectedCategory.getIdCategoria(), row, CAT_ID_COLUMN);
                         getTable().setValueAt(selectedCategory.getNombre(), row, CATEGORY_COLUMN);
                     }
                 } else {
                     if (textFields[col] != null) {
+                        switch (col) {
+                            case 1:
+                                product.setNombre(textFields[col].getText());
+                                break;
+                            case 2:
+                                product.setDescripcion(textFields[col].getText());
+                                break;
+                            case 3:
+                                product.setPrecioUnitario(Float.parseFloat(textFields[col].getText()));
+                                break;
+                            case 4:
+                                product.setStock(Integer.parseInt(textFields[col].getText()));
+                                break;
+                        }
                         getTable().setValueAt(textFields[col].getText(), row, col);
                     }
                 }

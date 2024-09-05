@@ -2,6 +2,7 @@ package com.tpi.tpi.view;
 
 import com.tpi.tpi.controller.AdminOperationsController;
 import com.tpi.tpi.model.Customer;
+import com.tpi.tpi.view.AbstractView; // Corrected import
 
 import javax.swing.*;
 import java.awt.*;
@@ -9,7 +10,9 @@ import java.util.List;
 import java.util.function.Function;
 
 public class CustomerView extends AbstractView<Customer, AdminOperationsController> implements PanelView<AdminOperationsController> {
-    
+
+    private List<Customer> customers;
+
     public CustomerView() {
         initComponents();
     }
@@ -34,24 +37,33 @@ public class CustomerView extends AbstractView<Customer, AdminOperationsControll
             customer.getEmailUsuario(),
             customer.getPassword(),
             customer.getDireccion(),
-            customer.getFechaRegistro()
+            customer.getFechaRegistro().toString() // Convert Date to String for display
         };
-        List<Customer> customers = controller.getCustomerService().getAllCustomerList();
+        customers = controller.getCustomerService().getAllCustomerList();
         super.showPanel(customers, columnNames, rowMapper);
     }
 
     @Override
     public void handleCommit(Object[][] data) {
-        // Specific commit logic for CustomerView
         System.out.println("Committing customer data:");
-        for (Object[] row : data) {
-            for (Object value : row) {
-                System.out.print(value + "\t");
+        for (int i = 0; i < getTable().getRowCount(); i++) {
+            Customer customer = customers.get(i);
+            customer.setNombreUsuario((String) getTable().getValueAt(i, 1));
+            customer.setEmailUsuario((String) getTable().getValueAt(i, 2));
+            customer.setPassword((String) getTable().getValueAt(i, 3));
+            customer.setDireccion((String) getTable().getValueAt(i, 4));
+            
+            // Handle Date conversion
+            Object dateValue = getTable().getValueAt(i, 5);
+            if (dateValue instanceof String) {
+                customer.setFechaRegistro(java.sql.Date.valueOf((String) dateValue));
+            } else if (dateValue instanceof java.sql.Date) {
+                customer.setFechaRegistro((java.sql.Date) dateValue);
             }
-            System.out.println();
+            
+            System.out.println(customer.getDireccion());
         }
 
-        // Example: Call a method on the controller to handle the commit
-        controller.commitCustomerData(data);
+        controller.commitCustomerData(customers);
     }
 }

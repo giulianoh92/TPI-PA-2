@@ -10,6 +10,8 @@ import java.util.function.Function;
 
 public class UserView extends AbstractView<User, AdminOperationsController> implements PanelView<AdminOperationsController> {
 
+    private List<User> users;
+
     public UserView() {
         initComponents();
     }
@@ -34,21 +36,17 @@ public class UserView extends AbstractView<User, AdminOperationsController> impl
             user.getPassword(),
             user.getFechaRegistro()
         };
-        List<User> users = controller.getUserService().getAllUserList();
+        users = controller.getUserService().getAllUserList();
         super.showPanel(users, columnNames, rowMapper);
     }
 
     @Override
     public void handleCommit(Object[][] data) {
-        // Specific commit logic for UserView
         System.out.println("Committing user data:");
-        for (Object[] row : data) {
-            for (Object value : row) {
-                System.out.print(value + "\t");
-            }
-            System.out.println();
+        for (User user : users) {
+            System.out.println(user);
         }
 
-        controller.commitUserData(data);
+        controller.commitUserData(users);
     }
 }

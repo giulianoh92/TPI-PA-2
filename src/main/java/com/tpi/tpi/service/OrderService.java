@@ -1,6 +1,7 @@
 package com.tpi.tpi.service;
 
 import com.tpi.tpi.model.Order;
+import com.tpi.tpi.model.Status;
 import com.tpi.tpi.repository.OrderRepository;
 
 import java.util.List;
@@ -19,5 +20,9 @@ public class OrderService {
 
     public List<Order> getOrdersByUserId(int id) {
         return orderRepository.findByUserId(id);
+    }
+
+    public List<Status> getAllStatuses() {
+        return orderRepository.findAllStatuses();
     }
 }

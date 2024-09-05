@@ -54,4 +54,11 @@ public class Order {
     public void addItemList(List<Item> items) {
         this.items.addAll(items);
     }
+
+    public void printAtributes() {
+        System.out.println("Order ID: " + idPedido);
+        System.out.println("Status: " + estado.getEstado());
+        System.out.println("Payment: " + pago.getMetodoDePago());
+        System.out.println("Date: " + pago.getFechaDePago());
+    }
 }
