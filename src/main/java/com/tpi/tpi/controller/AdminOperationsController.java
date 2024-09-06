@@ -20,10 +20,11 @@ public class AdminOperationsController {
     private UserService userService;
     private OrderService orderService;
     private CustomerService customerService;
+    @SuppressWarnings("rawtypes")
     private Map<ViewType, PanelView> views;
 
     // Constructor to initialize the services and views
-    public AdminOperationsController(AdminService adminService, ProductService productService, UserService userService, OrderService orderService, CustomerService customerService, Map<ViewType, PanelView> views) {
+    public AdminOperationsController(AdminService adminService, ProductService productService, UserService userService, OrderService orderService, CustomerService customerService, @SuppressWarnings("rawtypes") Map<ViewType, PanelView> views) {
         this.adminService = adminService;
         this.productService = productService;
         this.userService = userService;
@@ -33,7 +34,9 @@ public class AdminOperationsController {
     }
 
     // Method to display the table based on the view type
+    @SuppressWarnings("unchecked")
     public void displayView(ViewType viewType) {
+        @SuppressWarnings("rawtypes")
         PanelView view = views.get(viewType);
         if (view != null) {
             view.showPanel(this);
@@ -63,6 +66,7 @@ public class AdminOperationsController {
 
     // Method to handle the commit based on the view type
     public void commitData(ViewType viewType, Object[][] data) {
+        @SuppressWarnings("rawtypes")
         PanelView view = views.get(viewType);
         if (view != null) {
             view.handleCommit(data);

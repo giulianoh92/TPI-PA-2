@@ -53,10 +53,10 @@ public class CustomerView extends AbstractView<Customer, AdminOperationsControll
             
             // Handle Date conversion
             Object dateValue = getTable().getValueAt(i, 5);
-            if (dateValue instanceof String) {
-                customer.setRegisterDate(java.sql.Date.valueOf((String) dateValue));
-            } else if (dateValue instanceof java.sql.Date) {
-                customer.setRegisterDate((java.sql.Date) dateValue);
+            if (dateValue instanceof String string) {
+                customer.setRegisterDate(java.sql.Date.valueOf(string));
+            } else if (dateValue instanceof java.sql.Date date) {
+                customer.setRegisterDate(date);
             }
             
             System.out.println(customer.getAddress());

@@ -24,9 +24,11 @@ public class ProductRepository {
      * @return a list of products.
      */
     public List<Product> findAll() {
-        String sql = "SELECT p.product_id, p.name, p.description, p.unit_price, p.stock, c.category_id, c.name as category_name " +
-                     "FROM Products p " +
-                     "JOIN Prod_categories c ON p.category_id = c.category_id";
+        String sql = """
+                     SELECT p.product_id, p.name, p.description, p.unit_price, p.stock, c.category_id, c.name as category_name \
+                     FROM Products p \
+                     JOIN Prod_categories c ON p.category_id = c.category_id\
+                     """;
         return jdbcTemplate.query(sql, this::mapRowToProduct);
     }
     /**

@@ -52,6 +52,7 @@ public class AppConfig {
     }
 
     // Define a bean for the views map
+    @SuppressWarnings("rawtypes")
     @Bean
     public Map<ViewType, PanelView> views(AdminView adminView, ProductView productView, UserView userView, OrderView orderView, CustomerView customerView) {
         Map<ViewType, PanelView> views = new HashMap<>();
@@ -65,7 +66,7 @@ public class AppConfig {
 
     // Define a bean for the AdminOperationsController
     @Bean
-    public AdminOperationsController adminOperationsController(AdminService adminService, ProductService productService, UserService userService, OrderService orderService, CustomerService customerService, Map<ViewType, PanelView> views) {
+    public AdminOperationsController adminOperationsController(AdminService adminService, ProductService productService, UserService userService, OrderService orderService, CustomerService customerService, @SuppressWarnings("rawtypes") Map<ViewType, PanelView> views) {
         AdminOperationsController controller = new AdminOperationsController(adminService, productService, userService, orderService, customerService, views);
         // Set the controller for the AdminView
         ((AdminView) views.get(ViewType.ADMIN)).setController(controller);

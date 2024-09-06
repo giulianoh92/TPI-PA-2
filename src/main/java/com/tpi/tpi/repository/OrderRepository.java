@@ -29,16 +29,21 @@ public class OrderRepository {
      * @return a list of orders.
      */
     public List<Order> findAll() {
-        String sql = "SELECT o.*, s.*, py.*, pm.* FROM Orders o " +
-                "JOIN Statuses s ON o.status_id = s.status_id " +
-                "JOIN Payments py ON o.payment_id = py.payment_id " +
-                "JOIN Payment_methods pm ON py.payment_met_id = pm.payment_met_id";
+        String sql = """
+                SELECT o.*, s.*, py.*, pm.* FROM Orders o \
+                JOIN Statuses s ON o.status_id = s.status_id \
+                JOIN Payments py ON o.payment_id = py.payment_id \
+                JOIN Payment_methods pm ON py.payment_met_id = pm.payment_met_id\
+                """;
         List<Order> orders = jdbcTemplate.query(sql, this::mapRowToOrder);
 
         // Fetch items for each order
         for (Order order : orders) {
-            List<Item> items = findItemsByOrderId(order.getOrderId());
-            order.addItemList(items);
+            List<Item> items = null;
+            if (order != null) {
+                items = findItemsByOrderId(order.getOrderId());
+                order.addItemList(items);
+            }
         }
 
         return orders;
@@ -50,17 +55,22 @@ public class OrderRepository {
      * @return a list of orders.
      */
     public List<Order> findByUserId(int userId) {
-        String sql = "SELECT o.*, s.*, py.*, pm.* FROM Orders o " +
-                "JOIN Statuses s ON o.status_id = s.status_id " +
-                "JOIN Payments py ON o.payment_id = py.payment_id " +
-                "JOIN Payment_methods pm ON py.payment_met_id = pm.payment_met_id " +
-                "WHERE o.user_id = ?";
+        String sql = """
+                SELECT o.*, s.*, py.*, pm.* FROM Orders o \
+                JOIN Statuses s ON o.status_id = s.status_id \
+                JOIN Payments py ON o.payment_id = py.payment_id \
+                JOIN Payment_methods pm ON py.payment_met_id = pm.payment_met_id \
+                WHERE o.user_id = ?\
+                """;
         List<Order> orders = jdbcTemplate.query(sql, this::mapRowToOrder, userId);
 
         // Fetch items for each order
         for (Order order : orders) {
-            List<Item> items = findItemsByOrderId(order.getOrderId());
-            order.addItemList(items);
+            List<Item> items = null;
+            if (order != null) {
+                items = findItemsByOrderId(order.getOrderId());
+                order.addItemList(items);
+            }
         }
 
         return orders;
@@ -84,17 +94,21 @@ public class OrderRepository {
      * @return the order.
      */
     public Order findOrderById(int orderId) {
-        String sql = "SELECT o.*, s.*, py.*, pm.* FROM Orders o " +
-                "JOIN Statuses s ON o.status_id = s.status_id " +
-                "JOIN Payments py ON o.payment_id = py.payment_id " +
-                "JOIN Payment_methods pm ON py.payment_met_id = pm.payment_met_id " +
-                "WHERE o.order_id = ? LIMIT 1";
+        String sql = """
+                SELECT o.*, s.*, py.*, pm.* FROM Orders o \
+                JOIN Statuses s ON o.status_id = s.status_id \
+                JOIN Payments py ON o.payment_id = py.payment_id \
+                JOIN Payment_methods pm ON py.payment_met_id = pm.payment_met_id \
+                WHERE o.order_id = ? LIMIT 1\
+                """;
         Order order = jdbcTemplate.queryForObject(sql, this::mapRowToOrder, orderId);
-
-        // Fetch items for the order
-        List<Item> items = findItemsByOrderId(order.getOrderId());
-        order.addItemList(items);
-
+    
+        if (order != null) {
+            // Fetch items for the order
+            List<Item> items = findItemsByOrderId(order.getOrderId());
+            order.addItemList(items);
+        }
+    
         return order;
     }
 
@@ -113,10 +127,12 @@ public class OrderRepository {
      * @return a list of items.
      */
     private List<Item> findItemsByOrderId(int orderId) {
-        String sql = "SELECT i.*, p.*, pc.* FROM Items i " +
-                "JOIN Products p ON i.product_id = p.product_id " +
-                "JOIN Prod_categories pc ON p.category_id = pc.category_id " +
-                "WHERE i.order_id = ?";
+        String sql = """
+                SELECT i.*, p.*, pc.* FROM Items i \
+                JOIN Products p ON i.product_id = p.product_id \
+                JOIN Prod_categories pc ON p.category_id = pc.category_id \
+                WHERE i.order_id = ?\
+                """;
         return jdbcTemplate.query(sql, this::mapRowToItem, orderId);
     }
 
