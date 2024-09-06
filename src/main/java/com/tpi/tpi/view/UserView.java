@@ -2,8 +2,10 @@ package com.tpi.tpi.view;
 
 import com.tpi.tpi.controller.AdminOperationsController;
 import com.tpi.tpi.model.User;
+import com.tpi.tpi.view.AbstractView; // Corrected import statement
 
 import java.awt.*;
+import java.util.Date; // Added import for Date
 import java.util.List;
 import java.util.function.Function;
 
@@ -42,10 +44,14 @@ public class UserView extends AbstractView<User, AdminOperationsController> impl
     @Override
     public void handleCommit(Object[][] data) {
         System.out.println("Committing user data:");
-        for (User user : users) {
-            System.out.println(user);
+        for (int i = 0; i < data.length; i++) {
+            users.get(i).setUserId((Integer) data[i][0]);
+            users.get(i).setUsername((String) data[i][1]);
+            users.get(i).setPassword((String) data[i][2]);
+            users.get(i).setRegisterDate(new java.sql.Date(((java.util.Date) data[i][3]).getTime())); // Convert java.util.Date to java.sql.Date
+            System.out.println(users.get(i));
         }
-
+    
         controller.commitUserData(users);
     }
 }
