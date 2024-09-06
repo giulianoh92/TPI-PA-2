@@ -5,6 +5,7 @@ import com.tpi.tpi.model.Order;
 import com.tpi.tpi.model.Status;
 
 import java.sql.Date; // Add this import
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 import javax.swing.*;
@@ -83,14 +84,57 @@ public class OrderView extends AbstractView<Order, AdminOperationsController> im
         populateComboBox(statusComboBox, statuses);
         selectCurrentStatus(row, statusComboBox);
     
+        // Save current table data before editing
+        Object[][] beforeEditData = new Object[getTable().getRowCount()][getTable().getColumnCount()];
+        for (int i = 0; i < getTable().getRowCount(); i++) {
+            for (int j = 0; j < getTable().getColumnCount(); j++) {
+                beforeEditData[i][j] = getTable().getValueAt(i, j);
+            }
+        }
+    
+        // Debug: Print beforeEditData
+        System.out.println("Before Edit Data:");
+        for (Object[] rowArray : beforeEditData) {
+            System.out.println(Arrays.toString(rowArray));
+        }
+    
         int result = JOptionPane.showConfirmDialog(this, panel, "Edit Row", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
         if (result == JOptionPane.OK_OPTION) {
             updateTableData(row, columnCount, textFields, statusComboBox);
-            resetButton.setEnabled(true);
-            commitButton.setEnabled(true);
+    
+            // Check if there are any changes
+            boolean hasChanges = false;
+            for (int i = 0; i < getTable().getRowCount(); i++) {
+                for (int j = 0; j < getTable().getColumnCount(); j++) {
+                    boolean isEqual = beforeEditData[i][j].toString().equals(getTable().getValueAt(i, j).toString());
+                    System.out.println("Comparing beforeEditData[" + i + "][" + j + "] with getTable().getValueAt(" + i + ", " + j + "): " + isEqual);
+                    if (!isEqual) {
+                        hasChanges = true;
+                        break;
+                    }
+                }
+                if (hasChanges) {
+                    break;
+                }
+            }
+    
+            // Debug: Print data after edit
+            System.out.println("Data After Edit:");
+            for (int i = 0; i < getTable().getRowCount(); i++) {
+                for (int j = 0; j < getTable().getColumnCount(); j++) {
+                    System.out.print(getTable().getValueAt(i, j) + "\t");
+                }
+                System.out.println();
+            }
+    
+            // Enable buttons if changes are detected
+            if (hasChanges) {
+                resetButton.setEnabled(true);
+                commitButton.setEnabled(true);
+            }
         }
     }
-
+    
     private Object[] getRowData(int row, int columnCount) {
         Object[] rowData = new Object[columnCount];
         for (int col = 0; col < columnCount; col++) {
@@ -98,7 +142,7 @@ public class OrderView extends AbstractView<Order, AdminOperationsController> im
         }
         return rowData;
     }
-
+    
     private JPanel createEditPanel(int columnCount, Object[] rowData, JTextField[] textFields, JComboBox<Status> statusComboBox) {
         JPanel panel = new JPanel(new GridLayout(columnCount, 2));
         for (int col = 0; col < columnCount; col++) {
@@ -115,7 +159,7 @@ public class OrderView extends AbstractView<Order, AdminOperationsController> im
         }
         return panel;
     }
-
+    
     private void selectCurrentStatus(int row, JComboBox<Status> statusComboBox) {
         String currentStatusValue = (String) getTable().getValueAt(row, STATUS_COLUMN);
         Status currentStatus = statuses.stream()
@@ -124,7 +168,7 @@ public class OrderView extends AbstractView<Order, AdminOperationsController> im
                 .orElse(null);
         selectCurrentItem(statusComboBox, currentStatus);
     }
-
+    
     private void updateTableData(int row, int columnCount, JTextField[] textFields, JComboBox<Status> statusComboBox) {
         Order order = orders.get(row);
         for (int col = 0; col < columnCount; col++) {

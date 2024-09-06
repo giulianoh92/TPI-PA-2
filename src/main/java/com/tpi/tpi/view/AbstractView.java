@@ -13,7 +13,7 @@ import java.util.function.Function;
 
 public abstract class AbstractView<T, C> extends JPanel {
     protected C controller;
-    private JTable table;
+    protected JTable table; // Cambiado a protected
     private Object[][] initialTableData;
     protected JButton commitButton; // Cambiado a protected
     protected JButton resetButton;  // Cambiado a protected
@@ -232,6 +232,20 @@ public abstract class AbstractView<T, C> extends JPanel {
             panel.add(textFields[col]);
         }
     
+        // Save current table data before editing
+        Object[][] beforeEditData = new Object[table.getRowCount()][table.getColumnCount()];
+        for (int i = 0; i < table.getRowCount(); i++) {
+            for (int j = 0; j < table.getColumnCount(); j++) {
+                beforeEditData[i][j] = table.getValueAt(i, j);
+            }
+        }
+    
+        // Debug: Print beforeEditData
+        System.out.println("Before Edit Data:");
+        for (Object[] rowArray : beforeEditData) {
+            System.out.println(Arrays.toString(rowArray));
+        }
+    
         int result = JOptionPane.showConfirmDialog(this, panel, "Edit Row", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
         if (result == JOptionPane.OK_OPTION) {
             for (int col = 0; col < columnCount; col++) {
@@ -239,8 +253,37 @@ public abstract class AbstractView<T, C> extends JPanel {
                     table.setValueAt(textFields[col].getText(), row, col);
                 }
             }
-            resetButton.setEnabled(true);
-            commitButton.setEnabled(true);
+    
+            // Check if there are any changes
+            boolean hasChanges = false;
+            for (int i = 0; i < table.getRowCount(); i++) {
+                for (int j = 0; j < table.getColumnCount(); j++) {
+                    boolean isEqual = beforeEditData[i][j].toString().equals(table.getValueAt(i, j).toString());
+                    System.out.println("Comparing beforeEditData[" + i + "][" + j + "] with table.getValueAt(" + i + ", " + j + "): " + isEqual);
+                    if (!isEqual) {
+                        hasChanges = true;
+                        break;
+                    }
+                }
+                if (hasChanges) {
+                    break;
+                }
+            }
+    
+            // Debug: Print data after edit
+            System.out.println("Data After Edit:");
+            for (int i = 0; i < table.getRowCount(); i++) {
+                for (int j = 0; j < table.getColumnCount(); j++) {
+                    System.out.print(table.getValueAt(i, j) + "\t");
+                }
+                System.out.println();
+            }
+    
+            // Enable buttons if changes are detected
+            if (hasChanges) {
+                resetButton.setEnabled(true);
+                commitButton.setEnabled(true);
+            }
         }
     }
 
@@ -252,7 +295,6 @@ public abstract class AbstractView<T, C> extends JPanel {
         this.table = table;
     }
 
-    // Universal method to populate JComboBox
     protected <E> void populateComboBox(JComboBox<E> comboBox, List<E> items) {
         for (E item : items) {
             comboBox.addItem(item);
