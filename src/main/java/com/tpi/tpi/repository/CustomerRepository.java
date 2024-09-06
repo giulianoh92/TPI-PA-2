@@ -24,7 +24,12 @@ public class CustomerRepository {
      */
     public List<Customer> findAll() {
         String sql = "SELECT c.*, u.* FROM Customers c JOIN Users u ON c.customer_id = u.user_id";
-        return jdbcTemplate.query(sql, this::mapRowToCustomer);
+        try {
+            return jdbcTemplate.query(sql, this::mapRowToCustomer);
+        } catch (Exception e) {
+            // Log the exception and rethrow it or handle it accordingly
+            throw new RuntimeException("Error fetching all customers", e);
+        }
     }
 
     /**
@@ -34,7 +39,12 @@ public class CustomerRepository {
      */
     public Customer findById(int id) {
         String sql = "SELECT c.*, u.* FROM Customers c JOIN Users u ON c.customer_id = u.user_id WHERE c.customer_id = ?";
-        return jdbcTemplate.queryForObject(sql, this::mapRowToCustomer, id);
+        try {
+            return jdbcTemplate.queryForObject(sql, this::mapRowToCustomer, id);
+        } catch (Exception e) {
+            // Log the exception and rethrow it or handle it accordingly
+            throw new RuntimeException("Error fetching customer by ID", e);
+        }
     }
 
     /**
@@ -49,7 +59,12 @@ public class CustomerRepository {
             SET c.address = ?, c.email = ?, u.username = ?, u.password = ? \
             WHERE c.customer_id = ?\
             """;
-        jdbcTemplate.update(sql, customer.getAddress(), customer.getEmail(), customer.getUsername(), customer.getPassword(), customer.getUserId());
+        try {
+            jdbcTemplate.update(sql, customer.getAddress(), customer.getEmail(), customer.getUsername(), customer.getPassword(), customer.getUserId());
+        } catch (Exception e) {
+            // Log the exception and rethrow it or handle it accordingly
+            throw new RuntimeException("Error updating customer", e);
+        }
     }
 
     /**

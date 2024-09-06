@@ -15,14 +15,29 @@ public class ProductService {
     private ProductRepository productRepository;
 
     public List<Product> getAllProducts() {
-        return productRepository.findAll();
+        try {
+            return productRepository.findAll();
+        } catch (Exception e) {
+            // Log the exception and rethrow it or handle it accordingly
+            throw new RuntimeException("Error fetching all products", e);
+        }
     }
 
     public void updateProduct(Product product) {
-        productRepository.updateProduct(product);
+        try {
+            productRepository.updateProduct(product);
+        } catch (Exception e) {
+            // Log the exception and rethrow it or handle it accordingly
+            throw new RuntimeException("Error updating product", e);
+        }
     }
 
     public List<ProductCategory> getAllCategories() {
-        return productRepository.findAllCategories();
+        try {
+            return productRepository.findAllCategories();
+        } catch (Exception e) {
+            // Log the exception and rethrow it or handle it accordingly
+            throw new RuntimeException("Error fetching all categories", e);
+        }
     }
 }

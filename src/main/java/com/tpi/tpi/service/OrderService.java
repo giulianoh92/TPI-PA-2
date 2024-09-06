@@ -15,18 +15,38 @@ public class OrderService {
     private OrderRepository orderRepository;
 
     public List<Order> getAllOrders() {
-        return orderRepository.findAll();
+        try {
+            return orderRepository.findAll();
+        } catch (Exception e) {
+            // Log the exception and rethrow it or handle it accordingly
+            throw new RuntimeException("Error fetching all orders", e);
+        }
     }
 
     public List<Order> getOrdersByUserId(int id) {
-        return orderRepository.findByUserId(id);
+        try {
+            return orderRepository.findByUserId(id);
+        } catch (Exception e) {
+            // Log the exception and rethrow it or handle it accordingly
+            throw new RuntimeException("Error fetching orders by user ID", e);
+        }
     }
 
     public List<Status> getAllStatuses() {
-        return orderRepository.findAllStatuses();
+        try {
+            return orderRepository.findAllStatuses();
+        } catch (Exception e) {
+            // Log the exception and rethrow it or handle it accordingly
+            throw new RuntimeException("Error fetching all statuses", e);
+        }
     }
 
     public void updateOrder(Order order) {
-        orderRepository.updateOrder(order);
+        try {
+            orderRepository.updateOrder(order);
+        } catch (Exception e) {
+            // Log the exception and rethrow it or handle it accordingly
+            throw new RuntimeException("Error updating order", e);
+        }
     }
 }

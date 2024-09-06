@@ -35,18 +35,23 @@ public class OrderRepository {
                 JOIN Payments py ON o.payment_id = py.payment_id \
                 JOIN Payment_methods pm ON py.payment_met_id = pm.payment_met_id\
                 """;
-        List<Order> orders = jdbcTemplate.query(sql, this::mapRowToOrder);
+        try {
+            List<Order> orders = jdbcTemplate.query(sql, this::mapRowToOrder);
 
-        // Fetch items for each order
-        for (Order order : orders) {
-            List<Item> items = null;
-            if (order != null) {
-                items = findItemsByOrderId(order.getOrderId());
-                order.addItemList(items);
+            // Fetch items for each order
+            for (Order order : orders) {
+                List<Item> items = null;
+                if (order != null) {
+                    items = findItemsByOrderId(order.getOrderId());
+                    order.addItemList(items);
+                }
             }
-        }
 
-        return orders;
+            return orders;
+        } catch (Exception e) {
+            // Log the exception and rethrow it or handle it accordingly
+            throw new RuntimeException("Error fetching all orders", e);
+        }
     }
 
     /**
@@ -62,18 +67,23 @@ public class OrderRepository {
                 JOIN Payment_methods pm ON py.payment_met_id = pm.payment_met_id \
                 WHERE o.user_id = ?\
                 """;
-        List<Order> orders = jdbcTemplate.query(sql, this::mapRowToOrder, userId);
+        try {
+            List<Order> orders = jdbcTemplate.query(sql, this::mapRowToOrder, userId);
 
-        // Fetch items for each order
-        for (Order order : orders) {
-            List<Item> items = null;
-            if (order != null) {
-                items = findItemsByOrderId(order.getOrderId());
-                order.addItemList(items);
+            // Fetch items for each order
+            for (Order order : orders) {
+                List<Item> items = null;
+                if (order != null) {
+                    items = findItemsByOrderId(order.getOrderId());
+                    order.addItemList(items);
+                }
             }
-        }
 
-        return orders;
+            return orders;
+        } catch (Exception e) {
+            // Log the exception and rethrow it or handle it accordingly
+            throw new RuntimeException("Error fetching orders by user ID", e);
+        }
     }
 
     /**
@@ -82,10 +92,15 @@ public class OrderRepository {
      */
     public List<Status> findAllStatuses() {
         String sql = "SELECT * FROM Statuses";
-        return jdbcTemplate.query(sql, (rs, rowNum) -> new Status(
-                rs.getInt("status_id"),
-                rs.getString("name")
-        ));
+        try {
+            return jdbcTemplate.query(sql, (rs, rowNum) -> new Status(
+                    rs.getInt("status_id"),
+                    rs.getString("name")
+            ));
+        } catch (Exception e) {
+            // Log the exception and rethrow it or handle it accordingly
+            throw new RuntimeException("Error fetching all statuses", e);
+        }
     }
 
     /**
@@ -101,15 +116,20 @@ public class OrderRepository {
                 JOIN Payment_methods pm ON py.payment_met_id = pm.payment_met_id \
                 WHERE o.order_id = ? LIMIT 1\
                 """;
-        Order order = jdbcTemplate.queryForObject(sql, this::mapRowToOrder, orderId);
-    
-        if (order != null) {
-            // Fetch items for the order
-            List<Item> items = findItemsByOrderId(order.getOrderId());
-            order.addItemList(items);
+        try {
+            Order order = jdbcTemplate.queryForObject(sql, this::mapRowToOrder, orderId);
+        
+            if (order != null) {
+                // Fetch items for the order
+                List<Item> items = findItemsByOrderId(order.getOrderId());
+                order.addItemList(items);
+            }
+        
+            return order;
+        } catch (Exception e) {
+            // Log the exception and rethrow it or handle it accordingly
+            throw new RuntimeException("Error fetching order by ID", e);
         }
-    
-        return order;
     }
 
     /**
@@ -118,7 +138,12 @@ public class OrderRepository {
      */
     public void updateOrder(Order order) {
         String sql = "UPDATE Orders SET status_id = ? WHERE order_id = ?";
-        jdbcTemplate.update(sql, order.getStatus().getUserId(), order.getOrderId());
+        try {
+            jdbcTemplate.update(sql, order.getStatus().getUserId(), order.getOrderId());
+        } catch (Exception e) {
+            // Log the exception and rethrow it or handle it accordingly
+            throw new RuntimeException("Error updating order", e);
+        }
     }
 
     /**
@@ -133,7 +158,12 @@ public class OrderRepository {
                 JOIN Prod_categories pc ON p.category_id = pc.category_id \
                 WHERE i.order_id = ?\
                 """;
-        return jdbcTemplate.query(sql, this::mapRowToItem, orderId);
+        try {
+            return jdbcTemplate.query(sql, this::mapRowToItem, orderId);
+        } catch (Exception e) {
+            // Log the exception and rethrow it or handle it accordingly
+            throw new RuntimeException("Error fetching items by order ID", e);
+        }
     }
 
     /**
