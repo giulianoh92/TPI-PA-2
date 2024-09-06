@@ -1,34 +1,47 @@
 package com.tpi.tpi;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ApplicationContext;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.tpi.tpi.controller.AdminOperationsController;
+import com.tpi.tpi.controller.ViewType;
+
+import org.springframework.beans.factory.annotation.Autowired;
 
 @SpringBootApplication
 public class Main implements CommandLineRunner {
 
     @Autowired
-    private ProductoRepository productoRepository;
-
-    public static void main(String[] args) {
-        SpringApplication.run(Main.class, args);
-    }
+    private ApplicationContext context;
 
     @Override
     public void run(String... args) throws Exception {
-        // Cargar todos los productos de la base de datos
-        List<Producto> productos = productoRepository.findAll();
+        // Get the application mode from the environment properties
+        String mode = context.getEnvironment().getProperty("app.mode");
 
-        // Convertir la lista a un ArrayList (si realmente necesitas un ArrayList)
-        ArrayList<Producto> productosArrayList = new ArrayList<>(productos);
+        // Check if the application is running in desktop mode
+        if ("desktop".equalsIgnoreCase(mode)) {
+            // Check if the environment is headless
+            if (System.getProperty("java.awt.headless").equals("true")) {
+                System.out.println("Cannot create GUI in a headless environment.");
+                return;
+            }
 
-        // Imprimir la lista de productos para verificar
-        for (Producto producto : productosArrayList) {
-            System.out.println("Producto ID: " + producto.getIdProducto() + ", Nombre: " + producto.getNombre());
+            // Get the AdminOperationsController bean from the application context
+            AdminOperationsController adminOperationsController = context.getBean(AdminOperationsController.class);
+            // Display the admin table
+            adminOperationsController.displayView(ViewType.ADMIN);
+        } else {
+            System.out.println("Running in web mode");
+            // Web mode is handled by Spring Boot
         }
+    }
+
+    public static void main(String[] args) {
+        // Set the system property to disable headless mode before the Spring application context is initialized
+        System.setProperty("java.awt.headless", "false");
+        SpringApplication.run(Main.class, args);
     }
 }
