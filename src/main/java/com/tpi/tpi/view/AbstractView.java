@@ -15,6 +15,8 @@ public abstract class AbstractView<T, C> extends JPanel {
     protected C controller;
     private JTable table;
     private Object[][] initialTableData;
+    protected JButton commitButton; // Cambiado a protected
+    protected JButton resetButton;  // Cambiado a protected
 
     public AbstractView() {
         initComponents();
@@ -25,9 +27,12 @@ public abstract class AbstractView<T, C> extends JPanel {
 
         if (shouldShowDefaultButtons()) {
             JPanel buttonPanel = new JPanel();
-            JButton resetButton = createStyledButton("Reset");
-            JButton commitButton = createStyledButton("Commit");
+            resetButton = createStyledButton("Reset");
+            commitButton = createStyledButton("Commit");
             JButton editRowButton = createStyledButton("Edit Row");
+
+            resetButton.setEnabled(false);
+            commitButton.setEnabled(false);
 
             resetButton.addActionListener(e -> onReset());
             commitButton.addActionListener(e -> onCommit());
@@ -73,9 +78,12 @@ public abstract class AbstractView<T, C> extends JPanel {
 
         if (shouldShowDefaultButtons()) {
             JPanel buttonPanel = new JPanel();
-            JButton resetButton = createStyledButton("Reset");
-            JButton commitButton = createStyledButton("Commit");
+            resetButton = createStyledButton("Reset");
+            commitButton = createStyledButton("Commit");
             JButton editRowButton = createStyledButton("Edit Row");
+
+            resetButton.setEnabled(false);
+            commitButton.setEnabled(false);
 
             resetButton.addActionListener(e -> onReset());
             commitButton.addActionListener(e -> onCommit());
@@ -231,6 +239,8 @@ public abstract class AbstractView<T, C> extends JPanel {
                     table.setValueAt(textFields[col].getText(), row, col);
                 }
             }
+            resetButton.setEnabled(true);
+            commitButton.setEnabled(true);
         }
     }
 

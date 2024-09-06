@@ -73,19 +73,21 @@ public class OrderView extends AbstractView<Order, AdminOperationsController> im
             JOptionPane.showMessageDialog(this, "Please select a row to edit.", "No Row Selected", JOptionPane.WARNING_MESSAGE);
             return;
         }
-
+    
         int columnCount = getTable().getColumnCount();
         Object[] rowData = getRowData(row, columnCount);
         JTextField[] textFields = new JTextField[columnCount];
         JComboBox<Status> statusComboBox = new JComboBox<>();
         JPanel panel = createEditPanel(columnCount, rowData, textFields, statusComboBox);
-
+    
         populateComboBox(statusComboBox, statuses);
         selectCurrentStatus(row, statusComboBox);
-
+    
         int result = JOptionPane.showConfirmDialog(this, panel, "Edit Row", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
         if (result == JOptionPane.OK_OPTION) {
             updateTableData(row, columnCount, textFields, statusComboBox);
+            resetButton.setEnabled(true);
+            commitButton.setEnabled(true);
         }
     }
 
@@ -105,7 +107,7 @@ public class OrderView extends AbstractView<Order, AdminOperationsController> im
                 panel.add(statusComboBox);
             } else {
                 textFields[col] = new JTextField(rowData[col] != null ? rowData[col].toString() : "");
-                if (col == ID_COLUMN) {
+                if (col == ID_COLUMN || col == 1 || col == 3 || col == 4) { // Make "ID", "Date", "Payment Method", and "Total" columns uneditable
                     textFields[col].setEditable(false);
                 }
                 panel.add(textFields[col]);

@@ -77,19 +77,21 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
             JOptionPane.showMessageDialog(this, "Please select a row to edit.", "No Row Selected", JOptionPane.WARNING_MESSAGE);
             return;
         }
-
+    
         int columnCount = getTable().getColumnCount();
         Object[] rowData = getRowData(row, columnCount);
         JTextField[] textFields = new JTextField[columnCount];
         JComboBox<ProductCategory> categoryComboBox = new JComboBox<>();
         JPanel panel = createEditPanel(columnCount, rowData, textFields, categoryComboBox);
-
+    
         populateComboBox(categoryComboBox, categories);
         selectCurrentCategory(row, categoryComboBox);
-
+    
         int result = JOptionPane.showConfirmDialog(this, panel, "Edit Row", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
         if (result == JOptionPane.OK_OPTION) {
             updateTableData(row, columnCount, textFields, categoryComboBox);
+            resetButton.setEnabled(true);
+            commitButton.setEnabled(true);
         }
     }
 
