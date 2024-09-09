@@ -20,7 +20,8 @@ public class ProductRepository {
         String sql = """
                      SELECT p.product_id, p.name, p.description, p.unit_price, p.stock, c.category_id, c.name as category_name \
                      FROM Products p \
-                     JOIN Prod_categories c ON p.category_id = c.category_id\
+                     JOIN Prod_categories c ON p.category_id = c.category_id \
+                     WHERE p.is_active = true
                      """;
         try {
             return jdbcTemplate.query(sql, this::mapRowToProduct);
@@ -61,7 +62,28 @@ public class ProductRepository {
                 rs.getString("description"),
                 rs.getFloat("unit_price"),
                 rs.getInt("stock"),
+                true,
                 category
         );
+    }
+
+    public void addProduct(Product product) {
+        String sql = "INSERT INTO Products (name, description, unit_price, stock, category_id) VALUES (?, ?, ?, ?, ?)";
+        try {
+            jdbcTemplate.update(sql, product.getName(), product.getDescription(), product.getUnitPrice(), product.getStock(), product.getCategory().getCategoryId());
+        } catch (Exception e) {
+            // Log the exception and rethrow it or handle it accordingly
+            throw new RuntimeException("Error adding product", e);
+        }
+    }
+
+    public void deleteProduct(Product product) {
+        String sql = "UPDATE Products SET is_active = false WHERE product_id = ?";
+        try {
+            jdbcTemplate.update(sql, product.getProductId());
+        } catch (Exception e) {
+            // Log the exception and rethrow it or handle it accordingly
+            throw new RuntimeException("Error deleting product", e);
+        }
     }
 }

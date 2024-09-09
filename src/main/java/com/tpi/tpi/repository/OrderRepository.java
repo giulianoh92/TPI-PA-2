@@ -209,6 +209,7 @@ public class OrderRepository {
                 rs.getString("p.description"),
                 rs.getFloat("p.unit_price"),
                 rs.getInt("p.stock"),
+                true,
                 productCategory
         );
         return new Item(

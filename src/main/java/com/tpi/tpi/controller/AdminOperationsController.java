@@ -82,6 +82,26 @@ public class AdminOperationsController {
         }
     }
 
+    public void addProduct(Product product) {
+        try {
+            productService.addProduct(product);
+        } catch (Exception e) {
+            // Log the exception and handle it accordingly
+            System.err.println("Error adding product");
+            e.printStackTrace();
+        }
+    }
+
+    public void deleteProduct(Product product) {
+        try {
+            productService.deleteProduct(product);
+        } catch (Exception e) {
+            // Log the exception and handle it accordingly
+            System.err.println("Error deleting product");
+            e.printStackTrace();
+        }
+    }
+
     public void commitUserData(List<User> users) {
         System.out.println("Committing user data:");
         for (User user : users) {

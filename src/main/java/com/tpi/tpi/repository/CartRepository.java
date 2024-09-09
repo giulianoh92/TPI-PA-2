@@ -89,6 +89,7 @@ public class CartRepository {
                 rs.getString("description"),
                 rs.getFloat("unit_price"),
                 rs.getInt("stock"),
+                true,
                 category
         );
     }
