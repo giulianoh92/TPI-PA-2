@@ -13,10 +13,13 @@ import java.util.function.Function;
 
 public abstract class AbstractView<T, C> extends JPanel {
     protected C controller;
-    protected JTable table; // Cambiado a protected
+    protected JTable table;
     private Object[][] initialTableData;
-    protected JButton commitButton; // Cambiado a protected
-    protected JButton resetButton;  // Cambiado a protected
+    protected JButton commitButton;
+    protected JButton resetButton;
+    protected JButton editRowButton;
+    protected JButton addRowButton;
+    protected JButton deleteRowButton;
 
     public AbstractView() {
         initComponents();
@@ -29,9 +32,9 @@ public abstract class AbstractView<T, C> extends JPanel {
             JPanel buttonPanel = new JPanel();
             resetButton = createStyledButton("Reset");
             commitButton = createStyledButton("Commit");
-            JButton editRowButton = createStyledButton("Edit Row");
-            JButton addRowButton = createStyledButton("Add Row");
-            JButton deleteRowButton = createStyledButton("Delete Row");
+            editRowButton = createStyledButton("Edit Row");
+            addRowButton = createStyledButton("Add Row");
+            deleteRowButton = createStyledButton("Delete Row");
 
             resetButton.setEnabled(false);
             commitButton.setEnabled(false);
@@ -45,8 +48,11 @@ public abstract class AbstractView<T, C> extends JPanel {
             buttonPanel.add(resetButton);
             buttonPanel.add(commitButton);
             buttonPanel.add(editRowButton);
-            buttonPanel.add(addRowButton);
-            buttonPanel.add(deleteRowButton);
+
+            if (isFieldEditable()) {
+                buttonPanel.add(addRowButton);
+                buttonPanel.add(deleteRowButton);
+            }
 
             add(buttonPanel, BorderLayout.SOUTH);
         }
@@ -54,6 +60,10 @@ public abstract class AbstractView<T, C> extends JPanel {
 
     protected boolean shouldShowDefaultButtons() {
         return true;
+    }
+
+    protected boolean isFieldEditable() {
+        return false;
     }
 
     private JButton createStyledButton(String text) {
@@ -69,9 +79,9 @@ public abstract class AbstractView<T, C> extends JPanel {
         this.controller = controller;
     }
 
-    protected void onAdd(){}
+    protected void onAdd() {}
 
-    protected void onDelete(){}
+    protected void onDelete() {}
 
     public void showPanel(List<T> data, String[] columnNames, Function<T, Object[]> rowMapper) {
         if (GraphicsEnvironment.isHeadless()) {
@@ -90,9 +100,9 @@ public abstract class AbstractView<T, C> extends JPanel {
             JPanel buttonPanel = new JPanel();
             resetButton = createStyledButton("Reset");
             commitButton = createStyledButton("Commit");
-            JButton editRowButton = createStyledButton("Edit Row");
-            JButton addRowButton = createStyledButton("Add Row");
-            JButton deleteRowButton = createStyledButton("Delete Row");
+            editRowButton = createStyledButton("Edit Row");
+            addRowButton = createStyledButton("Add Row");
+            deleteRowButton = createStyledButton("Delete Row");
 
             resetButton.setEnabled(false);
             commitButton.setEnabled(false);
@@ -106,8 +116,11 @@ public abstract class AbstractView<T, C> extends JPanel {
             buttonPanel.add(resetButton);
             buttonPanel.add(commitButton);
             buttonPanel.add(editRowButton);
-            buttonPanel.add(addRowButton);
-            buttonPanel.add(deleteRowButton);
+
+            if (isFieldEditable()) {
+                buttonPanel.add(addRowButton);
+                buttonPanel.add(deleteRowButton);
+            }
 
             panel.add(buttonPanel, BorderLayout.SOUTH);
         }
@@ -169,13 +182,13 @@ public abstract class AbstractView<T, C> extends JPanel {
         for (int i = 0; i < data.size(); i++) {
             dataCopy[i] = Arrays.copyOf(rowMapper.apply(data.get(i)), columnNames.length);
         }
-    
+
         // Debug: Print initialTableData
         System.out.println("Initial Table Data:");
         for (Object[] row : dataCopy) {
             System.out.println(Arrays.toString(row));
         }
-    
+
         return dataCopy;
     }
 
@@ -225,18 +238,18 @@ public abstract class AbstractView<T, C> extends JPanel {
 
     protected void onEditRow() {
         int row = table.getSelectedRow();
-    
+
         if (row == -1) {
             JOptionPane.showMessageDialog(this, "Please select a row to edit.", "No Row Selected", JOptionPane.WARNING_MESSAGE);
             return;
         }
-    
+
         int columnCount = table.getColumnCount();
         Object[] rowData = new Object[columnCount];
         for (int col = 0; col < columnCount; col++) {
             rowData[col] = table.getValueAt(row, col);
         }
-    
+
         JTextField[] textFields = new JTextField[columnCount];
         JPanel panel = new JPanel(new GridLayout(columnCount, 2));
         for (int col = 0; col < columnCount; col++) {
@@ -247,7 +260,7 @@ public abstract class AbstractView<T, C> extends JPanel {
             }
             panel.add(textFields[col]);
         }
-    
+
         // Save current table data before editing
         Object[][] beforeEditData = new Object[table.getRowCount()][table.getColumnCount()];
         for (int i = 0; i < table.getRowCount(); i++) {
@@ -255,13 +268,13 @@ public abstract class AbstractView<T, C> extends JPanel {
                 beforeEditData[i][j] = table.getValueAt(i, j);
             }
         }
-    
+
         // Debug: Print beforeEditData
         System.out.println("Before Edit Data:");
         for (Object[] rowArray : beforeEditData) {
             System.out.println(Arrays.toString(rowArray));
         }
-    
+
         int result = JOptionPane.showConfirmDialog(this, panel, "Edit Row", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
         if (result == JOptionPane.OK_OPTION) {
             for (int col = 0; col < columnCount; col++) {
@@ -269,7 +282,7 @@ public abstract class AbstractView<T, C> extends JPanel {
                     table.setValueAt(textFields[col].getText(), row, col);
                 }
             }
-    
+
             // Check if there are any changes
             boolean hasChanges = false;
             for (int i = 0; i < table.getRowCount(); i++) {
@@ -285,7 +298,7 @@ public abstract class AbstractView<T, C> extends JPanel {
                     break;
                 }
             }
-    
+
             // Debug: Print data after edit
             System.out.println("Data After Edit:");
             for (int i = 0; i < table.getRowCount(); i++) {
@@ -294,7 +307,7 @@ public abstract class AbstractView<T, C> extends JPanel {
                 }
                 System.out.println();
             }
-    
+
             // Enable buttons if changes are detected
             if (hasChanges) {
                 resetButton.setEnabled(true);

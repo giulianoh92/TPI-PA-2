@@ -30,6 +30,11 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
     }
 
     @Override
+    protected boolean isFieldEditable() {
+        return true;
+    }
+
+    @Override
     protected String getFrameTitle() {
         return "Product Management";
     }
