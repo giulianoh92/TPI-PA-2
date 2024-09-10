@@ -6,23 +6,24 @@ import com.tpi.tpi.model.ProductCategory;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-
 import java.awt.*;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
+import java.util.logging.Logger;
 
 public class ProductView extends AbstractView<Product, AdminOperationsController> implements PanelView<AdminOperationsController> {
 
     private static final int ID_COLUMN = 0;
     private static final int CAT_ID_COLUMN = 5;
     private static final int CATEGORY_COLUMN = 6;
+    private static final Logger LOGGER = Logger.getLogger(ProductView.class.getName());
 
     private List<ProductCategory> categories;
     private List<Product> products;
 
     public ProductView() {
-        initComponents(); // Initialize ProductView-specific components
+        initComponents();
     }
 
     private void initComponents() {
@@ -62,17 +63,21 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
 
         JTable table = getTable();
         if (table != null) {
-            table.getColumnModel().getColumn(CAT_ID_COLUMN).setMinWidth(0);
-            table.getColumnModel().getColumn(CAT_ID_COLUMN).setMaxWidth(0);
-            table.getColumnModel().getColumn(CAT_ID_COLUMN).setPreferredWidth(0);
+            hideCategoryIdColumn(table);
         }
+    }
+
+    private void hideCategoryIdColumn(JTable table) {
+        table.getColumnModel().getColumn(CAT_ID_COLUMN).setMinWidth(0);
+        table.getColumnModel().getColumn(CAT_ID_COLUMN).setMaxWidth(0);
+        table.getColumnModel().getColumn(CAT_ID_COLUMN).setPreferredWidth(0);
     }
 
     @Override
     public void handleCommit(Object[][] data) {
-        System.out.println("Committing product data:");
+        LOGGER.info("Committing product data:");
         for (Product product : products) {
-            System.out.println(product);
+            LOGGER.info(product.toString());
         }
 
         controller.commitProductData(products);
@@ -95,50 +100,20 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
         populateComboBox(categoryComboBox, categories);
         selectCurrentCategory(row, categoryComboBox);
 
-        // Save current table data before editing
-        Object[][] beforeEditData = new Object[getTable().getRowCount()][getTable().getColumnCount()];
-        for (int i = 0; i < getTable().getRowCount(); i++) {
-            for (int j = 0; j < getTable().getColumnCount(); j++) {
-                beforeEditData[i][j] = getTable().getValueAt(i, j);
-            }
-        }
+        Object[][] beforeEditData = getCurrentTableData();
 
-        // Debug: Print beforeEditData
-        System.out.println("Before Edit Data:");
-        for (Object[] rowArray : beforeEditData) {
-            System.out.println(Arrays.toString(rowArray));
-        }
+        LOGGER.info("Before Edit Data:");
+        logTableData(beforeEditData);
 
         int result = JOptionPane.showConfirmDialog(this, panel, "Edit Row", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
         if (result == JOptionPane.OK_OPTION) {
             updateTableData(row, columnCount, textFields, categoryComboBox);
 
-            // Check if there are any changes
-            boolean hasChanges = false;
-            for (int i = 0; i < getTable().getRowCount(); i++) {
-                for (int j = 0; j < getTable().getColumnCount(); j++) {
-                    boolean isEqual = beforeEditData[i][j].toString().equals(getTable().getValueAt(i, j).toString());
-                    System.out.println("Comparing beforeEditData[" + i + "][" + j + "] with getTable().getValueAt(" + i + ", " + j + "): " + isEqual);
-                    if (!isEqual) {
-                        hasChanges = true;
-                        break;
-                    }
-                }
-                if (hasChanges) {
-                    break;
-                }
-            }
+            boolean hasChanges = checkForChanges(beforeEditData);
 
-            // Debug: Print data after edit
-            System.out.println("Data After Edit:");
-            for (int i = 0; i < getTable().getRowCount(); i++) {
-                for (int j = 0; j < getTable().getColumnCount(); j++) {
-                    System.out.print(getTable().getValueAt(i, j) + "\t");
-                }
-                System.out.println();
-            }
+            LOGGER.info("Data After Edit:");
+            logCurrentTableData();
 
-            // Enable buttons if changes are detected
             if (hasChanges) {
                 resetButton.setEnabled(true);
                 commitButton.setEnabled(true);
@@ -160,7 +135,7 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
             if (col == CAT_ID_COLUMN) {
                 continue;
             }
-    
+
             panel.add(new JLabel(getTable().getColumnName(col)));
             if (col == CATEGORY_COLUMN) {
                 panel.add(categoryComboBox);
@@ -174,7 +149,7 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
         }
         return panel;
     }
-    
+
     private void selectCurrentCategory(int row, JComboBox<ProductCategory> categoryComboBox) {
         int currentCategoryId = (Integer) getTable().getValueAt(row, CAT_ID_COLUMN);
         ProductCategory currentCategory = categories.stream()
@@ -183,7 +158,7 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
                 .orElse(null);
         selectCurrentItem(categoryComboBox, currentCategory);
     }
-    
+
     private void updateTableData(int row, int columnCount, JTextField[] textFields, JComboBox<ProductCategory> categoryComboBox) {
         Product product = products.get(row);
         for (int col = 0; col < columnCount; col++) {
@@ -197,24 +172,28 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
                     }
                 } else {
                     if (textFields[col] != null) {
-                        switch (col) {
-                            case 1:
-                                product.setName(textFields[col].getText());
-                                break;
-                            case 2:
-                                product.setDescription(textFields[col].getText());
-                                break;
-                            case 3:
-                                product.setUnitPrice(Float.parseFloat(textFields[col].getText()));
-                                break;
-                            case 4:
-                                product.setStock(Integer.parseInt(textFields[col].getText()));
-
-                        }
+                        updateProductField(product, col, textFields[col].getText());
                         getTable().setValueAt(textFields[col].getText(), row, col);
                     }
                 }
             }
+        }
+    }
+
+    private void updateProductField(Product product, int col, String value) {
+        switch (col) {
+            case 1:
+                product.setName(value);
+                break;
+            case 2:
+                product.setDescription(value);
+                break;
+            case 3:
+                product.setUnitPrice(Float.parseFloat(value));
+                break;
+            case 4:
+                product.setStock(Integer.parseInt(value));
+                break;
         }
     }
 
@@ -248,40 +227,15 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
         JTextField stockField = new JTextField();
         JComboBox<ProductCategory> categoryComboBox = new JComboBox<>();
 
-        JPanel panel = new JPanel(new GridLayout(5, 2));
-        panel.add(new JLabel("Name:"));
-        panel.add(nameField);
-        panel.add(new JLabel("Description:"));
-        panel.add(descriptionField);
-        panel.add(new JLabel("Unit Price:"));
-        panel.add(unitPriceField);
-        panel.add(new JLabel("Stock:"));
-        panel.add(stockField);
-        panel.add(new JLabel("Category:"));
-        panel.add(categoryComboBox);
+        JPanel panel = createAddPanel(nameField, descriptionField, unitPriceField, stockField, categoryComboBox);
 
         populateComboBox(categoryComboBox, categories);
 
         int result = JOptionPane.showConfirmDialog(this, panel, "Add Product", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
         if (result == JOptionPane.OK_OPTION) {
             try {
-                String name = nameField.getText();
-                String description = descriptionField.getText();
-                float unitPrice = Float.parseFloat(unitPriceField.getText());
-                int stock = Integer.parseInt(stockField.getText());
-                ProductCategory selectedCategory = (ProductCategory) categoryComboBox.getSelectedItem();
-
-                if (selectedCategory != null) {
-                    Product newProduct = new Product(
-                        0,
-                        name,
-                        description,
-                        unitPrice,
-                        stock,
-                        true,
-                        selectedCategory
-                    );
-
+                Product newProduct = createNewProduct(nameField, descriptionField, unitPriceField, stockField, categoryComboBox);
+                if (newProduct != null) {
                     controller.addProduct(newProduct);
                     products.add(newProduct);
 
@@ -302,6 +256,48 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
             } catch (NumberFormatException e) {
                 JOptionPane.showMessageDialog(this, "Invalid input. Please enter valid numbers for Unit Price and Stock.", "Input Error", JOptionPane.ERROR_MESSAGE);
             }
+        }
+    }
+
+    private JPanel createAddPanel(JTextField nameField, JTextField descriptionField, JTextField unitPriceField, JTextField stockField, JComboBox<ProductCategory> categoryComboBox) {
+        JPanel panel = new JPanel(new GridLayout(5, 2));
+        panel.add(new JLabel("Name:"));
+        panel.add(nameField);
+        panel.add(new JLabel("Description:"));
+        panel.add(descriptionField);
+        panel.add(new JLabel("Unit Price:"));
+        panel.add(unitPriceField);
+        panel.add(new JLabel("Stock:"));
+        panel.add(stockField);
+        panel.add(new JLabel("Category:"));
+        panel.add(categoryComboBox);
+        return panel;
+    }
+
+    private Product createNewProduct(JTextField nameField, JTextField descriptionField, JTextField unitPriceField, JTextField stockField, JComboBox<ProductCategory> categoryComboBox) {
+        String name = nameField.getText();
+        String description = descriptionField.getText();
+        float unitPrice = Float.parseFloat(unitPriceField.getText());
+        int stock = Integer.parseInt(stockField.getText());
+        ProductCategory selectedCategory = (ProductCategory) categoryComboBox.getSelectedItem();
+
+        if (selectedCategory != null) {
+            return new Product(
+                0,
+                name,
+                description,
+                unitPrice,
+                stock,
+                true,
+                selectedCategory
+            );
+        }
+        return null;
+    }
+
+    private void logTableData(Object[][] data) {
+        for (Object[] rowArray : data) {
+            LOGGER.info(Arrays.toString(rowArray));
         }
     }
 }

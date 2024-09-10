@@ -10,8 +10,14 @@ import java.awt.event.MouseEvent;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
+import java.util.logging.Logger;
 
 public abstract class AbstractView<T, C> extends JPanel {
+    private static final Color BUTTON_BACKGROUND_COLOR = new Color(70, 130, 180);
+    private static final Color BUTTON_FOREGROUND_COLOR = Color.WHITE;
+    private static final Font BUTTON_FONT = new Font("Tahoma", Font.BOLD, 12);
+    private static final Logger LOGGER = Logger.getLogger(AbstractView.class.getName());
+
     protected C controller;
     protected JTable table;
     private Object[][] initialTableData;
@@ -29,33 +35,38 @@ public abstract class AbstractView<T, C> extends JPanel {
         setLayout(new BorderLayout());
 
         if (shouldShowDefaultButtons()) {
-            JPanel buttonPanel = new JPanel();
-            resetButton = createStyledButton("Reset");
-            commitButton = createStyledButton("Commit");
-            editRowButton = createStyledButton("Edit Row");
-            addRowButton = createStyledButton("Add Row");
-            deleteRowButton = createStyledButton("Delete Row");
-
-            resetButton.setEnabled(false);
-            commitButton.setEnabled(false);
-
-            resetButton.addActionListener(e -> onReset());
-            commitButton.addActionListener(e -> onCommit());
-            editRowButton.addActionListener(e -> onEditRow());
-            addRowButton.addActionListener(e -> onAdd());
-            deleteRowButton.addActionListener(e -> onDelete());
-
-            buttonPanel.add(resetButton);
-            buttonPanel.add(commitButton);
-            buttonPanel.add(editRowButton);
-
-            if (isFieldEditable()) {
-                buttonPanel.add(addRowButton);
-                buttonPanel.add(deleteRowButton);
-            }
-
+            JPanel buttonPanel = createButtonPanel();
             add(buttonPanel, BorderLayout.SOUTH);
         }
+    }
+
+    private JPanel createButtonPanel() {
+        JPanel buttonPanel = new JPanel();
+        resetButton = createStyledButton("Reset");
+        commitButton = createStyledButton("Commit");
+        editRowButton = createStyledButton("Edit Row");
+        addRowButton = createStyledButton("Add Row");
+        deleteRowButton = createStyledButton("Delete Row");
+
+        resetButton.setEnabled(false);
+        commitButton.setEnabled(false);
+
+        resetButton.addActionListener(e -> onReset());
+        commitButton.addActionListener(e -> onCommit());
+        editRowButton.addActionListener(e -> onEditRow());
+        addRowButton.addActionListener(e -> onAdd());
+        deleteRowButton.addActionListener(e -> onDelete());
+
+        buttonPanel.add(resetButton);
+        buttonPanel.add(commitButton);
+        buttonPanel.add(editRowButton);
+
+        if (isFieldEditable()) {
+            buttonPanel.add(addRowButton);
+            buttonPanel.add(deleteRowButton);
+        }
+
+        return buttonPanel;
     }
 
     protected boolean shouldShowDefaultButtons() {
@@ -68,10 +79,10 @@ public abstract class AbstractView<T, C> extends JPanel {
 
     private JButton createStyledButton(String text) {
         JButton button = new JButton(text);
-        button.setBackground(new Color(70, 130, 180));
-        button.setForeground(Color.WHITE);
+        button.setBackground(BUTTON_BACKGROUND_COLOR);
+        button.setForeground(BUTTON_FOREGROUND_COLOR);
         button.setFocusPainted(false);
-        button.setFont(new Font("Tahoma", Font.BOLD, 12));
+        button.setFont(BUTTON_FONT);
         return button;
     }
 
@@ -97,31 +108,7 @@ public abstract class AbstractView<T, C> extends JPanel {
         panel.add(tableScrollPane, BorderLayout.CENTER);
 
         if (shouldShowDefaultButtons()) {
-            JPanel buttonPanel = new JPanel();
-            resetButton = createStyledButton("Reset");
-            commitButton = createStyledButton("Commit");
-            editRowButton = createStyledButton("Edit Row");
-            addRowButton = createStyledButton("Add Row");
-            deleteRowButton = createStyledButton("Delete Row");
-
-            resetButton.setEnabled(false);
-            commitButton.setEnabled(false);
-
-            resetButton.addActionListener(e -> onReset());
-            commitButton.addActionListener(e -> onCommit());
-            editRowButton.addActionListener(e -> onEditRow());
-            addRowButton.addActionListener(e -> onAdd());
-            deleteRowButton.addActionListener(e -> onDelete());
-
-            buttonPanel.add(resetButton);
-            buttonPanel.add(commitButton);
-            buttonPanel.add(editRowButton);
-
-            if (isFieldEditable()) {
-                buttonPanel.add(addRowButton);
-                buttonPanel.add(deleteRowButton);
-            }
-
+            JPanel buttonPanel = createButtonPanel();
             panel.add(buttonPanel, BorderLayout.SOUTH);
         }
 
@@ -164,13 +151,13 @@ public abstract class AbstractView<T, C> extends JPanel {
         table.setFillsViewportHeight(true);
         table.setRowHeight(25);
         table.setFont(new Font("Tahoma", Font.PLAIN, 12));
-        table.setSelectionBackground(new Color(70, 130, 180));
-        table.setSelectionForeground(Color.WHITE);
+        table.setSelectionBackground(BUTTON_BACKGROUND_COLOR);
+        table.setSelectionForeground(BUTTON_FOREGROUND_COLOR);
 
         JTableHeader header = table.getTableHeader();
         header.setFont(new Font("Tahoma", Font.BOLD, 12));
-        header.setBackground(new Color(70, 130, 180));
-        header.setForeground(Color.WHITE);
+        header.setBackground(BUTTON_BACKGROUND_COLOR);
+        header.setForeground(BUTTON_FOREGROUND_COLOR);
 
         DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
         centerRenderer.setHorizontalAlignment(JLabel.CENTER);
@@ -183,10 +170,9 @@ public abstract class AbstractView<T, C> extends JPanel {
             dataCopy[i] = Arrays.copyOf(rowMapper.apply(data.get(i)), columnNames.length);
         }
 
-        // Debug: Print initialTableData
-        System.out.println("Initial Table Data:");
+        LOGGER.info("Initial Table Data:");
         for (Object[] row : dataCopy) {
-            System.out.println(Arrays.toString(row));
+            LOGGER.info(Arrays.toString(row));
         }
 
         return dataCopy;
@@ -195,7 +181,7 @@ public abstract class AbstractView<T, C> extends JPanel {
     protected abstract String getFrameTitle();
 
     protected void onCommit() {
-        System.out.println("Current table values:");
+        LOGGER.info("Current table values:");
         int rowCount = table.getRowCount();
         int columnCount = table.getColumnCount();
 
@@ -203,9 +189,9 @@ public abstract class AbstractView<T, C> extends JPanel {
         for (int row = 0; row < rowCount; row++) {
             for (int col = 0; col < columnCount; col++) {
                 currentData[row][col] = table.getValueAt(row, col);
-                System.out.print(currentData[row][col] + "\t");
+                LOGGER.info(currentData[row][col] + "\t");
             }
-            System.out.println();
+            LOGGER.info("\n");
         }
 
         handleCommit(currentData);
@@ -215,17 +201,17 @@ public abstract class AbstractView<T, C> extends JPanel {
 
     protected void onReset() {
         if (initialTableData == null) {
-            System.out.println("No initial data available to reset.");
+            LOGGER.warning("No initial data available to reset.");
             return;
         }
 
-        System.out.println("Resetting table values to initial state");
+        LOGGER.info("Resetting table values to initial state");
 
         int rowCount = table.getRowCount();
         int columnCount = table.getColumnCount();
 
         if (rowCount != initialTableData.length || columnCount != initialTableData[0].length) {
-            System.out.println("Mismatch in data size. Cannot reset.");
+            LOGGER.warning("Mismatch in data size. Cannot reset.");
             return;
         }
 
@@ -255,64 +241,81 @@ public abstract class AbstractView<T, C> extends JPanel {
         for (int col = 0; col < columnCount; col++) {
             panel.add(new JLabel(table.getColumnName(col)));
             textFields[col] = new JTextField(rowData[col].toString());
-            if (col == 0 || "Registered At".equals(table.getColumnName(col)) || "Date".equals(table.getColumnName(col)) || "Total".equals(table.getColumnName(col)) || "Payment Method".equals(table.getColumnName(col)) || "Username".equals(table.getColumnName(col)) || "Password".equals(table.getColumnName(col)) || "Email".equals(table.getColumnName(col))) { // Make "ID" and "Registered At" columns uneditable
+            if (isNonEditableColumn(col)) {
                 textFields[col].setEditable(false);
             }
             panel.add(textFields[col]);
         }
 
-        // Save current table data before editing
-        Object[][] beforeEditData = new Object[table.getRowCount()][table.getColumnCount()];
-        for (int i = 0; i < table.getRowCount(); i++) {
-            for (int j = 0; j < table.getColumnCount(); j++) {
-                beforeEditData[i][j] = table.getValueAt(i, j);
-            }
-        }
+        Object[][] beforeEditData = getCurrentTableData();
 
-        // Debug: Print beforeEditData
-        System.out.println("Before Edit Data:");
+        LOGGER.info("Before Edit Data:");
         for (Object[] rowArray : beforeEditData) {
-            System.out.println(Arrays.toString(rowArray));
+            LOGGER.info(Arrays.toString(rowArray));
         }
 
         int result = JOptionPane.showConfirmDialog(this, panel, "Edit Row", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
         if (result == JOptionPane.OK_OPTION) {
-            for (int col = 0; col < columnCount; col++) {
-                if (col != 0 && !"Registered At".equals(table.getColumnName(col))) { // Skip the ID and "Registered At" columns
-                    table.setValueAt(textFields[col].getText(), row, col);
-                }
-            }
+            updateTableData(row, columnCount, textFields);
 
-            // Check if there are any changes
-            boolean hasChanges = false;
-            for (int i = 0; i < table.getRowCount(); i++) {
-                for (int j = 0; j < table.getColumnCount(); j++) {
-                    boolean isEqual = beforeEditData[i][j].toString().equals(table.getValueAt(i, j).toString());
-                    System.out.println("Comparing beforeEditData[" + i + "][" + j + "] with table.getValueAt(" + i + ", " + j + "): " + isEqual);
-                    if (!isEqual) {
-                        hasChanges = true;
-                        break;
-                    }
-                }
-                if (hasChanges) {
-                    break;
-                }
-            }
+            boolean hasChanges = checkForChanges(beforeEditData);
 
-            // Debug: Print data after edit
-            System.out.println("Data After Edit:");
-            for (int i = 0; i < table.getRowCount(); i++) {
-                for (int j = 0; j < table.getColumnCount(); j++) {
-                    System.out.print(table.getValueAt(i, j) + "\t");
-                }
-                System.out.println();
-            }
+            LOGGER.info("Data After Edit:");
+            logCurrentTableData();
 
-            // Enable buttons if changes are detected
             if (hasChanges) {
                 resetButton.setEnabled(true);
                 commitButton.setEnabled(true);
             }
+        }
+    }
+
+    private boolean isNonEditableColumn(int col) {
+        String columnName = table.getColumnName(col);
+        return col == 0 || "Registered At".equals(columnName) || "Date".equals(columnName) || "Total".equals(columnName) || "Payment Method".equals(columnName) || "Username".equals(columnName) || "Password".equals(columnName) || "Email".equals(columnName);
+    }
+
+    protected Object[][] getCurrentTableData() {
+        int rowCount = table.getRowCount();
+        int columnCount = table.getColumnCount();
+        Object[][] data = new Object[rowCount][columnCount];
+        for (int i = 0; i < rowCount; i++) {
+            for (int j = 0; j < columnCount; j++) {
+                data[i][j] = table.getValueAt(i, j);
+            }
+        }
+        return data;
+    }
+
+    private void updateTableData(int row, int columnCount, JTextField[] textFields) {
+        for (int col = 0; col < columnCount; col++) {
+            if (!isNonEditableColumn(col)) {
+                table.setValueAt(textFields[col].getText(), row, col);
+            }
+        }
+    }
+
+    public boolean checkForChanges(Object[][] beforeEditData) {
+        int rowCount = table.getRowCount();
+        int columnCount = table.getColumnCount();
+        for (int i = 0; i < rowCount; i++) {
+            for (int j = 0; j < columnCount; j++) {
+                if (!beforeEditData[i][j].toString().equals(table.getValueAt(i, j).toString())) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public void logCurrentTableData() {
+        int rowCount = table.getRowCount();
+        int columnCount = table.getColumnCount();
+        for (int i = 0; i < rowCount; i++) {
+            for (int j = 0; j < columnCount; j++) {
+                LOGGER.info(table.getValueAt(i, j) + "\t");
+            }
+            LOGGER.info("\n");
         }
     }
 
@@ -330,7 +333,6 @@ public abstract class AbstractView<T, C> extends JPanel {
         }
     }
 
-    // Universal method to select current item in JComboBox
     protected <E> void selectCurrentItem(JComboBox<E> comboBox, E currentItem) {
         comboBox.setSelectedItem(currentItem);
     }

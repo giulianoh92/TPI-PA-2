@@ -2,12 +2,15 @@ package com.tpi.tpi.view;
 
 import com.tpi.tpi.controller.AdminOperationsController;
 import com.tpi.tpi.model.User;
+
 import java.awt.*;
 import java.util.List;
 import java.util.function.Function;
+import java.util.logging.Logger;
 
 public class UserView extends AbstractView<User, AdminOperationsController> implements PanelView<AdminOperationsController> {
 
+    private static final Logger LOGGER = Logger.getLogger(UserView.class.getName());
     private List<User> users;
 
     public UserView() {
@@ -25,7 +28,7 @@ public class UserView extends AbstractView<User, AdminOperationsController> impl
 
     @Override
     public void showPanel(AdminOperationsController controller) {
-        setController(controller); // Set the controller
+        setController(controller);
 
         String[] columnNames = {"ID", "Username", "Password", "Registered At"};
         Function<User, Object[]> rowMapper = user -> new Object[]{
@@ -40,15 +43,16 @@ public class UserView extends AbstractView<User, AdminOperationsController> impl
 
     @Override
     public void handleCommit(Object[][] data) {
-        System.out.println("Committing user data:");
+        LOGGER.info("Committing user data:");
         for (int i = 0; i < data.length; i++) {
-            users.get(i).setUserId((Integer) data[i][0]);
-            users.get(i).setUsername((String) data[i][1]);
-            users.get(i).setPassword((String) data[i][2]);
-            users.get(i).setRegisterDate(new java.sql.Date(((java.util.Date) data[i][3]).getTime())); // Convert java.util.Date to java.sql.Date
-            System.out.println(users.get(i));
+            User user = users.get(i);
+            user.setUserId((Integer) data[i][0]);
+            user.setUsername((String) data[i][1]);
+            user.setPassword((String) data[i][2]);
+            user.setRegisterDate(new java.sql.Date(((java.util.Date) data[i][3]).getTime()));
+            LOGGER.info(user.toString());
         }
-    
+
         controller.commitUserData(users);
     }
 }

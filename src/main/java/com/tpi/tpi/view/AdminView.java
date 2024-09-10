@@ -6,8 +6,17 @@ import com.tpi.tpi.controller.ViewType;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import java.awt.*;
+import java.util.logging.Logger;
 
 public class AdminView extends AbstractView<Object, AdminOperationsController> implements PanelView<AdminOperationsController> {
+
+    private static final int PADDING = 10;
+    private static final int BORDER_PADDING = 20;
+    private static final String PRODUCT_BUTTON_TEXT = "Products";
+    private static final String USER_BUTTON_TEXT = "Users";
+    private static final String ORDER_BUTTON_TEXT = "Orders";
+    private static final String CUSTOMER_BUTTON_TEXT = "Customers";
+    private static final Logger LOGGER = Logger.getLogger(AdminView.class.getName());
 
     private JButton productButton;
     private JButton userButton;
@@ -20,35 +29,42 @@ public class AdminView extends AbstractView<Object, AdminOperationsController> i
 
     private void initComponents() {
         setLayout(new GridBagLayout());
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(10, 10, 10, 10); // Add padding between components
-        gbc.fill = GridBagConstraints.HORIZONTAL;
+        GridBagConstraints gbc = createGridBagConstraints();
 
-        productButton = new JButton("Products");
-        productButton.addActionListener(e -> controller.displayView(ViewType.PRODUCT));
+        productButton = createButton(PRODUCT_BUTTON_TEXT, e -> controller.displayView(ViewType.PRODUCT));
         gbc.gridx = 0;
         gbc.gridy = 0;
         add(productButton, gbc);
 
-        userButton = new JButton("Users");
-        userButton.addActionListener(e -> controller.displayView(ViewType.USER));
+        userButton = createButton(USER_BUTTON_TEXT, e -> controller.displayView(ViewType.USER));
         gbc.gridx = 1;
         gbc.gridy = 0;
         add(userButton, gbc);
 
-        orderButton = new JButton("Orders");
-        orderButton.addActionListener(e -> controller.displayView(ViewType.ORDER));
+        orderButton = createButton(ORDER_BUTTON_TEXT, e -> controller.displayView(ViewType.ORDER));
         gbc.gridx = 0;
         gbc.gridy = 1;
         add(orderButton, gbc);
 
-        customerButton = new JButton("Customers");
-        customerButton.addActionListener(e -> controller.displayView(ViewType.CUSTOMER));
+        customerButton = createButton(CUSTOMER_BUTTON_TEXT, e -> controller.displayView(ViewType.CUSTOMER));
         gbc.gridx = 1;
         gbc.gridy = 1;
         add(customerButton, gbc);
 
-        setBorder(new EmptyBorder(20, 20, 20, 20)); // Add padding around the panel
+        setBorder(new EmptyBorder(BORDER_PADDING, BORDER_PADDING, BORDER_PADDING, BORDER_PADDING));
+    }
+
+    private GridBagConstraints createGridBagConstraints() {
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(PADDING, PADDING, PADDING, PADDING);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        return gbc;
+    }
+
+    private JButton createButton(String text, java.awt.event.ActionListener actionListener) {
+        JButton button = new JButton(text);
+        button.addActionListener(actionListener);
+        return button;
     }
 
     @Override
@@ -63,24 +79,23 @@ public class AdminView extends AbstractView<Object, AdminOperationsController> i
 
     @Override
     public void showPanel(AdminOperationsController controller) {
-        setController(controller); // Set the controller
+        setController(controller);
         JFrame frame = new JFrame(getFrameTitle());
-        frame.setSize(400, 200); // Set fixed size
+        frame.setSize(400, 200);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        frame.add(this);  // Add the panel directly
+        frame.add(this);
         frame.setVisible(true);
     }
 
     @Override
     public void handleCommit(Object[][] data) {
-        // Specific commit logic for AdminView
-        System.out.println("Committing admin data:");
+        LOGGER.info("Committing admin data:");
         for (Object[] row : data) {
             for (Object value : row) {
-                System.out.print(value + "\t");
+                LOGGER.info(value + "\t");
             }
-            System.out.println();
+            LOGGER.info("\n");
         }
 
         controller.commitAdminData(data);
