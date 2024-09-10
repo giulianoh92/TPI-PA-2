@@ -30,6 +30,8 @@ public abstract class AbstractView<T, C> extends JPanel {
             resetButton = createStyledButton("Reset");
             commitButton = createStyledButton("Commit");
             JButton editRowButton = createStyledButton("Edit Row");
+            JButton addRowButton = createStyledButton("Add Row");
+            JButton deleteRowButton = createStyledButton("Delete Row");
 
             resetButton.setEnabled(false);
             commitButton.setEnabled(false);
@@ -37,10 +39,14 @@ public abstract class AbstractView<T, C> extends JPanel {
             resetButton.addActionListener(e -> onReset());
             commitButton.addActionListener(e -> onCommit());
             editRowButton.addActionListener(e -> onEditRow());
+            addRowButton.addActionListener(e -> onAdd());
+            deleteRowButton.addActionListener(e -> onDelete());
 
             buttonPanel.add(resetButton);
             buttonPanel.add(commitButton);
             buttonPanel.add(editRowButton);
+            buttonPanel.add(addRowButton);
+            buttonPanel.add(deleteRowButton);
 
             add(buttonPanel, BorderLayout.SOUTH);
         }
@@ -63,6 +69,10 @@ public abstract class AbstractView<T, C> extends JPanel {
         this.controller = controller;
     }
 
+    protected void onAdd(){}
+
+    protected void onDelete(){}
+
     public void showPanel(List<T> data, String[] columnNames, Function<T, Object[]> rowMapper) {
         if (GraphicsEnvironment.isHeadless()) {
             return;
@@ -81,6 +91,8 @@ public abstract class AbstractView<T, C> extends JPanel {
             resetButton = createStyledButton("Reset");
             commitButton = createStyledButton("Commit");
             JButton editRowButton = createStyledButton("Edit Row");
+            JButton addRowButton = createStyledButton("Add Row");
+            JButton deleteRowButton = createStyledButton("Delete Row");
 
             resetButton.setEnabled(false);
             commitButton.setEnabled(false);
@@ -88,10 +100,14 @@ public abstract class AbstractView<T, C> extends JPanel {
             resetButton.addActionListener(e -> onReset());
             commitButton.addActionListener(e -> onCommit());
             editRowButton.addActionListener(e -> onEditRow());
+            addRowButton.addActionListener(e -> onAdd());
+            deleteRowButton.addActionListener(e -> onDelete());
 
             buttonPanel.add(resetButton);
             buttonPanel.add(commitButton);
             buttonPanel.add(editRowButton);
+            buttonPanel.add(addRowButton);
+            buttonPanel.add(deleteRowButton);
 
             panel.add(buttonPanel, BorderLayout.SOUTH);
         }

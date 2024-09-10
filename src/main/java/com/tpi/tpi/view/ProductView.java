@@ -5,6 +5,8 @@ import com.tpi.tpi.model.Product;
 import com.tpi.tpi.model.ProductCategory;
 
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+
 import java.awt.*;
 import java.util.Arrays;
 import java.util.List;
@@ -20,7 +22,7 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
     private List<Product> products;
 
     public ProductView() {
-        initComponents();
+        initComponents(); // Initialize ProductView-specific components
     }
 
     private void initComponents() {
@@ -78,16 +80,16 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
             JOptionPane.showMessageDialog(this, "Please select a row to edit.", "No Row Selected", JOptionPane.WARNING_MESSAGE);
             return;
         }
-    
+
         int columnCount = getTable().getColumnCount();
         Object[] rowData = getRowData(row, columnCount);
         JTextField[] textFields = new JTextField[columnCount];
         JComboBox<ProductCategory> categoryComboBox = new JComboBox<>();
         JPanel panel = createEditPanel(columnCount, rowData, textFields, categoryComboBox);
-    
+
         populateComboBox(categoryComboBox, categories);
         selectCurrentCategory(row, categoryComboBox);
-    
+
         // Save current table data before editing
         Object[][] beforeEditData = new Object[getTable().getRowCount()][getTable().getColumnCount()];
         for (int i = 0; i < getTable().getRowCount(); i++) {
@@ -95,17 +97,17 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
                 beforeEditData[i][j] = getTable().getValueAt(i, j);
             }
         }
-    
+
         // Debug: Print beforeEditData
         System.out.println("Before Edit Data:");
         for (Object[] rowArray : beforeEditData) {
             System.out.println(Arrays.toString(rowArray));
         }
-    
+
         int result = JOptionPane.showConfirmDialog(this, panel, "Edit Row", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
         if (result == JOptionPane.OK_OPTION) {
             updateTableData(row, columnCount, textFields, categoryComboBox);
-    
+
             // Check if there are any changes
             boolean hasChanges = false;
             for (int i = 0; i < getTable().getRowCount(); i++) {
@@ -121,7 +123,7 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
                     break;
                 }
             }
-    
+
             // Debug: Print data after edit
             System.out.println("Data After Edit:");
             for (int i = 0; i < getTable().getRowCount(); i++) {
@@ -130,7 +132,7 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
                 }
                 System.out.println();
             }
-    
+
             // Enable buttons if changes are detected
             if (hasChanges) {
                 resetButton.setEnabled(true);
@@ -138,7 +140,7 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
             }
         }
     }
-    
+
     private Object[] getRowData(int row, int columnCount) {
         Object[] rowData = new Object[columnCount];
         for (int col = 0; col < columnCount; col++) {
@@ -146,7 +148,7 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
         }
         return rowData;
     }
-    
+
     private JPanel createEditPanel(int columnCount, Object[] rowData, JTextField[] textFields, JComboBox<ProductCategory> categoryComboBox) {
         JPanel panel = new JPanel(new GridLayout(columnCount, 2));
         for (int col = 0; col < columnCount; col++) {
@@ -202,11 +204,98 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
                                 break;
                             case 4:
                                 product.setStock(Integer.parseInt(textFields[col].getText()));
-                                break;
+
                         }
                         getTable().setValueAt(textFields[col].getText(), row, col);
                     }
                 }
+            }
+        }
+    }
+
+    @Override
+    protected void onDelete() {
+        int row = getTable().getSelectedRow();
+        if (row == -1) {
+            JOptionPane.showMessageDialog(this, "Please select a row to delete.", "No Row Selected", JOptionPane.WARNING_MESSAGE);
+            return;
+        }
+
+        int result = JOptionPane.showConfirmDialog(this, "Are you sure you want to delete the selected row?", "Delete Row", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+        if (result == JOptionPane.YES_OPTION) {
+            Product productToDelete = products.get(row);
+            controller.deleteProduct(productToDelete);
+            products.remove(row);
+
+            DefaultTableModel model = (DefaultTableModel) getTable().getModel();
+            model.removeRow(row);
+
+            resetButton.setEnabled(true);
+            commitButton.setEnabled(true);
+        }
+    }
+
+    @Override
+    protected void onAdd() {
+        JTextField nameField = new JTextField();
+        JTextField descriptionField = new JTextField();
+        JTextField unitPriceField = new JTextField();
+        JTextField stockField = new JTextField();
+        JComboBox<ProductCategory> categoryComboBox = new JComboBox<>();
+
+        JPanel panel = new JPanel(new GridLayout(5, 2));
+        panel.add(new JLabel("Name:"));
+        panel.add(nameField);
+        panel.add(new JLabel("Description:"));
+        panel.add(descriptionField);
+        panel.add(new JLabel("Unit Price:"));
+        panel.add(unitPriceField);
+        panel.add(new JLabel("Stock:"));
+        panel.add(stockField);
+        panel.add(new JLabel("Category:"));
+        panel.add(categoryComboBox);
+
+        populateComboBox(categoryComboBox, categories);
+
+        int result = JOptionPane.showConfirmDialog(this, panel, "Add Product", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+        if (result == JOptionPane.OK_OPTION) {
+            try {
+                String name = nameField.getText();
+                String description = descriptionField.getText();
+                float unitPrice = Float.parseFloat(unitPriceField.getText());
+                int stock = Integer.parseInt(stockField.getText());
+                ProductCategory selectedCategory = (ProductCategory) categoryComboBox.getSelectedItem();
+
+                if (selectedCategory != null) {
+                    Product newProduct = new Product(
+                        0,
+                        name,
+                        description,
+                        unitPrice,
+                        stock,
+                        true,
+                        selectedCategory
+                    );
+
+                    controller.addProduct(newProduct);
+                    products.add(newProduct);
+
+                    DefaultTableModel model = (DefaultTableModel) getTable().getModel();
+                    model.addRow(new Object[]{
+                        newProduct.getProductId(),
+                        newProduct.getName(),
+                        newProduct.getDescription(),
+                        newProduct.getUnitPrice(),
+                        newProduct.getStock(),
+                        newProduct.getCategory().getCategoryId(),
+                        newProduct.getCategory().getCategory()
+                    });
+
+                    resetButton.setEnabled(true);
+                    commitButton.setEnabled(true);
+                }
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(this, "Invalid input. Please enter valid numbers for Unit Price and Stock.", "Input Error", JOptionPane.ERROR_MESSAGE);
             }
         }
     }
