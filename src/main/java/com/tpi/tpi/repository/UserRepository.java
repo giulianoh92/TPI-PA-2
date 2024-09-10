@@ -24,7 +24,12 @@ public class UserRepository {
      */
     public List<User> findAll() {
         String sql = "SELECT * FROM Users";
-        return jdbcTemplate.query(sql, this::mapRowToUser);
+        try {
+            return jdbcTemplate.query(sql, this::mapRowToUser);
+        } catch (Exception e) {
+            // Log the exception and rethrow it or handle it accordingly
+            throw new RuntimeException("Error fetching all users", e);
+        }
     }
 
     /**
@@ -34,7 +39,12 @@ public class UserRepository {
      */
     public User findById(int id) {
         String sql = "SELECT * FROM Users WHERE user_id = ?";
-        return jdbcTemplate.queryForObject(sql, this::mapRowToUser, id);
+        try {
+            return jdbcTemplate.queryForObject(sql, this::mapRowToUser, id);
+        } catch (Exception e) {
+            // Log the exception and rethrow it or handle it accordingly
+            throw new RuntimeException("Error fetching user by ID", e);
+        }
     }
 
     /**
@@ -43,9 +53,13 @@ public class UserRepository {
      */
     public void updateUser(User user) {
         String sql = "UPDATE Users SET username = ?, password = ? WHERE user_id = ?";
-        jdbcTemplate.update(sql, user.getUsername(), user.getPassword(), user.getUserId());
+        try {
+            jdbcTemplate.update(sql, user.getUsername(), user.getPassword(), user.getUserId());
+        } catch (Exception e) {
+            // Log the exception and rethrow it or handle it accordingly
+            throw new RuntimeException("Error updating user", e);
+        }
     }
-
 
     /**
      * Maps a row from the ResultSet to a User object.

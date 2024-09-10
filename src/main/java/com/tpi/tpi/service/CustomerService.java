@@ -14,10 +14,20 @@ public class CustomerService {
     private CustomerRepository customerRepository;
 
     public List<Customer> getAllCustomerList() {
-        return customerRepository.findAll();
+        try {
+            return customerRepository.findAll();
+        } catch (Exception e) {
+            // Log the exception and rethrow it or handle it accordingly
+            throw new RuntimeException("Error fetching all customers", e);
+        }
     }
 
-    public void updateCustomer(Customer row) {
-        customerRepository.updateCustomer(row);
+    public void updateCustomer(Customer customer) {
+        try {
+            customerRepository.updateCustomer(customer);
+        } catch (Exception e) {
+            // Log the exception and rethrow it or handle it accordingly
+            throw new RuntimeException("Error updating customer", e);
+        }
     }
 }

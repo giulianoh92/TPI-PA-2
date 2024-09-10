@@ -24,25 +24,25 @@ public class AdminView extends AbstractView<Object, AdminOperationsController> i
         gbc.insets = new Insets(10, 10, 10, 10); // Add padding between components
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        productButton = new JButton("Products CRUD");
+        productButton = new JButton("Products");
         productButton.addActionListener(e -> controller.displayView(ViewType.PRODUCT));
         gbc.gridx = 0;
         gbc.gridy = 0;
         add(productButton, gbc);
 
-        userButton = new JButton("Users CRUD");
+        userButton = new JButton("Users");
         userButton.addActionListener(e -> controller.displayView(ViewType.USER));
         gbc.gridx = 1;
         gbc.gridy = 0;
         add(userButton, gbc);
 
-        orderButton = new JButton("Orders CRUD");
+        orderButton = new JButton("Orders");
         orderButton.addActionListener(e -> controller.displayView(ViewType.ORDER));
         gbc.gridx = 0;
         gbc.gridy = 1;
         add(orderButton, gbc);
 
-        customerButton = new JButton("Customers CRUD");
+        customerButton = new JButton("Customers");
         customerButton.addActionListener(e -> controller.displayView(ViewType.CUSTOMER));
         gbc.gridx = 1;
         gbc.gridy = 1;

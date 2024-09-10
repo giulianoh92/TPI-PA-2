@@ -14,10 +14,20 @@ public class UserService {
     private UserRepository userRepository;
 
     public List<User> getAllUserList() {
-        return userRepository.findAll();
+        try {
+            return userRepository.findAll();
+        } catch (Exception e) {
+            // Log the exception and rethrow it or handle it accordingly
+            throw new RuntimeException("Error fetching all users", e);
+        }
     }
 
     public void updateUser(User row) {
-        userRepository.updateUser(row);
+        try {
+            userRepository.updateUser(row);
+        } catch (Exception e) {
+            // Log the exception and rethrow it or handle it accordingly
+            throw new RuntimeException("Error updating user", e);
+        }
     }
 }

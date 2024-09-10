@@ -20,10 +20,10 @@ public class AdminOperationsController {
     private UserService userService;
     private OrderService orderService;
     private CustomerService customerService;
+    @SuppressWarnings("rawtypes")
     private Map<ViewType, PanelView> views;
 
-    // Constructor to initialize the services and views
-    public AdminOperationsController(AdminService adminService, ProductService productService, UserService userService, OrderService orderService, CustomerService customerService, Map<ViewType, PanelView> views) {
+    public AdminOperationsController(AdminService adminService, ProductService productService, UserService userService, OrderService orderService, CustomerService customerService, @SuppressWarnings("rawtypes") Map<ViewType, PanelView> views) {
         this.adminService = adminService;
         this.productService = productService;
         this.userService = userService;
@@ -32,15 +32,15 @@ public class AdminOperationsController {
         this.views = views;
     }
 
-    // Method to display the table based on the view type
+    @SuppressWarnings("unchecked")
     public void displayView(ViewType viewType) {
+        @SuppressWarnings("rawtypes")
         PanelView view = views.get(viewType);
         if (view != null) {
             view.showPanel(this);
         }
     }
 
-    // Getters for the services
     public AdminService getAdminService() {
         return adminService;
     }
@@ -61,47 +61,86 @@ public class AdminOperationsController {
         return customerService;
     }
 
-    // Method to handle the commit based on the view type
     public void commitData(ViewType viewType, Object[][] data) {
+        @SuppressWarnings("rawtypes")
         PanelView view = views.get(viewType);
         if (view != null) {
             view.handleCommit(data);
         }
     }
 
-    // Métodos de commit actualizados
     public void commitProductData(List<Product> products) {
         System.out.println("Committing product data:");
         for (Product product : products) {
-            productService.updateProduct(product);
+            try {
+                productService.updateProduct(product);
+            } catch (Exception e) {
+                // Log the exception and handle it accordingly
+                System.err.println("Error committing product data for product ID: " + product.getProductId());
+                e.printStackTrace();
+            }
+        }
+    }
+
+    public void addProduct(Product product) {
+        try {
+            productService.addProduct(product);
+        } catch (Exception e) {
+            // Log the exception and handle it accordingly
+            System.err.println("Error adding product");
+            e.printStackTrace();
+        }
+    }
+
+    public void deleteProduct(Product product) {
+        try {
+            productService.deleteProduct(product);
+        } catch (Exception e) {
+            // Log the exception and handle it accordingly
+            System.err.println("Error deleting product");
+            e.printStackTrace();
         }
     }
 
     public void commitUserData(List<User> users) {
         System.out.println("Committing user data:");
         for (User user : users) {
-            System.out.println(user.getUserId() + " " + user.getUsername() + " " + user.getPassword() + " " + user.getRegisterDate());
-            userService.updateUser(user);
+            try {
+                userService.updateUser(user);
+            } catch (Exception e) {
+                // Log the exception and handle it accordingly
+                System.err.println("Error committing user data for user ID: " + user.getUserId());
+                e.printStackTrace();
+            }
         }
     }
 
     public void commitOrderData(List<Order> orders) {
         System.out.println("Committing order data:");
         for (Order order : orders) {
-            order.printAttributes();
-            orderService.updateOrder(order);
+            try {
+                orderService.updateOrder(order);
+            } catch (Exception e) {
+                // Log the exception and handle it accordingly
+                System.err.println("Error committing order data for order ID: " + order.getOrderId());
+                e.printStackTrace();
+            }
         }
     }
 
     public void commitCustomerData(List<Customer> customers) {
         System.out.println("Committing customer data:");
         for (Customer customer : customers) {
-            System.out.println(customer);
-            customerService.updateCustomer(customer);
+            try {
+                customerService.updateCustomer(customer);
+            } catch (Exception e) {
+                // Log the exception and handle it accordingly
+                System.err.println("Error committing customer data for customer ID: " + customer.getUserId());
+                e.printStackTrace();
+            }
         }
     }
 
-    // Add this method to handle admin data commit
     public void commitAdminData(Object[][] data) {
         System.out.println("Committing admin data:");
         for (Object[] row : data) {

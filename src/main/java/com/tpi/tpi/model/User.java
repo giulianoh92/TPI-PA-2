@@ -12,7 +12,7 @@ public class User implements Serializable {
     private String password;
     private Date registerDate;
 
-    public User(int UserId, String username, String password, Date registerDate) {
+    public User(int UserId, String password, String username, Date registerDate) {
         this.userId = UserId;
         this.username = username;
         this.password = password;

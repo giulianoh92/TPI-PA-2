@@ -73,6 +73,7 @@ CREATE TABLE Products (
     description TEXT,
     unit_price DECIMAL(10, 2) NOT NULL,
     stock INT UNSIGNED NOT NULL,
+    is_active BOOLEAN NOT NULL DEFAULT TRUE,
     FOREIGN KEY (category_id) REFERENCES Prod_categories(category_id) ON DELETE SET NULL
 );
 

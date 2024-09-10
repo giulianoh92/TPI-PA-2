@@ -9,14 +9,16 @@ public class Product {
     private String description;
     private float unitPrice;
     private int stock;
+    private boolean isActive;
     private ProductCategory category;
 
-    public Product(int productId, String name, String description, float unitPrice, int stock, ProductCategory category) {
+    public Product(int productId, String name, String description, float unitPrice, int stock, boolean isActive, ProductCategory category) {
         this.productId = productId;
         this.name = name;
         this.description = description;
         this.unitPrice = unitPrice;
         this.stock = stock;
+        this.isActive = isActive;
         this.category = category;
     }
 
@@ -60,6 +62,14 @@ public class Product {
         this.stock = stock;
     }
 
+    public boolean isActive() {
+        return isActive;
+    }
+
+    public void setActive(boolean active) {
+        isActive = active;
+    }
+    
     public ProductCategory getCategory() {
         return category;
     }
