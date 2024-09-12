@@ -125,6 +125,8 @@ public class OrderView extends AbstractView<Order, AdminOperationsController> im
         }
 
         controller.commitOrderData(orders);
+
+        commitButton.setEnabled(false);
     }
 
     @Override

@@ -27,6 +27,8 @@ public abstract class AbstractView<T, C> extends JPanel {
     protected JButton addRowButton;
     protected JButton deleteRowButton;
 
+    private boolean commitMade = false;
+
     public AbstractView() {
         initComponents();
     }
@@ -181,20 +183,21 @@ public abstract class AbstractView<T, C> extends JPanel {
     protected abstract String getFrameTitle();
 
     protected void onCommit() {
-        LOGGER.info("Current table values:");
+        //LOGGER.info("Current table values:");
         int rowCount = table.getRowCount();
         int columnCount = table.getColumnCount();
-
+    
         Object[][] currentData = new Object[rowCount][columnCount];
         for (int row = 0; row < rowCount; row++) {
             for (int col = 0; col < columnCount; col++) {
                 currentData[row][col] = table.getValueAt(row, col);
-                LOGGER.info(currentData[row][col] + "\t");
+                //LOGGER.info(currentData[row][col] + "\t");
             }
-            LOGGER.info("\n");
+            //LOGGER.info("\n");
         }
-
+    
         handleCommit(currentData);
+        commitMade = true; // Set the flag to true after commit
     }
 
     protected abstract void handleCommit(Object[][] data);
@@ -204,21 +207,38 @@ public abstract class AbstractView<T, C> extends JPanel {
             LOGGER.warning("No initial data available to reset.");
             return;
         }
-
+    
         LOGGER.info("Resetting table values to initial state");
-
-        int rowCount = table.getRowCount();
+    
+        int currentRowCount = table.getRowCount();
+        int initialRowCount = initialTableData.length;
         int columnCount = table.getColumnCount();
-
-        if (rowCount != initialTableData.length || columnCount != initialTableData[0].length) {
-            LOGGER.warning("Mismatch in data size. Cannot reset.");
-            return;
+    
+        // Adjust the table's row count to match the initial data length
+        if (currentRowCount < initialRowCount) {
+            // Add rows
+            for (int i = currentRowCount; i < initialRowCount; i++) {
+                ((DefaultTableModel) table.getModel()).addRow(new Object[columnCount]);
+            }
+        } else if (currentRowCount > initialRowCount) {
+            // Remove rows
+            for (int i = currentRowCount - 1; i >= initialRowCount; i--) {
+                ((DefaultTableModel) table.getModel()).removeRow(i);
+            }
         }
-
-        for (int row = 0; row < rowCount; row++) {
+    
+        // Update the table values to match the initial data
+        for (int row = 0; row < initialRowCount; row++) {
             for (int col = 0; col < columnCount; col++) {
                 table.setValueAt(initialTableData[row][col], row, col);
             }
+        }
+
+        // Check if the data has changed and enable or disable the commit button accordingly
+        if (checkForChanges(initialTableData) || commitMade) {
+            commitButton.setEnabled(true);
+        } else {
+            commitButton.setEnabled(false);
         }
     }
 
@@ -272,7 +292,7 @@ public abstract class AbstractView<T, C> extends JPanel {
 
     private boolean isNonEditableColumn(int col) {
         String columnName = table.getColumnName(col);
-        return col == 0 || "Registered At".equals(columnName) || "Date".equals(columnName) || "Total".equals(columnName) || "Payment Method".equals(columnName) || "Username".equals(columnName) || "Password".equals(columnName) || "Email".equals(columnName);
+        return col == 0 || "Registered At".equals(columnName) || "Date".equals(columnName) || "Total".equals(columnName) || "Payment Method".equals(columnName) || "Username".equals(columnName) || "Password".equals(columnName) || "Email".equals(columnName) || "Address".equals(columnName);
     }
 
     protected Object[][] getCurrentTableData() {

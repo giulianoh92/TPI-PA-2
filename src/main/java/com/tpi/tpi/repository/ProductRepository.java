@@ -42,9 +42,9 @@ public class ProductRepository {
     }
 
     public void updateProduct(Product product) {
-        String sql = "UPDATE Products SET name = ?, description = ?, unit_price = ?, stock = ?, category_id = ? WHERE product_id = ?";
+        String sql = "UPDATE Products SET name = ?, description = ?, unit_price = ?, stock = ?, category_id = ?, is_active = ? WHERE product_id = ?";
         try {
-            jdbcTemplate.update(sql, product.getName(), product.getDescription(), product.getUnitPrice(), product.getStock(), product.getCategory().getCategoryId(), product.getProductId());
+            jdbcTemplate.update(sql, product.getName(), product.getDescription(), product.getUnitPrice(), product.getStock(), product.getCategory().getCategoryId(), product.isActive(), product.getProductId());
         } catch (Exception e) {
             // Log the exception and rethrow it or handle it accordingly
             throw new RuntimeException("Error updating product", e);
@@ -74,16 +74,6 @@ public class ProductRepository {
         } catch (Exception e) {
             // Log the exception and rethrow it or handle it accordingly
             throw new RuntimeException("Error adding product", e);
-        }
-    }
-
-    public void deleteProduct(Product product) {
-        String sql = "UPDATE Products SET is_active = false WHERE product_id = ?";
-        try {
-            jdbcTemplate.update(sql, product.getProductId());
-        } catch (Exception e) {
-            // Log the exception and rethrow it or handle it accordingly
-            throw new RuntimeException("Error deleting product", e);
         }
     }
 }

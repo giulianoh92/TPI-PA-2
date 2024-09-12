@@ -70,7 +70,7 @@ public class AdminOperationsController {
     }
 
     public void commitProductData(List<Product> products) {
-        System.out.println("Committing product data:");
+        //System.out.println("Committing product data:");
         for (Product product : products) {
             try {
                 productService.updateProduct(product);
@@ -92,18 +92,8 @@ public class AdminOperationsController {
         }
     }
 
-    public void deleteProduct(Product product) {
-        try {
-            productService.deleteProduct(product);
-        } catch (Exception e) {
-            // Log the exception and handle it accordingly
-            System.err.println("Error deleting product");
-            e.printStackTrace();
-        }
-    }
-
     public void commitUserData(List<User> users) {
-        System.out.println("Committing user data:");
+        //System.out.println("Committing user data:");
         for (User user : users) {
             try {
                 userService.updateUser(user);
@@ -116,7 +106,7 @@ public class AdminOperationsController {
     }
 
     public void commitOrderData(List<Order> orders) {
-        System.out.println("Committing order data:");
+        //System.out.println("Committing order data:");
         for (Order order : orders) {
             try {
                 orderService.updateOrder(order);
@@ -129,7 +119,7 @@ public class AdminOperationsController {
     }
 
     public void commitCustomerData(List<Customer> customers) {
-        System.out.println("Committing customer data:");
+        //System.out.println("Committing customer data:");
         for (Customer customer : customers) {
             try {
                 customerService.updateCustomer(customer);
@@ -142,7 +132,7 @@ public class AdminOperationsController {
     }
 
     public void commitAdminData(Object[][] data) {
-        System.out.println("Committing admin data:");
+        //System.out.println("Committing admin data:");
         for (Object[] row : data) {
             for (Object value : row) {
                 System.out.print(value + "\t");

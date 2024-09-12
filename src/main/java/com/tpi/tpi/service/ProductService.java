@@ -41,15 +41,6 @@ public class ProductService {
         }
     }
 
-    public void deleteProduct(Product product) {
-        try {
-            productRepository.deleteProduct(product);
-        } catch (Exception e) {
-            // Log the exception and rethrow it or handle it accordingly
-            throw new RuntimeException("Error deleting product", e);
-        }
-    }
-
     public List<ProductCategory> getAllCategories() {
         try {
             return productRepository.findAllCategories();
