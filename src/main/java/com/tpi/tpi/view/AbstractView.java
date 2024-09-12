@@ -4,6 +4,9 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.JTableHeader;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumn;
+
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -100,43 +103,43 @@ public abstract class AbstractView<T, C> extends JPanel {
         if (GraphicsEnvironment.isHeadless()) {
             return;
         }
-
+    
         JFrame frame = new JFrame(getFrameTitle());
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-
+    
         JPanel panel = new JPanel(new BorderLayout());
-
+    
         JScrollPane tableScrollPane = createTable(data, columnNames, rowMapper);
         panel.add(tableScrollPane, BorderLayout.CENTER);
-
+    
         if (shouldShowDefaultButtons()) {
             JPanel buttonPanel = createButtonPanel();
             panel.add(buttonPanel, BorderLayout.SOUTH);
         }
-
+    
         frame.add(panel);
-        frame.pack();
+        frame.pack(); // Adjust the frame size to fit the preferred size of its components
         frame.setVisible(true);
     }
 
     protected JScrollPane createTable(List<T> data, String[] columnNames, Function<T, Object[]> rowMapper) {
         initialTableData = storeInitialData(data, columnNames, rowMapper);
-
+    
         Object[][] tableData = Arrays.copyOf(initialTableData, initialTableData.length);
         for (int i = 0; i < tableData.length; i++) {
             tableData[i] = Arrays.copyOf(initialTableData[i], initialTableData[i].length);
         }
-
+    
         DefaultTableModel tableModel = new DefaultTableModel(tableData, columnNames) {
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
             }
         };
-
+    
         table = new JTable(tableModel);
         styleTable(table);
-
+    
         table.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -145,8 +148,29 @@ public abstract class AbstractView<T, C> extends JPanel {
                 }
             }
         });
+    
+        adjustColumnSizes(); // Adjust column sizes after creating the table
+    
+        JScrollPane scrollPane = new JScrollPane(table);
+    
+        // Adjust the panel or window size to fit the table's preferred size
+        Dimension tablePreferredSize = table.getPreferredSize();
+        scrollPane.setPreferredSize(new Dimension(tablePreferredSize.width + 20, tablePreferredSize.height + 20)); // Add some padding
+    
+        return scrollPane;
+    }
 
-        return new JScrollPane(table);
+    private void adjustColumnSizes() {
+        for (int col = 0; col < table.getColumnCount(); col++) {
+            int maxWidth = 0;
+            for (int row = 0; row < table.getRowCount(); row++) {
+                TableCellRenderer renderer = table.getCellRenderer(row, col);
+                Component comp = table.prepareRenderer(renderer, row, col);
+                maxWidth = Math.max(comp.getPreferredSize().width, maxWidth);
+            }
+            TableColumn column = table.getColumnModel().getColumn(col);
+            column.setPreferredWidth(maxWidth + 10); // Add some padding
+        }
     }
 
     private void styleTable(JTable table) {
