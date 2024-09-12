@@ -40,7 +40,7 @@ public abstract class AbstractView<T, C> extends JPanel {
         }
     }
 
-    private JPanel createButtonPanel() {
+    protected JPanel createButtonPanel() {
         JPanel buttonPanel = new JPanel();
         resetButton = createStyledButton("Reset");
         commitButton = createStyledButton("Commit");
@@ -117,7 +117,7 @@ public abstract class AbstractView<T, C> extends JPanel {
         frame.setVisible(true);
     }
 
-    private JScrollPane createTable(List<T> data, String[] columnNames, Function<T, Object[]> rowMapper) {
+    protected JScrollPane createTable(List<T> data, String[] columnNames, Function<T, Object[]> rowMapper) {
         initialTableData = storeInitialData(data, columnNames, rowMapper);
 
         Object[][] tableData = Arrays.copyOf(initialTableData, initialTableData.length);

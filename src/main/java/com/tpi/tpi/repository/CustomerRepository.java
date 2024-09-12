@@ -68,6 +68,28 @@ public class CustomerRepository {
     }
 
     /**
+     * Finds a customer by an order ID.
+     * @param orderId the order ID.
+     * @return the customer.
+     */
+    public Customer getCustomerByOrderId(int orderId) {
+        String sql = 
+            """
+            SELECT c.*, u.* \
+            FROM Customers c \
+            JOIN Users u ON c.customer_id = u.user_id \
+            JOIN Orders o ON c.customer_id = o.customer_id \
+            WHERE o.order_id = ?
+            """;
+        try {
+            return jdbcTemplate.queryForObject(sql, this::mapRowToCustomer, orderId);
+        } catch (Exception e) {
+            // Log the exception and rethrow it or handle it accordingly
+            throw new RuntimeException("Error fetching customer by order ID", e);
+        }
+    }
+
+    /**
      * Maps a row from the ResultSet to a Customer object.
      * @param rs the ResultSet.
      * @param rowNum the row number.

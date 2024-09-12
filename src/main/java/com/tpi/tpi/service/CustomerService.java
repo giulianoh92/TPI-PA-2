@@ -30,4 +30,13 @@ public class CustomerService {
             throw new RuntimeException("Error updating customer", e);
         }
     }
+
+    public Customer getCustomerByOrderId(int orderId) {
+        try {
+            return customerRepository.getCustomerByOrderId(orderId);
+        } catch (Exception e) {
+            // Log the exception and rethrow it or handle it accordingly
+            throw new RuntimeException("Error fetching customer by order id", e);
+        }
+    }
 }

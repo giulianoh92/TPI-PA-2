@@ -1,6 +1,7 @@
 package com.tpi.tpi.view;
 
 import com.tpi.tpi.controller.AdminOperationsController;
+import com.tpi.tpi.model.Item;
 import com.tpi.tpi.model.Order;
 import com.tpi.tpi.model.Status;
 
@@ -10,19 +11,25 @@ import java.util.List;
 import java.util.function.Function;
 import java.util.logging.Logger;
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
+
 import java.awt.*;
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 
 public class OrderView extends AbstractView<Order, AdminOperationsController> implements PanelView<AdminOperationsController> {
 
     private static final int ID_COLUMN = 0;
+    private static final int CUSTOMER_COLUMN = 1;
     private static final int STATUS_COLUMN = 2;
-    private static final int DATE_COLUMN = 1;
-    private static final int PAYMENT_METHOD_COLUMN = 3;
-    private static final int TOTAL_COLUMN = 4;
+    private static final int DATE_COLUMN = 3;
+    private static final int PAYMENT_METHOD_COLUMN = 4;
+    private static final int TOTAL_COLUMN = 5;
     private static final Logger LOGGER = Logger.getLogger(OrderView.class.getName());
 
     private List<Status> statuses;
     private List<Order> orders;
+    private JTable itemsTable;
 
     public OrderView() {
         initComponents();
@@ -37,28 +44,77 @@ public class OrderView extends AbstractView<Order, AdminOperationsController> im
         return "Order Management";
     }
 
+
     @Override
     public void showPanel(AdminOperationsController controller) {
         setController(controller);
-
-        String[] columnNames = {"ID", "Date", "Status", "Payment Method", "Total"};
+    
+        String[] columnNames = {"ID", "Customer", "Status", "Date", "Payment Method", "Total"};
         Function<Order, Object[]> rowMapper = order -> new Object[]{
             order.getOrderId(),
-            order.getPayment().getPaymentDate(),
+            controller.getCustomerService().getCustomerByOrderId(order.getOrderId()).getUsername(),
             order.getStatus().getStatus(),
+            order.getPayment().getPaymentDate(),
             order.getPayment().getPaymentMethod(),
-            order.getPayment().getAmount()
+            new BigDecimal(order.getItems().stream()
+                .mapToDouble(item -> item.getProduct().getUnitPrice() * item.getAmount())
+                .sum())
+                .setScale(2, RoundingMode.HALF_UP)
+                .doubleValue(),
         };
-
+    
         orders = controller.getOrderService().getAllOrders();
         statuses = controller.getOrderService().getAllStatuses();
+    
+        JPanel panel = new JPanel(new BorderLayout());
+    
+        JScrollPane ordersScrollPane = createTable(orders, columnNames, rowMapper);
+        panel.add(ordersScrollPane, BorderLayout.WEST);
+    
+        itemsTable = new JTable();
+        JScrollPane itemsScrollPane = new JScrollPane(itemsTable);
+        panel.add(itemsScrollPane, BorderLayout.EAST);
+    
+        // Add the button panel
+        if (shouldShowDefaultButtons()) {
+            JPanel buttonPanel = createButtonPanel();
+            panel.add(buttonPanel, BorderLayout.SOUTH);
+        }
+    
+        JFrame frame = new JFrame(getFrameTitle());
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frame.add(panel);
+        frame.pack();
+        frame.setVisible(true);
+    
+        table.getSelectionModel().addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting() && table.getSelectedRow() != -1) {
+                Order selectedOrder = orders.get(table.getSelectedRow());
+                updateItemsTable(selectedOrder);
+            }
+        });
+    }
 
-        //LOGGER.info("Orders List:");
-        //for (Order order : orders) {
-        //    LOGGER.info(order.getOrderId() + " " + order.getPayment().getPaymentDate() + " " + order.getStatus().getStatus() + " " + order.getPayment().getPaymentMethod() + " " + order.getPayment().getAmount());
-        //}
+    private void updateItemsTable(Order order) {
+        String[] columnNames = {"Product", "Unit Price", "Amount", "Total Price"};
+        Object[][] data = new Object[order.getItems().size()][4];
 
-        super.showPanel(orders, columnNames, rowMapper);
+        for (int i = 0; i < order.getItems().size(); i++) {
+            Item item = order.getItems().get(i);
+            data[i][0] = item.getProduct().getName();
+            data[i][1] = item.getProduct().getUnitPrice();
+            data[i][2] = item.getAmount();
+            data[i][3] = item.getProduct().getUnitPrice() * item.getAmount();
+        }
+
+        DefaultTableModel tableModel = new DefaultTableModel(data, columnNames) {
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                return false;
+            }
+        };
+
+        itemsTable.setModel(tableModel);
     }
 
     @Override
@@ -90,17 +146,11 @@ public class OrderView extends AbstractView<Order, AdminOperationsController> im
 
         Object[][] beforeEditData = getCurrentTableData();
 
-        //LOGGER.info("Before Edit Data:");
-        //logTableData(beforeEditData);
-
         int result = JOptionPane.showConfirmDialog(this, panel, "Edit Row", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
         if (result == JOptionPane.OK_OPTION) {
             updateTableData(row, columnCount, textFields, statusComboBox);
 
             boolean hasChanges = checkForChanges(beforeEditData);
-
-            //LOGGER.info("Data After Edit:");
-            //logCurrentTableData();
 
             if (hasChanges) {
                 resetButton.setEnabled(true);
@@ -125,7 +175,7 @@ public class OrderView extends AbstractView<Order, AdminOperationsController> im
                 panel.add(statusComboBox);
             } else {
                 textFields[col] = new JTextField(rowData[col] != null ? rowData[col].toString() : "");
-                if (col == ID_COLUMN || col == DATE_COLUMN || col == PAYMENT_METHOD_COLUMN || col == TOTAL_COLUMN) {
+                if (col == ID_COLUMN || col == DATE_COLUMN || col == PAYMENT_METHOD_COLUMN || col == TOTAL_COLUMN || col == CUSTOMER_COLUMN) {
                     textFields[col].setEditable(false);
                 }
                 panel.add(textFields[col]);
@@ -201,12 +251,6 @@ public class OrderView extends AbstractView<Order, AdminOperationsController> im
         }
         return false;
     }
-
-    /*private void logTableData(Object[][] data) {
-        for (Object[] rowArray : data) {
-            LOGGER.info(Arrays.toString(rowArray));
-        }
-    }*/
 
     public void logCurrentTableData() {
         int rowCount = getTable().getRowCount();
