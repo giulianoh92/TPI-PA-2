@@ -5,7 +5,7 @@ import com.tpi.tpi.model.Order;
 import com.tpi.tpi.model.Status;
 
 import java.sql.Date;
-import java.util.Arrays;
+//import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 import java.util.logging.Logger;
@@ -53,10 +53,10 @@ public class OrderView extends AbstractView<Order, AdminOperationsController> im
         orders = controller.getOrderService().getAllOrders();
         statuses = controller.getOrderService().getAllStatuses();
 
-        LOGGER.info("Orders List:");
-        for (Order order : orders) {
-            LOGGER.info(order.getOrderId() + " " + order.getPayment().getPaymentDate() + " " + order.getStatus().getStatus() + " " + order.getPayment().getPaymentMethod() + " " + order.getPayment().getAmount());
-        }
+        //LOGGER.info("Orders List:");
+        //for (Order order : orders) {
+        //    LOGGER.info(order.getOrderId() + " " + order.getPayment().getPaymentDate() + " " + order.getStatus().getStatus() + " " + order.getPayment().getPaymentMethod() + " " + order.getPayment().getAmount());
+        //}
 
         super.showPanel(orders, columnNames, rowMapper);
     }
@@ -90,8 +90,8 @@ public class OrderView extends AbstractView<Order, AdminOperationsController> im
 
         Object[][] beforeEditData = getCurrentTableData();
 
-        LOGGER.info("Before Edit Data:");
-        logTableData(beforeEditData);
+        //LOGGER.info("Before Edit Data:");
+        //logTableData(beforeEditData);
 
         int result = JOptionPane.showConfirmDialog(this, panel, "Edit Row", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
         if (result == JOptionPane.OK_OPTION) {
@@ -99,8 +99,8 @@ public class OrderView extends AbstractView<Order, AdminOperationsController> im
 
             boolean hasChanges = checkForChanges(beforeEditData);
 
-            LOGGER.info("Data After Edit:");
-            logCurrentTableData();
+            //LOGGER.info("Data After Edit:");
+            //logCurrentTableData();
 
             if (hasChanges) {
                 resetButton.setEnabled(true);
@@ -202,11 +202,11 @@ public class OrderView extends AbstractView<Order, AdminOperationsController> im
         return false;
     }
 
-    private void logTableData(Object[][] data) {
+    /*private void logTableData(Object[][] data) {
         for (Object[] rowArray : data) {
             LOGGER.info(Arrays.toString(rowArray));
         }
-    }
+    }*/
 
     public void logCurrentTableData() {
         int rowCount = getTable().getRowCount();

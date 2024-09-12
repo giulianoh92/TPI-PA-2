@@ -170,10 +170,10 @@ public abstract class AbstractView<T, C> extends JPanel {
             dataCopy[i] = Arrays.copyOf(rowMapper.apply(data.get(i)), columnNames.length);
         }
 
-        LOGGER.info("Initial Table Data:");
-        for (Object[] row : dataCopy) {
-            LOGGER.info(Arrays.toString(row));
-        }
+        //LOGGER.info("Initial Table Data:");
+        //for (Object[] row : dataCopy) {
+        //    LOGGER.info(Arrays.toString(row));
+        //}
 
         return dataCopy;
     }
@@ -249,10 +249,10 @@ public abstract class AbstractView<T, C> extends JPanel {
 
         Object[][] beforeEditData = getCurrentTableData();
 
-        LOGGER.info("Before Edit Data:");
-        for (Object[] rowArray : beforeEditData) {
-            LOGGER.info(Arrays.toString(rowArray));
-        }
+        //LOGGER.info("Before Edit Data:");
+        //for (Object[] rowArray : beforeEditData) {
+        //    LOGGER.info(Arrays.toString(rowArray));
+        //}
 
         int result = JOptionPane.showConfirmDialog(this, panel, "Edit Row", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
         if (result == JOptionPane.OK_OPTION) {
@@ -260,8 +260,8 @@ public abstract class AbstractView<T, C> extends JPanel {
 
             boolean hasChanges = checkForChanges(beforeEditData);
 
-            LOGGER.info("Data After Edit:");
-            logCurrentTableData();
+            //LOGGER.info("Data After Edit:");
+            //logCurrentTableData();
 
             if (hasChanges) {
                 resetButton.setEnabled(true);

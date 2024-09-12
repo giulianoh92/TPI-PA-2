@@ -7,7 +7,7 @@ import com.tpi.tpi.model.ProductCategory;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.util.Arrays;
+//import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 import java.util.logging.Logger;
@@ -102,8 +102,8 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
 
         Object[][] beforeEditData = getCurrentTableData();
 
-        LOGGER.info("Before Edit Data:");
-        logTableData(beforeEditData);
+        //LOGGER.info("Before Edit Data:");
+        //logTableData(beforeEditData);
 
         int result = JOptionPane.showConfirmDialog(this, panel, "Edit Row", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
         if (result == JOptionPane.OK_OPTION) {
@@ -111,8 +111,8 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
 
             boolean hasChanges = checkForChanges(beforeEditData);
 
-            LOGGER.info("Data After Edit:");
-            logCurrentTableData();
+            //LOGGER.info("Data After Edit:");
+            //logCurrentTableData();
 
             if (hasChanges) {
                 resetButton.setEnabled(true);
@@ -295,9 +295,9 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
         return null;
     }
 
-    private void logTableData(Object[][] data) {
+    /*private void logTableData(Object[][] data) {
         for (Object[] rowArray : data) {
             LOGGER.info(Arrays.toString(rowArray));
         }
-    }
+    }*/
 }
