@@ -3,21 +3,21 @@ package com.tpi.tpi.config;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import com.tpi.tpi.controller.AdminOperationsController;
-import com.tpi.tpi.controller.ViewType;
-import com.tpi.tpi.service.AdminService;
-import com.tpi.tpi.service.ProductService;
-import com.tpi.tpi.service.UserService;
-import com.tpi.tpi.service.OrderService;
-import com.tpi.tpi.service.CustomerService;
-import com.tpi.tpi.view.AdminView;
-import com.tpi.tpi.view.ProductView;
-import com.tpi.tpi.view.PanelView;
+import com.tpi.tpi.desktop.controller.AdminOperationsController;
+import com.tpi.tpi.desktop.controller.ViewType;
+import com.tpi.tpi.common.service.AdminService;
+import com.tpi.tpi.common.service.ProductService;
+import com.tpi.tpi.common.service.UserService;
+import com.tpi.tpi.common.service.OrderService;
+import com.tpi.tpi.common.service.CustomerService;
+import com.tpi.tpi.desktop.view.AdminView;
+import com.tpi.tpi.desktop.view.ProductView;
+import com.tpi.tpi.desktop.view.PanelView;
 
 
-import com.tpi.tpi.view.UserView;
-import com.tpi.tpi.view.OrderView;
-import com.tpi.tpi.view.CustomerView;
+import com.tpi.tpi.desktop.view.UserView;
+import com.tpi.tpi.desktop.view.OrderView;
+import com.tpi.tpi.desktop.view.CustomerView;
 
 import java.util.HashMap;
 import java.util.Map;
