@@ -1,4 +1,3 @@
-CREATE DATABASE tpi_db;
 USE tpi_db;
 
 -- Drop the User if it exists, then create it and grant permissions
@@ -19,9 +18,7 @@ DROP TABLE IF EXISTS Prod_categories;
 DROP TABLE IF EXISTS Statuses;
 DROP TABLE IF EXISTS Payment_methods;
 
-
 -- Create Tables
-
 CREATE TABLE Payment_methods (
     payment_met_id INT AUTO_INCREMENT PRIMARY KEY,
     name VARCHAR(100) NOT NULL
@@ -119,6 +116,66 @@ BEGIN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Cannot have both cart_id and order_id set at the same time.';
     END IF;
+END//
+
+-- Trigger to update Payments.amount when an item is inserted
+CREATE TRIGGER update_payment_amount_after_insert
+AFTER INSERT ON Items
+FOR EACH ROW
+BEGIN
+    DECLARE total_amount DECIMAL(10, 2);
+    
+    -- Calculate the total amount for the order
+    SELECT SUM(i.amount * p.unit_price)
+    INTO total_amount
+    FROM Items i
+    JOIN Products p ON i.product_id = p.product_id
+    WHERE i.order_id = NEW.order_id;
+    
+    -- Update the Payments table with the calculated amount
+    UPDATE Payments
+    SET amount = total_amount
+    WHERE payment_id = (SELECT payment_id FROM Orders WHERE order_id = NEW.order_id);
+END//
+
+-- Trigger to update Payments.amount when an item is updated
+CREATE TRIGGER update_payment_amount_after_update
+AFTER UPDATE ON Items
+FOR EACH ROW
+BEGIN
+    DECLARE total_amount DECIMAL(10, 2);
+    
+    -- Calculate the total amount for the order
+    SELECT SUM(i.amount * p.unit_price)
+    INTO total_amount
+    FROM Items i
+    JOIN Products p ON i.product_id = p.product_id
+    WHERE i.order_id = NEW.order_id;
+    
+    -- Update the Payments table with the calculated amount
+    UPDATE Payments
+    SET amount = total_amount
+    WHERE payment_id = (SELECT payment_id FROM Orders WHERE order_id = NEW.order_id);
+END//
+
+-- Trigger to update Payments.amount when an item is deleted
+CREATE TRIGGER update_payment_amount_after_delete
+AFTER DELETE ON Items
+FOR EACH ROW
+BEGIN
+    DECLARE total_amount DECIMAL(10, 2);
+    
+    -- Calculate the total amount for the order
+    SELECT SUM(i.amount * p.unit_price)
+    INTO total_amount
+    FROM Items i
+    JOIN Products p ON i.product_id = p.product_id
+    WHERE i.order_id = OLD.order_id;
+    
+    -- Update the Payments table with the calculated amount
+    UPDATE Payments
+    SET amount = total_amount
+    WHERE payment_id = (SELECT payment_id FROM Orders WHERE order_id = OLD.order_id);
 END//
 
 DELIMITER ;
