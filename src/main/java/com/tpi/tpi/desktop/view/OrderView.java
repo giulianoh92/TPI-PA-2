@@ -6,13 +6,11 @@ import com.tpi.tpi.common.model.Order;
 import com.tpi.tpi.common.model.Status;
 
 import java.sql.Date;
-//import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 import java.util.logging.Logger;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
-
 import java.awt.*;
 
 public class OrderView extends AbstractView<Order, AdminOperationsController> implements PanelView<AdminOperationsController> {
@@ -42,11 +40,10 @@ public class OrderView extends AbstractView<Order, AdminOperationsController> im
         return "Order Management";
     }
 
-
     @Override
     public void showPanel(AdminOperationsController controller) {
         setController(controller);
-    
+
         String[] columnNames = {"ID", "Customer", "Status", "Date", "Payment Method", "Total"};
         Function<Order, Object[]> rowMapper = order -> new Object[]{
             order.getOrderId(),
@@ -56,31 +53,74 @@ public class OrderView extends AbstractView<Order, AdminOperationsController> im
             order.getPayment().getPaymentMethod(),
             order.getPayment().getAmount()
         };
-    
+
         orders = controller.getOrderService().getAllOrders();
         statuses = controller.getOrderService().getAllStatuses();
-    
-        JPanel panel = new JPanel(new BorderLayout());
-    
+
         JScrollPane ordersScrollPane = createTable(orders, columnNames, rowMapper);
-        panel.add(ordersScrollPane, BorderLayout.WEST);
-    
         itemsTable = new JTable();
         JScrollPane itemsScrollPane = new JScrollPane(itemsTable);
-        panel.add(itemsScrollPane, BorderLayout.EAST);
-    
+
+        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, ordersScrollPane, itemsScrollPane);
+        splitPane.setDividerSize(0); // Remove the divider gap
+        splitPane.setResizeWeight(0.5); // Distribute space equally
+
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.add(splitPane, BorderLayout.CENTER);
+
         // Add the button panel
         if (shouldShowDefaultButtons()) {
             JPanel buttonPanel = createButtonPanel();
             panel.add(buttonPanel, BorderLayout.SOUTH);
         }
-    
+
         JFrame frame = new JFrame(getFrameTitle());
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.add(panel);
         frame.pack();
         frame.setVisible(true);
-    
+
+        table.getSelectionModel().addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting() && table.getSelectedRow() != -1) {
+                Order selectedOrder = orders.get(table.getSelectedRow());
+                updateItemsTable(selectedOrder);
+            }
+        });
+    }
+
+    @Override
+    public void showPanel(AdminOperationsController controller, JPanel panel) {
+        setController(controller);
+
+        String[] columnNames = {"ID", "Customer", "Status", "Date", "Payment Method", "Total"};
+        Function<Order, Object[]> rowMapper = order -> new Object[]{
+            order.getOrderId(),
+            controller.getCustomerService().getCustomerByOrderId(order.getOrderId()).getUsername(),
+            order.getStatus().getStatus(),
+            order.getPayment().getPaymentDate(),
+            order.getPayment().getPaymentMethod(),
+            order.getPayment().getAmount()
+        };
+
+        orders = controller.getOrderService().getAllOrders();
+        statuses = controller.getOrderService().getAllStatuses();
+
+        JScrollPane ordersScrollPane = createTable(orders, columnNames, rowMapper);
+        itemsTable = new JTable();
+        JScrollPane itemsScrollPane = new JScrollPane(itemsTable);
+
+        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, ordersScrollPane, itemsScrollPane);
+        splitPane.setDividerSize(0); // Remove the divider gap
+        splitPane.setResizeWeight(0.5); // Distribute space equally
+
+        panel.add(splitPane, BorderLayout.CENTER);
+
+        // Add the button panel
+        if (shouldShowDefaultButtons()) {
+            JPanel buttonPanel = createButtonPanel();
+            panel.add(buttonPanel, BorderLayout.SOUTH);
+        }
+
         table.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting() && table.getSelectedRow() != -1) {
                 Order selectedOrder = orders.get(table.getSelectedRow());

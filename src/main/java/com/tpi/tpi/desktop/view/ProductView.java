@@ -7,17 +7,14 @@ import com.tpi.tpi.common.model.ProductCategory;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-//import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
-//import java.util.logging.Logger;
 
 public class ProductView extends AbstractView<Product, AdminOperationsController> implements PanelView<AdminOperationsController> {
 
     private static final int ID_COLUMN = 0;
     private static final int CAT_ID_COLUMN = 5;
     private static final int CATEGORY_COLUMN = 6;
-    //private static final Logger LOGGER = Logger.getLogger(ProductView.class.getName());
 
     private List<ProductCategory> categories;
     private List<Product> products;
@@ -42,6 +39,11 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
 
     @Override
     public void showPanel(AdminOperationsController controller) {
+        // This method can remain empty or call the other showPanel method with a default panel
+    }
+
+    @Override
+    public void showPanel(AdminOperationsController controller, JPanel panel) {
         setController(controller);
 
         String[] columnNames = {"ID", "Name", "Description", "Unit Price", "Stock", "CatId", "Category"};
@@ -59,7 +61,14 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
         products = controller.getProductService().getAllProducts();
         categories = controller.getProductService().getAllCategories();
 
-        super.showPanel(products, columnNames, rowMapper);
+        JScrollPane tableScrollPane = createTable(products, columnNames, rowMapper);
+        panel.add(tableScrollPane, BorderLayout.CENTER);
+
+        // Add the button panel
+        if (shouldShowDefaultButtons()) {
+            JPanel buttonPanel = createButtonPanel();
+            panel.add(buttonPanel, BorderLayout.SOUTH);
+        }
 
         JTable table = getTable();
         if (table != null) {
@@ -76,25 +85,27 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
     @Override
     public void handleCommit(Object[][] data) {
         for (Product product : products) {
-            if (product.getProductId() == 0) {
-                // New product, add to database
-                controller.getProductService().addProduct(product);
-            } else {
-                // Existing product, update in database
-                controller.getProductService().updateProduct(product);
-            }
+            product.setProductId((Integer) data[products.indexOf(product)][0]);
+            product.setName((String) data[products.indexOf(product)][1]);
+            product.setDescription((String) data[products.indexOf(product)][2]);
+            product.setUnitPrice((Float) data[products.indexOf(product)][3]);
+            product.setStock((Integer) data[products.indexOf(product)][4]);
+            product.getCategory().setCategoryId((Integer) data[products.indexOf(product)][5]);
+            product.getCategory().setCategory((String) data[products.indexOf(product)][6]);
         }
-        
+
+        controller.commitProductData(products);
+
         commitButton.setEnabled(false);
 
         refreshTableData();
     }
-    
+
     private void refreshTableData() {
         products = controller.getProductService().getAllProducts();
         DefaultTableModel model = (DefaultTableModel) getTable().getModel();
         model.setRowCount(0); // Clear existing rows
-    
+
         for (Product product : products) {
             model.addRow(new Object[]{
                 product.getProductId(),
@@ -127,17 +138,11 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
 
         Object[][] beforeEditData = getCurrentTableData();
 
-        //LOGGER.info("Before Edit Data:");
-        //logTableData(beforeEditData);
-
         int result = JOptionPane.showConfirmDialog(this, panel, "Edit Row", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
         if (result == JOptionPane.OK_OPTION) {
             updateTableData(row, columnCount, textFields, categoryComboBox);
 
             boolean hasChanges = checkForChanges(beforeEditData);
-
-            //LOGGER.info("Data After Edit:");
-            //logCurrentTableData();
 
             if (hasChanges) {
                 resetButton.setEnabled(true);
@@ -157,16 +162,12 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
     private JPanel createEditPanel(int columnCount, Object[] rowData, JTextField[] textFields, JComboBox<ProductCategory> categoryComboBox) {
         JPanel panel = new JPanel(new GridLayout(columnCount, 2));
         for (int col = 0; col < columnCount; col++) {
-            if (col == CAT_ID_COLUMN) {
-                continue;
-            }
-
             panel.add(new JLabel(getTable().getColumnName(col)));
             if (col == CATEGORY_COLUMN) {
                 panel.add(categoryComboBox);
             } else {
                 textFields[col] = new JTextField(rowData[col] != null ? rowData[col].toString() : "");
-                if (col == ID_COLUMN) {
+                if (col == ID_COLUMN || col == CAT_ID_COLUMN) {
                     textFields[col].setEditable(false);
                 }
                 panel.add(textFields[col]);
@@ -191,8 +192,8 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
                 if (col == CATEGORY_COLUMN) {
                     ProductCategory selectedCategory = (ProductCategory) categoryComboBox.getSelectedItem();
                     if (selectedCategory != null) {
-                        product.setCategory(selectedCategory);
-                        getTable().setValueAt(selectedCategory.getCategoryId(), row, CAT_ID_COLUMN);
+                        product.getCategory().setCategoryId(selectedCategory.getCategoryId());
+                        product.getCategory().setCategory(selectedCategory.getCategory());
                         getTable().setValueAt(selectedCategory.getCategory(), row, CATEGORY_COLUMN);
                     }
                 } else {
@@ -226,11 +227,9 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
     protected void onReset() {
         // Set active to true for all products
         for (Product product : products) {
-            if (!product.isActive()) {
-                product.setActive(true);
-            }
+            product.setActive(true);
         }
-        
+
         // Call the superclass method to reset the table data
         super.onReset();
     }
@@ -242,17 +241,12 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
             JOptionPane.showMessageDialog(this, "Please select a row to delete.", "No Row Selected", JOptionPane.WARNING_MESSAGE);
             return;
         }
-    
+
         int result = JOptionPane.showConfirmDialog(this, "Are you sure you want to delete the selected row?", "Delete Row", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
         if (result == JOptionPane.YES_OPTION) {
-            Product productToDelete = products.get(row);
-            productToDelete.setActive(false);
-    
-            DefaultTableModel model = (DefaultTableModel) getTable().getModel();
-            model.removeRow(row);
-    
-            resetButton.setEnabled(true);
-            commitButton.setEnabled(true);
+            Product product = products.get(row);
+            controller.getProductService().updateProduct(product);
+            refreshTableData();
         }
     }
 
@@ -263,34 +257,16 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
         JTextField unitPriceField = new JTextField();
         JTextField stockField = new JTextField();
         JComboBox<ProductCategory> categoryComboBox = new JComboBox<>();
-    
+
         JPanel panel = createAddPanel(nameField, descriptionField, unitPriceField, stockField, categoryComboBox);
-    
+
         populateComboBox(categoryComboBox, categories);
-    
+
         int result = JOptionPane.showConfirmDialog(this, panel, "Add Product", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
         if (result == JOptionPane.OK_OPTION) {
-            try {
-                Product newProduct = createNewProduct(nameField, descriptionField, unitPriceField, stockField, categoryComboBox);
-                if (newProduct != null) {
-                    products.add(newProduct);
-                    DefaultTableModel model = (DefaultTableModel) getTable().getModel();
-                    model.addRow(new Object[]{
-                        newProduct.getProductId(),
-                        newProduct.getName(),
-                        newProduct.getDescription(),
-                        newProduct.getUnitPrice(),
-                        newProduct.getStock(),
-                        newProduct.getCategory().getCategoryId(),
-                        newProduct.getCategory().getCategory()
-                    });
-    
-                    resetButton.setEnabled(true);
-                    commitButton.setEnabled(true);
-                }
-            } catch (NumberFormatException e) {
-                JOptionPane.showMessageDialog(this, "Invalid input. Please enter valid values.", "Input Error", JOptionPane.ERROR_MESSAGE);
-            }
+            Product newProduct = createNewProduct(nameField, descriptionField, unitPriceField, stockField, categoryComboBox);
+            controller.getProductService().addProduct(newProduct);
+            refreshTableData();
         }
     }
 
@@ -315,24 +291,8 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
         float unitPrice = Float.parseFloat(unitPriceField.getText());
         int stock = Integer.parseInt(stockField.getText());
         ProductCategory selectedCategory = (ProductCategory) categoryComboBox.getSelectedItem();
-
-        if (selectedCategory != null) {
-            return new Product(
-                0,
-                name,
-                description,
-                unitPrice,
-                stock,
-                true,
-                selectedCategory
-            );
-        }
-        return null;
+    
+        Product newProduct = new Product(0, name, description, unitPrice, stock, true, selectedCategory);
+        return newProduct;
     }
-
-    /*private void logTableData(Object[][] data) {
-        for (Object[] rowArray : data) {
-            LOGGER.info(Arrays.toString(rowArray));
-        }
-    }*/
 }
