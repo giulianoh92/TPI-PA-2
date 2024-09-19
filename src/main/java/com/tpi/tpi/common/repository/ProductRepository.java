@@ -58,6 +58,7 @@ public class ProductRepository {
     public void updateProduct(Product product) {
         String sql = "UPDATE Products SET name = ?, description = ?, unit_price = ?, stock = ?, category_id = ?, is_active = ? WHERE product_id = ?";
         try {
+            System.out.println("Updating product: " + product.getProductId() + product.getCategory().getCategory() + product.getCategory().getCategoryId()); // Log the product being updated
             jdbcTemplate.update(sql, product.getName(), product.getDescription(), product.getUnitPrice(), product.getStock(), product.getCategory().getCategoryId(), product.isActive(), product.getProductId());
         } catch (Exception e) {
             // Log the exception and rethrow it or handle it accordingly

@@ -1,5 +1,3 @@
-USE tpi_db;
-
 -- Drop the User if it exists, then create it and grant permissions
 DROP USER IF EXISTS 'admin'@'localhost';
 CREATE USER 'admin'@'localhost' IDENTIFIED BY '1234';

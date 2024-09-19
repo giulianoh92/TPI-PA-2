@@ -7,6 +7,7 @@ import com.tpi.tpi.common.model.ProductCategory;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.util.List;
 import java.util.function.Function;
 
@@ -94,23 +95,58 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
 
     @Override
     public void handleCommit(Object[][] data) {
-        for (Product product : products) {
-            product.setProductId((Integer) data[products.indexOf(product)][0]);
-            product.setName((String) data[products.indexOf(product)][1]);
-            product.setDescription((String) data[products.indexOf(product)][2]);
-            product.setUnitPrice((Float) data[products.indexOf(product)][3]);
-            product.setStock((Integer) data[products.indexOf(product)][4]);
-            product.getCategory().setCategoryId((Integer) data[products.indexOf(product)][5]);
-            product.getCategory().setCategory((String) data[products.indexOf(product)][6]);
+        // Log the data values to the terminal
+        System.out.println("Logging data values:");
+        for (int i = 0; i < data.length; i++) {
+            for (int j = 0; j < data[i].length; j++) {
+                System.out.print(data[i][j] + " ");
+            }
+            System.out.println();
         }
-
+    
+        // Actualizar la lista de productos en memoria
+        for (Product product : products) {
+            int index = products.indexOf(product);
+            if (index < data.length) {
+                // Verifica que los datos sean del tipo esperado antes de hacer la conversión
+                try {
+                    product.setProductId(Integer.parseInt(data[index][0].toString()));
+                    product.setName(data[index][1].toString());
+                    product.setDescription(data[index][2].toString());
+                    
+                    // Parse the String to Float
+                    product.setUnitPrice(Float.parseFloat(data[index][3].toString()));
+                
+                    product.setStock(Integer.parseInt(data[index][4].toString()));
+                    
+                    // Update the ProductCategory object
+                    int categoryId = Integer.parseInt(data[index][5].toString());
+                    String categoryName = data[index][6].toString();
+                    ProductCategory category = product.getCategory();
+                    category.setCategoryId(categoryId);
+                    category.setCategory(categoryName);
+                    
+                    // Maneja el imagePath si es editable
+                    // product.setImagePath(data[index][7].toString());
+                } catch (NumberFormatException e) {
+                    // Maneja excepciones de formato
+                    JOptionPane.showMessageDialog(this, "Error en el formato de los datos: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                    e.printStackTrace();
+                    return; // Salir del método en caso de error
+                }
+            }
+        }
+    
+        // Commit a la base de datos
         controller.commitProductData(products);
-
+    
+        // Desactivar el botón de commit
         commitButton.setEnabled(false);
-
+    
+        // Refrescar los datos de la tabla
         refreshTableData();
     }
-
+    
     private void refreshTableData() {
         products = controller.getProductService().getAllProducts();
         DefaultTableModel model = (DefaultTableModel) getTable().getModel();
@@ -153,34 +189,44 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
         if (imagePathObj instanceof String) {
             String imagePath = (String) imagePathObj;
             if (imagePath != null && !imagePath.isEmpty()) {
-                // Load the image from the resources directory
                 java.net.URL imgURL = getClass().getClassLoader().getResource(imagePath);
                 if (imgURL != null) {
                     ImageIcon imageIcon = new ImageIcon(imgURL);
-                    // Scale the image to fit within the fixed size of the JLabel
-                    Image scaledImage = imageIcon.getImage().getScaledInstance(200, 200, Image.SCALE_SMOOTH);
+                    Image scaledImage = getScaledImage(imageIcon.getImage(), imageIcon.getIconWidth(), imageIcon.getIconHeight());
                     imageLabel.setIcon(new ImageIcon(scaledImage));
                 } else {
-                    System.err.println("Couldn't find file: " + imagePath);
+                    imageLabel.setText("Image not found");
                 }
             }
         }
     
+        Object[][] beforeEditData = getCurrentTableData();
+    
         int result = JOptionPane.showConfirmDialog(this, panel, "Edit Row", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
         if (result == JOptionPane.OK_OPTION) {
+            // Update the product in memory
             updateTableData(row, columnCount, textFields, categoryComboBox);
-            refreshTableData();
+            // Only reflect changes in the table if any data was modified
+            boolean hasChanges = checkForChanges(beforeEditData);
+    
+            if (hasChanges) {
+                resetButton.setEnabled(true);
+                commitButton.setEnabled(true);
+            }
         }
     }
-
-    private Object[] getRowData(int row, int columnCount) {
-        Object[] rowData = new Object[columnCount];
-        for (int col = 0; col < columnCount; col++) {
-            rowData[col] = getTable().getValueAt(row, col);
-        }
-        return rowData;
+    
+    private Image getScaledImage(Image srcImg, int w, int h) {
+        BufferedImage resizedImg = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g2 = resizedImg.createGraphics();
+    
+        g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+        g2.drawImage(srcImg, 0, 0, w, h, null);
+        g2.dispose();
+    
+        return resizedImg;
     }
-
+    
     private JPanel createEditPanel(int columnCount, Object[] rowData, JTextField[] textFields, JComboBox<ProductCategory> categoryComboBox, JLabel imageLabel) {
         JPanel panel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
@@ -188,6 +234,10 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
         gbc.insets = new Insets(5, 5, 5, 5);
     
         for (int col = 0; col < columnCount; col++) {
+            if (col == CAT_ID_COLUMN) {
+                continue; // Skip the CatId column
+            }
+    
             gbc.gridx = 0;
             gbc.gridy = col;
             gbc.weightx = 0.1;
@@ -202,7 +252,7 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
                 JTextField textField = new JTextField(rowData[col] != null ? rowData[col].toString() : "");
                 textFields[col] = textField;
                 panel.add(textField, gbc);
-                if (col == 7) { // Assuming 7 is the index for image_path
+                if (col == 7) { 
                     label.setVisible(false);
                     textField.setVisible(false);
                     textField.setEditable(false);
@@ -228,26 +278,18 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
     
         return panel;
     }
-
-    private void selectCurrentCategory(int row, JComboBox<ProductCategory> categoryComboBox) {
-        int currentCategoryId = (Integer) getTable().getValueAt(row, CAT_ID_COLUMN);
-        ProductCategory currentCategory = categories.stream()
-                .filter(cat -> cat.getCategoryId() == currentCategoryId)
-                .findFirst()
-                .orElse(null);
-        selectCurrentItem(categoryComboBox, currentCategory);
-    }
-
+    
+    
     private void updateTableData(int row, int columnCount, JTextField[] textFields, JComboBox<ProductCategory> categoryComboBox) {
         Product product = products.get(row);
         for (int col = 0; col < columnCount; col++) {
-            if (col != ID_COLUMN && col != CAT_ID_COLUMN) {
+            if (col != ID_COLUMN) {
                 if (col == CATEGORY_COLUMN) {
                     ProductCategory selectedCategory = (ProductCategory) categoryComboBox.getSelectedItem();
                     if (selectedCategory != null) {
-                        product.getCategory().setCategoryId(selectedCategory.getCategoryId());
-                        product.getCategory().setCategory(selectedCategory.getCategory());
+                        product.setCategory(selectedCategory);
                         getTable().setValueAt(selectedCategory.getCategory(), row, CATEGORY_COLUMN);
+                        getTable().setValueAt(selectedCategory.getCategoryId(), row, CAT_ID_COLUMN); // Update CatId column
                     }
                 } else {
                     if (textFields[col] != null) {
@@ -258,7 +300,8 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
             }
         }
     }
-
+    
+    
     private void updateProductField(Product product, int col, String value) {
         switch (col) {
             case 1:
@@ -273,7 +316,27 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
             case 4:
                 product.setStock(Integer.parseInt(value));
                 break;
+            case 7:
+                product.setImagePath(value);
+                break;
         }
+    }
+
+    private Object[] getRowData(int row, int columnCount) {
+        Object[] rowData = new Object[columnCount];
+        for (int col = 0; col < columnCount; col++) {
+            rowData[col] = getTable().getValueAt(row, col);
+        }
+        return rowData;
+    }
+
+    private void selectCurrentCategory(int row, JComboBox<ProductCategory> categoryComboBox) {
+        int currentCategoryId = (Integer) getTable().getValueAt(row, CAT_ID_COLUMN);
+        ProductCategory currentCategory = categories.stream()
+                .filter(cat -> cat.getCategoryId() == currentCategoryId)
+                .findFirst()
+                .orElse(null);
+        selectCurrentItem(categoryComboBox, currentCategory);
     }
 
     @Override

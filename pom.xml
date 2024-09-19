@@ -23,12 +23,6 @@
     </parent>
 
     <dependencies>
-        <!-- Spring Boot Starter Web para aplicaciones web -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
-
         <!-- Spring Boot Starter Data JPA para persistencia -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -62,12 +56,7 @@
             <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
 
-        <!-- Thymeleaf for serving HTML templates -->
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-thymeleaf</artifactId>
-        </dependency>
-
+        <!-- FlatLaf for modern UI look and feel -->
         <dependency>
             <groupId>com.formdev</groupId>
             <artifactId>flatlaf</artifactId>
@@ -82,7 +71,7 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
-                    <start-class>com.tpi.Main</start-class>
+                    <start-class>com.tpi.tpi.Main</start-class>
                 </configuration>
             </plugin>
         </plugins>
