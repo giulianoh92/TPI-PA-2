@@ -45,9 +45,9 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
     @Override
     public void showPanel(AdminOperationsController controller, JPanel panel) {
         setController(controller);
-
-        String[] columnNames = {"ID", "Name", "Description", "Unit Price", "Stock", "CatId", "Category"};
-
+    
+        String[] columnNames = {"ID", "Name", "Description", "Unit Price", "Stock", "CatId", "Category", "Image Path"};
+    
         Function<Product, Object[]> rowMapper = product -> new Object[]{
             product.getProductId(),
             product.getName(),
@@ -55,31 +55,41 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
             product.getUnitPrice(),
             product.getStock(),
             product.getCategory().getCategoryId(),
-            product.getCategory().getCategory()
+            product.getCategory().getCategory(),
+            product.getImagePath() // Assuming getImagePath() method exists in Product class
         };
-
+    
         products = controller.getProductService().getAllProducts();
         categories = controller.getProductService().getAllCategories();
-
+    
         JScrollPane tableScrollPane = createTable(products, columnNames, rowMapper);
         panel.add(tableScrollPane, BorderLayout.CENTER);
-
+    
         // Add the button panel
         if (shouldShowDefaultButtons()) {
             JPanel buttonPanel = createButtonPanel();
             panel.add(buttonPanel, BorderLayout.SOUTH);
         }
-
+    
         JTable table = getTable();
         if (table != null) {
             hideCategoryIdColumn(table);
+            hideImagePathColumn(table);
         }
     }
 
     private void hideCategoryIdColumn(JTable table) {
-        table.getColumnModel().getColumn(CAT_ID_COLUMN).setMinWidth(0);
-        table.getColumnModel().getColumn(CAT_ID_COLUMN).setMaxWidth(0);
-        table.getColumnModel().getColumn(CAT_ID_COLUMN).setPreferredWidth(0);
+        int catIdColumnIndex = CAT_ID_COLUMN; // Use the constant defined for the CatId column index
+        table.getColumnModel().getColumn(catIdColumnIndex).setMinWidth(0);
+        table.getColumnModel().getColumn(catIdColumnIndex).setMaxWidth(0);
+        table.getColumnModel().getColumn(catIdColumnIndex).setPreferredWidth(0);
+    }
+    
+    private void hideImagePathColumn(JTable table) {
+        int imagePathColumnIndex = 7; // Update this to the correct column index for image_path
+        table.getColumnModel().getColumn(imagePathColumnIndex).setMinWidth(0);
+        table.getColumnModel().getColumn(imagePathColumnIndex).setMaxWidth(0);
+        table.getColumnModel().getColumn(imagePathColumnIndex).setPreferredWidth(0);
     }
 
     @Override
@@ -123,31 +133,43 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
     protected void onEditRow() {
         int row = getTable().getSelectedRow();
         if (row == -1) {
-            JOptionPane.showMessageDialog(this, "Please select a row to edit.", "No Row Selected", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Please select a row to edit.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
-
+    
         int columnCount = getTable().getColumnCount();
         Object[] rowData = getRowData(row, columnCount);
         JTextField[] textFields = new JTextField[columnCount];
         JComboBox<ProductCategory> categoryComboBox = new JComboBox<>();
-        JPanel panel = createEditPanel(columnCount, rowData, textFields, categoryComboBox);
-
+        JLabel imageLabel = new JLabel();
+        JPanel panel = createEditPanel(columnCount, rowData, textFields, categoryComboBox, imageLabel);
+    
         populateComboBox(categoryComboBox, categories);
         selectCurrentCategory(row, categoryComboBox);
-
-        Object[][] beforeEditData = getCurrentTableData();
-
+    
+        // Load and display the image
+        int imagePathColumnIndex = 7; // Update this to the correct column index for image_path
+        Object imagePathObj = getTable().getValueAt(row, imagePathColumnIndex);
+        if (imagePathObj instanceof String) {
+            String imagePath = (String) imagePathObj;
+            if (imagePath != null && !imagePath.isEmpty()) {
+                // Load the image from the resources directory
+                java.net.URL imgURL = getClass().getClassLoader().getResource(imagePath);
+                if (imgURL != null) {
+                    ImageIcon imageIcon = new ImageIcon(imgURL);
+                    // Scale the image to fit within the fixed size of the JLabel
+                    Image scaledImage = imageIcon.getImage().getScaledInstance(200, 200, Image.SCALE_SMOOTH);
+                    imageLabel.setIcon(new ImageIcon(scaledImage));
+                } else {
+                    System.err.println("Couldn't find file: " + imagePath);
+                }
+            }
+        }
+    
         int result = JOptionPane.showConfirmDialog(this, panel, "Edit Row", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
         if (result == JOptionPane.OK_OPTION) {
             updateTableData(row, columnCount, textFields, categoryComboBox);
-
-            boolean hasChanges = checkForChanges(beforeEditData);
-
-            if (hasChanges) {
-                resetButton.setEnabled(true);
-                commitButton.setEnabled(true);
-            }
+            refreshTableData();
         }
     }
 
@@ -159,20 +181,51 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
         return rowData;
     }
 
-    private JPanel createEditPanel(int columnCount, Object[] rowData, JTextField[] textFields, JComboBox<ProductCategory> categoryComboBox) {
-        JPanel panel = new JPanel(new GridLayout(columnCount, 2));
+    private JPanel createEditPanel(int columnCount, Object[] rowData, JTextField[] textFields, JComboBox<ProductCategory> categoryComboBox, JLabel imageLabel) {
+        JPanel panel = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+        gbc.insets = new Insets(5, 5, 5, 5);
+    
         for (int col = 0; col < columnCount; col++) {
-            panel.add(new JLabel(getTable().getColumnName(col)));
+            gbc.gridx = 0;
+            gbc.gridy = col;
+            gbc.weightx = 0.1;
+            JLabel label = new JLabel(getTable().getColumnName(col) + ":");
+            panel.add(label, gbc);
+    
+            gbc.gridx = 1;
+            gbc.weightx = 0.9;
             if (col == CATEGORY_COLUMN) {
-                panel.add(categoryComboBox);
+                panel.add(categoryComboBox, gbc);
             } else {
-                textFields[col] = new JTextField(rowData[col] != null ? rowData[col].toString() : "");
-                if (col == ID_COLUMN || col == CAT_ID_COLUMN) {
-                    textFields[col].setEditable(false);
+                JTextField textField = new JTextField(rowData[col] != null ? rowData[col].toString() : "");
+                textFields[col] = textField;
+                panel.add(textField, gbc);
+                if (col == 7) { // Assuming 7 is the index for image_path
+                    label.setVisible(false);
+                    textField.setVisible(false);
+                    textField.setEditable(false);
                 }
-                panel.add(textFields[col]);
             }
         }
+    
+        gbc.gridx = 0;
+        gbc.gridy = columnCount;
+        gbc.gridwidth = 2;
+        gbc.weightx = 1.0;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.anchor = GridBagConstraints.CENTER;
+        panel.add(new JLabel("Image:"), gbc);
+    
+        // Set a fixed size for the image label
+        imageLabel.setPreferredSize(new Dimension(200, 200)); // Adjust the size as needed
+        imageLabel.setHorizontalAlignment(JLabel.CENTER);
+        imageLabel.setVerticalAlignment(JLabel.CENTER);
+    
+        gbc.gridy = columnCount + 1;
+        panel.add(imageLabel, gbc);
+    
         return panel;
     }
 

@@ -98,7 +98,7 @@ INSERT INTO Products (category_id, name, description, unit_price, stock) VALUES
 (7, 'Tennis Racket', 'Professional-grade tennis racket', 199.99, 25),
 (9, 'Dining Table', 'Wooden dining table with seating for six', 499.99, 15);
 
-UPDATE Products SET image_path = 'images/product1' WHERE product_id = 1;
+UPDATE Products SET image_path = 'images/product1.jpg' WHERE product_id = 1;
 
 -- Insert data into Orders
 INSERT INTO Orders (customer_id, status_id, payment_id) VALUES 

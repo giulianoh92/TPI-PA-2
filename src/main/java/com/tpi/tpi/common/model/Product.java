@@ -9,6 +9,7 @@ public class Product {
     private String description;
     private float unitPrice;
     private int stock;
+    private String imagePath;
     private boolean isActive;
     private ProductCategory category;
 
@@ -76,5 +77,13 @@ public class Product {
 
     public void setCategory(ProductCategory category) {
         this.category = category;
+    }
+
+    public String getImagePath() {
+        return imagePath;
+    }
+
+    public void setImagePath(String imagePath) {
+        this.imagePath = imagePath;
     }
 }
