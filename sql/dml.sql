@@ -46,16 +46,16 @@ INSERT INTO Carts () VALUES
 (), 
 ();
 
--- Insert data into Users
+-- Insert data into Users with hashed passwords
 INSERT INTO Users (password, username, is_admin, reg_date) VALUES 
-('password123', 'john_doe', FALSE, '2024-01-01'),
-('password456', 'jane_smith', TRUE, '2024-02-15'),
-('password789', 'alice_jones', FALSE, '2024-03-20'),
-('securepass1', 'michael_brown', FALSE, '2024-04-05'),
-('securepass2', 'laura_wilson', TRUE, '2024-05-10'),
-('securepass3', 'peter_clark', FALSE, '2024-06-15'),
-('securepass4', 'susan_taylor', FALSE, '2024-07-01'),
-('securepass5', 'david_white', TRUE, '2024-08-01');
+('$2b$12$DKcc2uGCDWxBXnZpx1NjsO1mD4Ap19bHShaupNHmFY3z0K0oRtrKi', 'john_doe', FALSE, '2024-01-01'),
+('$2b$12$lE9k8ydrb8GGpjodqrVo8emeQxx5hZeM6mHkFN99E/bbn8vPamkoW', 'jane_smith', TRUE, '2024-02-15'),
+('$2b$12$xclFQYJke65JrmxrLI.HkuvnT8nxLtKG1lmXmg0BH2yq3K32PrpXy', 'alice_jones', FALSE, '2024-03-20'),
+('$2b$12$5n2BE40ZaCRuoGHl3hwHOeAuREHe7jL4VUKcQPUWHNlaXnkaPRO3S', 'michael_brown', FALSE, '2024-04-05'),
+('$2b$12$69Qfvzffx80FmxfSLch9ceVLrYUlogLhuQgAosHNOU3H.AsrXOCjS', 'laura_wilson', TRUE, '2024-05-10'),
+('$2b$12$VTdsDUA86VmZqjL/JYEkU.3pgjqgGICA5tO1PAYgoralG4dVUYSdi', 'peter_clark', FALSE, '2024-06-15'),
+('$2b$12$4HK7xxi6MBvsZohwJ3CBuuEvVYjex4wb44Yjb/vLIOHP8RHKyDMxa', 'susan_taylor', FALSE, '2024-07-01'),
+('$2b$12$1L9SH.yZH/30o9icAR9.6OapkFZm40MGt7ENpaBZpcGUlBRcVnUN2', 'david_white', TRUE, '2024-08-01');
 
 -- Insert data into Customers
 INSERT INTO Customers (customer_id, email, address, cart_id) VALUES 
@@ -97,6 +97,8 @@ INSERT INTO Products (category_id, name, description, unit_price, stock) VALUES
 (2, 'Jacket', 'Waterproof jacket for outdoor activities', 59.99, 100),
 (7, 'Tennis Racket', 'Professional-grade tennis racket', 199.99, 25),
 (9, 'Dining Table', 'Wooden dining table with seating for six', 499.99, 15);
+
+UPDATE Products SET image_path = 'images/product1' WHERE product_id = 1;
 
 -- Insert data into Orders
 INSERT INTO Orders (customer_id, status_id, payment_id) VALUES 

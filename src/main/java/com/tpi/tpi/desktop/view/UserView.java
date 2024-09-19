@@ -40,7 +40,7 @@ public class UserView extends AbstractView<User, AdminOperationsController> impl
         Function<User, Object[]> rowMapper = user -> new Object[]{
             user.getUserId(),
             user.getUsername(),
-            user.getPassword(),
+            "******",
             user.getRegisterDate()
         };
         users = controller.getUserService().getAllUserList();

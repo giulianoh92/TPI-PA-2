@@ -41,7 +41,7 @@ public class CustomerView extends AbstractView<Customer, AdminOperationsControll
             customer.getUserId(),
             customer.getUsername(),
             customer.getEmail(),
-            customer.getPassword(),
+            "******",
             customer.getAddress(),
             customer.getRegisterDate().toString()
         };

@@ -71,6 +71,7 @@ CREATE TABLE Products (
     unit_price DECIMAL(10, 2) NOT NULL,
     stock INT UNSIGNED NOT NULL,
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
+    image_path VARCHAR(255),
     FOREIGN KEY (category_id) REFERENCES Prod_categories(category_id) ON DELETE SET NULL
 );
 
