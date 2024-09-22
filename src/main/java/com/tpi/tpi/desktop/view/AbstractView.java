@@ -4,10 +4,12 @@ import javax.swing.*;
 import javax.swing.table.*;
 import java.awt.*;
 import java.awt.event.*;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 public abstract class AbstractView<T, C> extends JPanel {
     private static final Color BUTTON_BACKGROUND_COLOR = new Color(70, 130, 180);
@@ -23,6 +25,8 @@ public abstract class AbstractView<T, C> extends JPanel {
     protected JButton editRowButton;
     protected JButton addRowButton;
     protected JButton deleteRowButton;
+    private JTextField searchField;
+    private List<JComboBox<String>> filterComboBoxes = new ArrayList<>(); // Ensure this is declared here
 
     private boolean commitMade = false;
 
@@ -122,25 +126,25 @@ public abstract class AbstractView<T, C> extends JPanel {
 
     protected JScrollPane createTable(List<T> data, String[] columnNames, Function<T, Object[]> rowMapper) {
         initialTableData = storeInitialData(data, columnNames, rowMapper);
-
+    
         Object[][] tableData = Arrays.copyOf(initialTableData, initialTableData.length);
         for (int i = 0; i < tableData.length; i++) {
-            tableData[i] = Arrays.copyOf(initialTableData[i], initialTableData[i].length);
+            tableData[i] = rowMapper.apply(data.get(i));
         }
-
+    
         DefaultTableModel tableModel = new DefaultTableModel(tableData, columnNames) {
             @Override
             public boolean isCellEditable(int row, int column) {
                 return false;
             }
         };
-
+    
         table = new JTable(tableModel);
         styleTable(table);
-
+    
         TableRowSorter<TableModel> sorter = new TableRowSorter<>(tableModel);
         table.setRowSorter(sorter);
-
+    
         table.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -149,26 +153,97 @@ public abstract class AbstractView<T, C> extends JPanel {
                 }
             }
         });
-
+    
         adjustColumnSizes();
-
+    
         JScrollPane scrollPane = new JScrollPane(table);
         Dimension tablePreferredSize = table.getPreferredSize();
         scrollPane.setPreferredSize(new Dimension(tablePreferredSize.width + 20, tablePreferredSize.height + 20));
+    
+        // Add search and filter components
+        JPanel searchPanel = createSearchPanel(columnNames);
+        JPanel containerPanel = new JPanel(new BorderLayout());
+        containerPanel.add(searchPanel, BorderLayout.NORTH);
+        containerPanel.add(scrollPane, BorderLayout.CENTER);
+    
+        return new JScrollPane(containerPanel);
+    }
 
-        return scrollPane;
+    private JPanel createSearchPanel(String[] columnNames) {
+        searchField = new JTextField();
+        searchField.setToolTipText("Search...");
+        searchField.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyReleased(KeyEvent e) {
+                filterTable();
+            }
+        });
+        
+        JPanel filterPanel = new JPanel(new BorderLayout());
+        JComboBox<String> comboBox = new JComboBox<>();
+        filterComboBoxes.add(comboBox);
+        filterComboBoxes.get(0).addItem("All");
+        
+        // Populate combo box with unique values from the "Category" column
+        final int categoryColumnIndex = getCategoryColumnIndex(columnNames);
+        
+        if (categoryColumnIndex != -1) {
+            List<String> uniqueValues = Arrays.stream(initialTableData)
+                    .map(row -> row[categoryColumnIndex] != null ? row[categoryColumnIndex].toString() : "")
+                    .distinct()
+                    .sorted()
+                    .collect(Collectors.toList());
+            for (String value : uniqueValues) {
+                filterComboBoxes.get(0).addItem(value);
+            }
+        
+            filterComboBoxes.get(0).addActionListener(e -> filterTable());
+            filterPanel.add(filterComboBoxes.get(0), BorderLayout.EAST);
+        }
+    
+        JPanel searchPanel = new JPanel(new BorderLayout());
+        searchPanel.add(searchField, BorderLayout.CENTER);
+        searchPanel.add(filterPanel, BorderLayout.EAST);
+    
+        return searchPanel;
+    }
+
+    private int getCategoryColumnIndex(String[] columnNames) {
+        for (int i = 0; i < columnNames.length; i++) {
+            if ("Category".equals(columnNames[i])) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
+    private void filterTable() {
+        RowSorter<? extends TableModel> rowSorter = table.getRowSorter();
+        if (rowSorter instanceof TableRowSorter) {
+            TableRowSorter<? extends TableModel> sorter = (TableRowSorter<? extends TableModel>) rowSorter;
+            List<RowFilter<Object, Object>> filters = new ArrayList<>();
+    
+            if (filterComboBoxes.get(0).getSelectedIndex() > 0) {
+                filters.add(RowFilter.regexFilter(filterComboBoxes.get(0).getSelectedItem().toString(), table.getColumnModel().getColumnIndex("Category")));
+            }
+            if (!searchField.getText().trim().isEmpty()) {
+                filters.add(RowFilter.regexFilter("(?i)" + searchField.getText().trim()));
+            }
+    
+            sorter.setRowFilter(RowFilter.andFilter(filters));
+        }
     }
 
     private void adjustColumnSizes() {
         for (int col = 0; col < table.getColumnCount(); col++) {
-            int maxWidth = 0;
+            TableColumn column = table.getColumnModel().getColumn(col);
+            int width = 15; // Min width
             for (int row = 0; row < table.getRowCount(); row++) {
                 TableCellRenderer renderer = table.getCellRenderer(row, col);
                 Component comp = table.prepareRenderer(renderer, row, col);
-                maxWidth = Math.max(comp.getPreferredSize().width, maxWidth);
+                width = Math.max(comp.getPreferredSize().width + 1, width);
             }
-            TableColumn column = table.getColumnModel().getColumn(col);
-            column.setPreferredWidth(maxWidth + 10);
+            column.setPreferredWidth(width);
         }
     }
 
@@ -192,7 +267,7 @@ public abstract class AbstractView<T, C> extends JPanel {
     private Object[][] storeInitialData(List<T> data, String[] columnNames, Function<T, Object[]> rowMapper) {
         Object[][] dataCopy = new Object[data.size()][columnNames.length];
         for (int i = 0; i < data.size(); i++) {
-            dataCopy[i] = Arrays.copyOf(rowMapper.apply(data.get(i)), columnNames.length);
+            dataCopy[i] = rowMapper.apply(data.get(i));
         }
         return dataCopy;
     }
@@ -218,7 +293,6 @@ public abstract class AbstractView<T, C> extends JPanel {
 
     protected void onReset() {
         if (initialTableData == null) {
-            LOGGER.warning("No initial data available to reset.");
             return;
         }
 
@@ -233,9 +307,11 @@ public abstract class AbstractView<T, C> extends JPanel {
         updateTableValues(initialRowCount, columnCount);
 
         if (checkForChanges(initialTableData) || commitMade) {
-            commitButton.setEnabled(true);
-        } else {
+            resetButton.setEnabled(false);
             commitButton.setEnabled(false);
+        } else {
+            resetButton.setEnabled(true);
+            commitButton.setEnabled(true);
         }
     }
 
@@ -286,6 +362,7 @@ public abstract class AbstractView<T, C> extends JPanel {
 
             if (hasChanges) {
                 resetButton.setEnabled(true);
+                commitButton.setEnabled(true);
             }
         }
     }
@@ -293,7 +370,7 @@ public abstract class AbstractView<T, C> extends JPanel {
     private JTextField[] createTextFields(int columnCount, Object[] rowData) {
         JTextField[] textFields = new JTextField[columnCount];
         for (int col = 0; col < columnCount; col++) {
-            textFields[col] = new JTextField(rowData[col].toString());
+            textFields[col] = new JTextField(rowData[col] != null ? rowData[col].toString() : "");
             if (isNonEditableColumn(col)) {
                 textFields[col].setEditable(false);
             }
@@ -329,9 +406,7 @@ public abstract class AbstractView<T, C> extends JPanel {
 
     private void updateTableData(int row, int columnCount, JTextField[] textFields) {
         for (int col = 0; col < columnCount; col++) {
-            if (!isNonEditableColumn(col)) {
-                table.setValueAt(textFields[col].getText(), row, col);
-            }
+            table.setValueAt(textFields[col].getText(), row, col);
         }
     }
 
@@ -340,7 +415,7 @@ public abstract class AbstractView<T, C> extends JPanel {
         int columnCount = table.getColumnCount();
         for (int i = 0; i < rowCount; i++) {
             for (int j = 0; j < columnCount; j++) {
-                if (!table.getValueAt(i, j).equals(beforeEditData[i][j])) {
+                if (!beforeEditData[i][j].toString().equals(table.getValueAt(i, j).toString())) {
                     return true;
                 }
             }
