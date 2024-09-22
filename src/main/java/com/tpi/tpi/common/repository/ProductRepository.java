@@ -22,6 +22,7 @@ public class ProductRepository {
                      FROM Products p
                      JOIN Prod_categories c ON p.category_id = c.category_id
                      WHERE p.is_active = true
+                     ORDER BY p.product_id
                      """;
 
         return jdbcTemplate.query(sql, this::mapRowToProduct);

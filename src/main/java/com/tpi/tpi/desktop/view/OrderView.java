@@ -11,6 +11,9 @@ import java.util.function.Function;
 import java.util.logging.Logger;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
+
 import java.awt.*;
 
 public class OrderView extends AbstractView<Order, AdminOperationsController> implements PanelView<AdminOperationsController> {
@@ -80,12 +83,14 @@ public class OrderView extends AbstractView<Order, AdminOperationsController> im
         frame.pack();
         frame.setVisible(true);
 
-        table.getSelectionModel().addListSelectionListener(e -> {
-            if (!e.getValueIsAdjusting() && table.getSelectedRow() != -1) {
-                Order selectedOrder = orders.get(table.getSelectedRow());
-                updateItemsTable(selectedOrder);
-            }
-        });
+        if (table != null) {
+            table.getSelectionModel().addListSelectionListener(e -> {
+                if (!e.getValueIsAdjusting() && table.getSelectedRow() != -1) {
+                    Order selectedOrder = orders.get(table.getSelectedRow());
+                    updateItemsTable(selectedOrder);
+                }
+            });
+        }
     }
 
     @Override
@@ -121,12 +126,30 @@ public class OrderView extends AbstractView<Order, AdminOperationsController> im
             panel.add(buttonPanel, BorderLayout.SOUTH);
         }
 
-        table.getSelectionModel().addListSelectionListener(e -> {
-            if (!e.getValueIsAdjusting() && table.getSelectedRow() != -1) {
-                Order selectedOrder = orders.get(table.getSelectedRow());
-                updateItemsTable(selectedOrder);
-            }
-        });
+        JTable table = getTable();
+        if (table != null) {
+            configureTableSorter(table);
+            table.getSelectionModel().addListSelectionListener(e -> {
+                if (!e.getValueIsAdjusting() && table.getSelectedRow() != -1) {
+                    Order selectedOrder = orders.get(table.convertRowIndexToModel(table.getSelectedRow()));
+                    updateItemsTable(selectedOrder);
+                }
+            });
+        }
+    }
+
+    private void configureTableSorter(JTable table) {
+        RowSorter<? extends TableModel> rowSorter = table.getRowSorter();
+        if (rowSorter instanceof TableRowSorter) {
+            TableRowSorter<? extends TableModel> sorter = (TableRowSorter<? extends TableModel>) rowSorter;
+            sorter.setComparator(ID_COLUMN, (o1, o2) -> {
+                try {
+                    return Integer.compare(Integer.parseInt(o1.toString()), Integer.parseInt(o2.toString()));
+                } catch (NumberFormatException e) {
+                    return o1.toString().compareTo(o2.toString());
+                }
+            });
+        }
     }
 
     private void updateItemsTable(Order order) {

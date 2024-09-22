@@ -6,8 +6,12 @@ import com.tpi.tpi.common.model.ProductCategory;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableModel;
+import javax.swing.table.TableRowSorter;
+
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.Comparator;
 import java.util.List;
 import java.util.function.Function;
 
@@ -16,6 +20,7 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
     private static final int ID_COLUMN = 0;
     private static final int CAT_ID_COLUMN = 5;
     private static final int CATEGORY_COLUMN = 6;
+    private static final int IMAGE_PATH_COLUMN = 7;
 
     private List<ProductCategory> categories;
     private List<Product> products;
@@ -46,9 +51,9 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
     @Override
     public void showPanel(AdminOperationsController controller, JPanel panel) {
         setController(controller);
-    
+
         String[] columnNames = {"ID", "Name", "Description", "Unit Price", "Stock", "CatId", "Category", "Image Path"};
-    
+
         Function<Product, Object[]> rowMapper = product -> new Object[]{
             product.getProductId(),
             product.getName(),
@@ -59,94 +64,94 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
             product.getCategory().getCategory(),
             product.getImagePath() // Assuming getImagePath() method exists in Product class
         };
-    
+
         products = controller.getProductService().getAllProducts();
         categories = controller.getProductService().getAllCategories();
-    
+
         JScrollPane tableScrollPane = createTable(products, columnNames, rowMapper);
         panel.add(tableScrollPane, BorderLayout.CENTER);
-    
+
         // Add the button panel
         if (shouldShowDefaultButtons()) {
             JPanel buttonPanel = createButtonPanel();
             panel.add(buttonPanel, BorderLayout.SOUTH);
         }
-    
+
         JTable table = getTable();
         if (table != null) {
-            hideCategoryIdColumn(table);
-            hideImagePathColumn(table);
+            configureTableSorter(table);
+            hideColumn(table, CAT_ID_COLUMN);
+            hideColumn(table, IMAGE_PATH_COLUMN);
         }
     }
 
-    private void hideCategoryIdColumn(JTable table) {
-        int catIdColumnIndex = CAT_ID_COLUMN; // Use the constant defined for the CatId column index
-        table.getColumnModel().getColumn(catIdColumnIndex).setMinWidth(0);
-        table.getColumnModel().getColumn(catIdColumnIndex).setMaxWidth(0);
-        table.getColumnModel().getColumn(catIdColumnIndex).setPreferredWidth(0);
+    private void configureTableSorter(JTable table) {
+        RowSorter<? extends TableModel> rowSorter = table.getRowSorter();
+        if (rowSorter instanceof TableRowSorter) {
+            TableRowSorter<? extends TableModel> sorter = (TableRowSorter<? extends TableModel>) rowSorter;
+            sorter.setComparator(ID_COLUMN, Comparator.comparingInt(o -> Integer.parseInt(o.toString())));
+        }
     }
-    
-    private void hideImagePathColumn(JTable table) {
-        int imagePathColumnIndex = 7; // Update this to the correct column index for image_path
-        table.getColumnModel().getColumn(imagePathColumnIndex).setMinWidth(0);
-        table.getColumnModel().getColumn(imagePathColumnIndex).setMaxWidth(0);
-        table.getColumnModel().getColumn(imagePathColumnIndex).setPreferredWidth(0);
+
+    private void hideColumn(JTable table, int columnIndex) {
+        table.getColumnModel().getColumn(columnIndex).setMinWidth(0);
+        table.getColumnModel().getColumn(columnIndex).setMaxWidth(0);
+        table.getColumnModel().getColumn(columnIndex).setPreferredWidth(0);
     }
 
     @Override
     public void handleCommit(Object[][] data) {
         // Log the data values to the terminal
         System.out.println("Logging data values:");
-        for (int i = 0; i < data.length; i++) {
-            for (int j = 0; j < data[i].length; j++) {
-                System.out.print(data[i][j] + " ");
+        for (Object[] row : data) {
+            for (Object cell : row) {
+                System.out.print(cell + " ");
             }
             System.out.println();
         }
-    
-        // Actualizar la lista de productos en memoria
+
+        // Update the product list in memory
+        updateProductsInMemory(data);
+
+        // Commit to the database
+        controller.commitProductData(products);
+
+        // Disable the commit button
+        commitButton.setEnabled(false);
+
+        // Refresh the table data
+        refreshTableData();
+    }
+
+    private void updateProductsInMemory(Object[][] data) {
         for (Product product : products) {
             int index = products.indexOf(product);
             if (index < data.length) {
-                // Verifica que los datos sean del tipo esperado antes de hacer la conversión
                 try {
-                    product.setProductId(Integer.parseInt(data[index][0].toString()));
+                    product.setProductId(Integer.parseInt(data[index][ID_COLUMN].toString()));
                     product.setName(data[index][1].toString());
                     product.setDescription(data[index][2].toString());
-                    
-                    // Parse the String to Float
                     product.setUnitPrice(Float.parseFloat(data[index][3].toString()));
-                
                     product.setStock(Integer.parseInt(data[index][4].toString()));
-                    
+
                     // Update the ProductCategory object
-                    int categoryId = Integer.parseInt(data[index][5].toString());
-                    String categoryName = data[index][6].toString();
+                    int categoryId = Integer.parseInt(data[index][CAT_ID_COLUMN].toString());
+                    String categoryName = data[index][CATEGORY_COLUMN].toString();
                     ProductCategory category = product.getCategory();
                     category.setCategoryId(categoryId);
                     category.setCategory(categoryName);
-                    
-                    // Maneja el imagePath si es editable
-                    // product.setImagePath(data[index][7].toString());
+
+                    // Handle the imagePath if it is editable
+                    // product.setImagePath(data[index][IMAGE_PATH_COLUMN].toString());
                 } catch (NumberFormatException e) {
-                    // Maneja excepciones de formato
-                    JOptionPane.showMessageDialog(this, "Error en el formato de los datos: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(this, "Error in data format: " + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
                     e.printStackTrace();
-                    return; // Salir del método en caso de error
+                    return; // Exit the method in case of error
                 }
             }
         }
-    
-        // Commit a la base de datos
-        controller.commitProductData(products);
-    
-        // Desactivar el botón de commit
-        commitButton.setEnabled(false);
-    
-        // Refrescar los datos de la tabla
-        refreshTableData();
     }
-    
+
     private void refreshTableData() {
         products = controller.getProductService().getAllProducts();
         DefaultTableModel model = (DefaultTableModel) getTable().getModel();
@@ -172,51 +177,63 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
             JOptionPane.showMessageDialog(this, "Please select a row to edit.", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
-    
+
         int columnCount = getTable().getColumnCount();
         Object[] rowData = getRowData(row, columnCount);
         JTextField[] textFields = new JTextField[columnCount];
         JComboBox<ProductCategory> categoryComboBox = new JComboBox<>();
         JLabel imageLabel = new JLabel();
         JPanel panel = createEditPanel(columnCount, rowData, textFields, categoryComboBox, imageLabel);
-    
+
         populateComboBox(categoryComboBox, categories);
         selectCurrentCategory(row, categoryComboBox);
-    
+
         // Load and display the image
-        int imagePathColumnIndex = 7; // Update this to the correct column index for image_path
-        Object imagePathObj = getTable().getValueAt(row, imagePathColumnIndex);
-        if (imagePathObj instanceof String) {
-            String imagePath = (String) imagePathObj;
-            if (imagePath != null && !imagePath.isEmpty()) {
-                java.net.URL imgURL = getClass().getClassLoader().getResource(imagePath);
-                if (imgURL != null) {
-                    ImageIcon imageIcon = new ImageIcon(imgURL);
-                    Image scaledImage = getScaledImage(imageIcon.getImage(), imageIcon.getIconWidth(), imageIcon.getIconHeight());
-                    imageLabel.setIcon(new ImageIcon(scaledImage));
-                } else {
-                    imageLabel.setText("Image not found");
-                }
-            }
-        }
-    
+        loadImage(row, imageLabel);
+
         Object[][] beforeEditData = getCurrentTableData();
-    
+
         int result = JOptionPane.showConfirmDialog(this, panel, "Edit Row", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
         if (result == JOptionPane.OK_OPTION) {
             // Update the product in memory
             updateTableData(row, columnCount, textFields, categoryComboBox);
             // Only reflect changes in the table if any data was modified
             boolean hasChanges = checkForChanges(beforeEditData);
-    
+
             if (hasChanges) {
                 resetButton.setEnabled(true);
                 commitButton.setEnabled(true);
             }
         }
     }
+
+    private void loadImage(int row, JLabel imageLabel) {
+        Object imagePathObj = getTable().getValueAt(row, IMAGE_PATH_COLUMN);
+        if (imagePathObj instanceof String) {
+            String imagePath = (String) imagePathObj;
+            if (imagePath != null && !imagePath.isEmpty()) {
+                java.net.URL imgURL = getClass().getClassLoader().getResource(imagePath);
+                if (imgURL != null) {
+                    ImageIcon imageIcon = new ImageIcon(imgURL);
+                    int width = imageIcon.getIconWidth();
+                    int height = imageIcon.getIconHeight();
+                    if (width > 0 && height > 0) {
+                        Image scaledImage = getScaledImage(imageIcon.getImage(), width, height);
+                        imageLabel.setIcon(new ImageIcon(scaledImage));
+                    } else {
+                        imageLabel.setText("Invalid image dimensions");
+                    }
+                } else {
+                    imageLabel.setText("Image not found");
+                }
+            }
+        }
+    }
     
     private Image getScaledImage(Image srcImg, int w, int h) {
+        if (w <= 0 || h <= 0) {
+            throw new IllegalArgumentException("Width (" + w + ") and height (" + h + ") cannot be <= 0");
+        }
         BufferedImage resizedImg = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2 = resizedImg.createGraphics();
     
@@ -226,24 +243,24 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
     
         return resizedImg;
     }
-    
+
     private JPanel createEditPanel(int columnCount, Object[] rowData, JTextField[] textFields, JComboBox<ProductCategory> categoryComboBox, JLabel imageLabel) {
         JPanel panel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(5, 5, 5, 5);
-    
+
         for (int col = 0; col < columnCount; col++) {
             if (col == CAT_ID_COLUMN) {
                 continue; // Skip the CatId column
             }
-    
+
             gbc.gridx = 0;
             gbc.gridy = col;
             gbc.weightx = 0.1;
             JLabel label = new JLabel(getTable().getColumnName(col) + ":");
             panel.add(label, gbc);
-    
+
             gbc.gridx = 1;
             gbc.weightx = 0.9;
             if (col == CATEGORY_COLUMN) {
@@ -252,14 +269,14 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
                 JTextField textField = new JTextField(rowData[col] != null ? rowData[col].toString() : "");
                 textFields[col] = textField;
                 panel.add(textField, gbc);
-                if (col == 7) { 
+                if (col == IMAGE_PATH_COLUMN) {
                     label.setVisible(false);
                     textField.setVisible(false);
                     textField.setEditable(false);
                 }
             }
         }
-    
+
         gbc.gridx = 0;
         gbc.gridy = columnCount;
         gbc.gridwidth = 2;
@@ -267,19 +284,18 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
         gbc.fill = GridBagConstraints.NONE;
         gbc.anchor = GridBagConstraints.CENTER;
         panel.add(new JLabel("Image:"), gbc);
-    
+
         // Set a fixed size for the image label
         imageLabel.setPreferredSize(new Dimension(200, 200)); // Adjust the size as needed
         imageLabel.setHorizontalAlignment(JLabel.CENTER);
         imageLabel.setVerticalAlignment(JLabel.CENTER);
-    
+
         gbc.gridy = columnCount + 1;
         panel.add(imageLabel, gbc);
-    
+
         return panel;
     }
-    
-    
+
     private void updateTableData(int row, int columnCount, JTextField[] textFields, JComboBox<ProductCategory> categoryComboBox) {
         Product product = products.get(row);
         for (int col = 0; col < columnCount; col++) {
@@ -300,8 +316,7 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
             }
         }
     }
-    
-    
+
     private void updateProductField(Product product, int col, String value) {
         switch (col) {
             case 1:
@@ -316,7 +331,7 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
             case 4:
                 product.setStock(Integer.parseInt(value));
                 break;
-            case 7:
+            case IMAGE_PATH_COLUMN:
                 product.setImagePath(value);
                 break;
         }
@@ -342,9 +357,7 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
     @Override
     protected void onReset() {
         // Set active to true for all products
-        for (Product product : products) {
-            product.setActive(true);
-        }
+        products.forEach(product -> product.setActive(true));
 
         // Call the superclass method to reset the table data
         super.onReset();
@@ -361,6 +374,7 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
         int result = JOptionPane.showConfirmDialog(this, "Are you sure you want to delete the selected row?", "Delete Row", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
         if (result == JOptionPane.YES_OPTION) {
             Product product = products.get(row);
+            product.setActive(false);
             controller.getProductService().updateProduct(product);
             refreshTableData();
         }
@@ -407,8 +421,7 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
         float unitPrice = Float.parseFloat(unitPriceField.getText());
         int stock = Integer.parseInt(stockField.getText());
         ProductCategory selectedCategory = (ProductCategory) categoryComboBox.getSelectedItem();
-    
-        Product newProduct = new Product(0, name, description, unitPrice, stock, true, selectedCategory);
-        return newProduct;
+
+        return new Product(0, name, description, unitPrice, stock, true, selectedCategory);
     }
 }
