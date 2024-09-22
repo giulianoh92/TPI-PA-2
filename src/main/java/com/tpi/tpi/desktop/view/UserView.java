@@ -3,6 +3,7 @@ package com.tpi.tpi.desktop.view;
 import com.tpi.tpi.desktop.controller.AdminOperationsController;
 import com.tpi.tpi.common.model.User;
 
+import javax.swing.*;
 import java.awt.*;
 import java.util.List;
 import java.util.function.Function;
@@ -28,17 +29,30 @@ public class UserView extends AbstractView<User, AdminOperationsController> impl
 
     @Override
     public void showPanel(AdminOperationsController controller) {
+        // This method can remain empty or call the other showPanel method with a default panel
+    }
+
+    @Override
+    public void showPanel(AdminOperationsController controller, JPanel panel) {
         setController(controller);
 
         String[] columnNames = {"ID", "Username", "Password", "Registered At"};
         Function<User, Object[]> rowMapper = user -> new Object[]{
             user.getUserId(),
             user.getUsername(),
-            user.getPassword(),
+            "******",
             user.getRegisterDate()
         };
         users = controller.getUserService().getAllUserList();
-        super.showPanel(users, columnNames, rowMapper);
+
+        JScrollPane tableScrollPane = createTable(users, columnNames, rowMapper);
+        panel.add(tableScrollPane, BorderLayout.CENTER);
+
+        // Add the button panel
+        if (shouldShowDefaultButtons()) {
+            JPanel buttonPanel = createButtonPanel();
+            panel.add(buttonPanel, BorderLayout.SOUTH);
+        }
     }
 
     @Override

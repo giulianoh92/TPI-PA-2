@@ -1,70 +1,30 @@
 package com.tpi.tpi.desktop.view;
 
+import com.formdev.flatlaf.FlatDarkLaf;
+import com.formdev.flatlaf.FlatLaf;
 import com.tpi.tpi.desktop.controller.AdminOperationsController;
 import com.tpi.tpi.desktop.controller.ViewType;
 
 import javax.swing.*;
-import javax.swing.border.EmptyBorder;
 import java.awt.*;
 import java.util.logging.Logger;
 
 public class AdminView extends AbstractView<Object, AdminOperationsController> implements PanelView<AdminOperationsController> {
 
-    private static final int PADDING = 10;
-    private static final int BORDER_PADDING = 20;
-    private static final String PRODUCT_BUTTON_TEXT = "Products";
-    private static final String USER_BUTTON_TEXT = "Users";
-    private static final String ORDER_BUTTON_TEXT = "Orders";
-    private static final String CUSTOMER_BUTTON_TEXT = "Customers";
     private static final Logger LOGGER = Logger.getLogger(AdminView.class.getName());
 
-    private JButton productButton;
-    private JButton userButton;
-    private JButton orderButton;
-    private JButton customerButton;
+    private JTabbedPane tabbedPane;
 
     public AdminView() {
         initComponents();
     }
 
     private void initComponents() {
-        setLayout(new GridBagLayout());
-        GridBagConstraints gbc = createGridBagConstraints();
-
-        productButton = createButton(PRODUCT_BUTTON_TEXT, e -> controller.displayView(ViewType.PRODUCT));
-        gbc.gridx = 0;
-        gbc.gridy = 0;
-        add(productButton, gbc);
-
-        userButton = createButton(USER_BUTTON_TEXT, e -> controller.displayView(ViewType.USER));
-        gbc.gridx = 1;
-        gbc.gridy = 0;
-        add(userButton, gbc);
-
-        orderButton = createButton(ORDER_BUTTON_TEXT, e -> controller.displayView(ViewType.ORDER));
-        gbc.gridx = 0;
-        gbc.gridy = 1;
-        add(orderButton, gbc);
-
-        customerButton = createButton(CUSTOMER_BUTTON_TEXT, e -> controller.displayView(ViewType.CUSTOMER));
-        gbc.gridx = 1;
-        gbc.gridy = 1;
-        add(customerButton, gbc);
-
-        setBorder(new EmptyBorder(BORDER_PADDING, BORDER_PADDING, BORDER_PADDING, BORDER_PADDING));
-    }
-
-    private GridBagConstraints createGridBagConstraints() {
-        GridBagConstraints gbc = new GridBagConstraints();
-        gbc.insets = new Insets(PADDING, PADDING, PADDING, PADDING);
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        return gbc;
-    }
-
-    private JButton createButton(String text, java.awt.event.ActionListener actionListener) {
-        JButton button = new JButton(text);
-        button.addActionListener(actionListener);
-        return button;
+        setLayout(new BorderLayout());
+        tabbedPane = new JTabbedPane();
+        add(tabbedPane, BorderLayout.CENTER);
+        setBorder(null); // Remove any border to eliminate padding
+        setBackground(UIManager.getColor("Panel.background")); // Set background color to match dark theme
     }
 
     @Override
@@ -79,13 +39,40 @@ public class AdminView extends AbstractView<Object, AdminOperationsController> i
 
     @Override
     public void showPanel(AdminOperationsController controller) {
+        // Set the FlatLaf dark theme
+        FlatDarkLaf.setup();
+        FlatLaf.setUseNativeWindowDecorations(false);
+
         setController(controller);
         JFrame frame = new JFrame(getFrameTitle());
-        frame.setSize(400, 200);
+        frame.setSize(1200, 800); // Increased size to fit tabs properly
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.getContentPane().setLayout(new BorderLayout()); // Ensure content pane uses BorderLayout
+        frame.getContentPane().setBackground(UIManager.getColor("Panel.background")); // Set background color to match dark theme
 
-        frame.add(this);
+        frame.add(this, BorderLayout.CENTER); // Add the main panel to the center of the content pane
         frame.setVisible(true);
+
+        // Add tabs for different views
+        addTab(ViewType.PRODUCT, "Products");
+        addTab(ViewType.USER, "Users");
+        addTab(ViewType.ORDER, "Orders");
+        addTab(ViewType.CUSTOMER, "Customers");
+    }
+
+    @Override
+    public void showPanel(AdminOperationsController controller, JPanel panel) {
+        setController(controller);
+        panel.setLayout(new BorderLayout()); // Ensure panel uses BorderLayout
+        panel.add(this, BorderLayout.CENTER); // Add the main panel to the center of the panel
+        panel.setBackground(UIManager.getColor("Panel.background")); // Set background color to match dark theme
+    }
+
+    private void addTab(ViewType viewType, String title) {
+        JPanel panel = new JPanel(new BorderLayout());
+        panel.setBackground(UIManager.getColor("Panel.background")); // Set background color to match dark theme
+        tabbedPane.addTab(title, panel);
+        controller.displayViewInPanel(viewType, panel);
     }
 
     @Override

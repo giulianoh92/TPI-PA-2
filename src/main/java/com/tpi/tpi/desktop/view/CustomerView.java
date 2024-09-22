@@ -3,6 +3,7 @@ package com.tpi.tpi.desktop.view;
 import com.tpi.tpi.desktop.controller.AdminOperationsController;
 import com.tpi.tpi.common.model.Customer;
 
+import javax.swing.*;
 import java.awt.*;
 import java.util.List;
 import java.util.function.Function;
@@ -28,6 +29,11 @@ public class CustomerView extends AbstractView<Customer, AdminOperationsControll
 
     @Override
     public void showPanel(AdminOperationsController controller) {
+        // This method can remain empty or call the other showPanel method with a default panel
+    }
+
+    @Override
+    public void showPanel(AdminOperationsController controller, JPanel panel) {
         setController(controller);
 
         String[] columnNames = {"ID", "Username", "Email", "Password", "Address", "Registered At"};
@@ -35,12 +41,20 @@ public class CustomerView extends AbstractView<Customer, AdminOperationsControll
             customer.getUserId(),
             customer.getUsername(),
             customer.getEmail(),
-            customer.getPassword(),
+            "******",
             customer.getAddress(),
             customer.getRegisterDate().toString()
         };
         customers = controller.getCustomerService().getAllCustomerList();
-        super.showPanel(customers, columnNames, rowMapper);
+
+        JScrollPane tableScrollPane = createTable(customers, columnNames, rowMapper);
+        panel.add(tableScrollPane, BorderLayout.CENTER);
+
+        // Add the button panel
+        if (shouldShowDefaultButtons()) {
+            JPanel buttonPanel = createButtonPanel();
+            panel.add(buttonPanel, BorderLayout.SOUTH);
+        }
     }
 
     @Override

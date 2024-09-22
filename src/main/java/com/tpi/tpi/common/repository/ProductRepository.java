@@ -18,17 +18,32 @@ public class ProductRepository {
 
     public List<Product> findAll() {
         String sql = """
-                     SELECT p.product_id, p.name, p.description, p.unit_price, p.stock, c.category_id, c.name as category_name \
-                     FROM Products p \
-                     JOIN Prod_categories c ON p.category_id = c.category_id \
+                     SELECT p.product_id, p.name, p.description, p.unit_price, p.stock, p.image_path, c.category_id, c.name as category_name
+                     FROM Products p
+                     JOIN Prod_categories c ON p.category_id = c.category_id
                      WHERE p.is_active = true
+                     ORDER BY p.product_id
                      """;
-        try {
-            return jdbcTemplate.query(sql, this::mapRowToProduct);
-        } catch (Exception e) {
-            // Log the exception and rethrow it or handle it accordingly
-            throw new RuntimeException("Error fetching all products", e);
-        }
+
+        return jdbcTemplate.query(sql, this::mapRowToProduct);
+    }
+
+    private Product mapRowToProduct(ResultSet rs, int rowNum) throws SQLException {
+        ProductCategory category = new ProductCategory(
+            rs.getInt("category_id"),
+            rs.getString("category_name")
+        );
+        Product product = new Product(
+                rs.getInt("product_id"),
+                rs.getString("name"),
+                rs.getString("description"),
+                rs.getFloat("unit_price"),
+                rs.getInt("stock"),
+                true,
+                category
+        );
+        product.setImagePath(rs.getString("image_path"));
+        return product;
     }
 
     public List<ProductCategory> findAllCategories() {
@@ -44,27 +59,12 @@ public class ProductRepository {
     public void updateProduct(Product product) {
         String sql = "UPDATE Products SET name = ?, description = ?, unit_price = ?, stock = ?, category_id = ?, is_active = ? WHERE product_id = ?";
         try {
+            System.out.println("Updating product: " + product.getProductId() + product.getCategory().getCategory() + product.getCategory().getCategoryId()); // Log the product being updated
             jdbcTemplate.update(sql, product.getName(), product.getDescription(), product.getUnitPrice(), product.getStock(), product.getCategory().getCategoryId(), product.isActive(), product.getProductId());
         } catch (Exception e) {
             // Log the exception and rethrow it or handle it accordingly
             throw new RuntimeException("Error updating product", e);
         }
-    }
-
-    private Product mapRowToProduct(ResultSet rs, int rowNum) throws SQLException {
-        ProductCategory category = new ProductCategory(
-                rs.getInt("category_id"),
-                rs.getString("category_name")
-        );
-        return new Product(
-                rs.getInt("product_id"),
-                rs.getString("name"),
-                rs.getString("description"),
-                rs.getFloat("unit_price"),
-                rs.getInt("stock"),
-                true,
-                category
-        );
     }
 
     public void addProduct(Product product) {

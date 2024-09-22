@@ -5,7 +5,6 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
-import org.springframework.core.env.ConfigurableEnvironment;
 
 import com.tpi.tpi.desktop.controller.AdminOperationsController;
 import com.tpi.tpi.desktop.controller.ViewType;
@@ -21,7 +20,7 @@ public class Main implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
         // Get the application mode from the environment properties or command-line arguments
-        String mode = context.getEnvironment().getProperty("app.mode", "web");
+        String mode = context.getEnvironment().getProperty("app.mode", "desktop");
 
         // Check if the application is running in desktop mode
         if ("desktop".equalsIgnoreCase(mode)) {
@@ -47,16 +46,8 @@ public class Main implements CommandLineRunner {
         // Set the system property to disable headless mode before the Spring application context is initialized
         System.setProperty("java.awt.headless", "false");
 
-        // Determine the mode from the command-line arguments or environment properties
-        ConfigurableEnvironment environment = app.run(args).getEnvironment();
-        String mode = environment.getProperty("app.mode", "web");
-
-        // Set the web application type based on the mode
-        if ("desktop".equalsIgnoreCase(mode)) {
-            environment.setActiveProfiles("desktop");
-        } else {
-            environment.setActiveProfiles("web");
-        }
+        // Run the application
+        app.run(args);
     }
 
     @Bean
