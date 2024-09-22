@@ -113,7 +113,7 @@ INSERT INTO Products (category_id, name, description, unit_price, stock, image_p
 (1, 'JBL Flip 6', 'Portable Bluetooth Speaker', 129.99, 80, 'images/JBL_Flip_6.jpg'),
 (1, 'Fitbit Charge 5', 'Fitness Tracker, Black', 149.99, 55, 'images/Fitbit_Charge_5.jpg'),
 
-(3, 'The Subtle Art of Not Giving a F*ck', 'Paperback by Mark Manson', 12.99, 65, 'images/The_Subtle_Art_of_Not_Giving_a_F\'ck.jpg'),
+(3, 'The Subtle Art of Not Giving a F\'ck', 'Paperback by Mark Manson', 12.99, 65, 'images/The_Subtle_Art_of_Not_Giving_a_F\'ck.jpg'),
 (3, 'The Power of Habit', 'Paperback by Charles Duhigg', 10.99, 70, 'images/The_Power_of_Habit.jpg'),
 (3, 'Atomic Habits', 'Hardcover by James Clear', 16.99, 55, 'images/Atomic_Habits.jpg'),
 (3, 'How to Win Friends and Influence People', 'Paperback by Dale Carnegie', 9.99, 75, 'images/How_to_Win_Friends_and_Influence_People.jpg'),
