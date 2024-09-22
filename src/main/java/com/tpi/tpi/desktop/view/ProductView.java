@@ -9,6 +9,8 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
 
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.util.Comparator;
@@ -226,7 +228,11 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
                 } else {
                     imageLabel.setText("Image not found");
                 }
+            } else {
+                imageLabel.setText("No image path provided");
             }
+        } else {
+            imageLabel.setText("Invalid image path");
         }
     }
     
@@ -236,11 +242,11 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
         }
         BufferedImage resizedImg = new BufferedImage(w, h, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2 = resizedImg.createGraphics();
-    
+
         g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BILINEAR);
         g2.drawImage(srcImg, 0, 0, w, h, null);
         g2.dispose();
-    
+
         return resizedImg;
     }
 
@@ -249,18 +255,18 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(5, 5, 5, 5);
-
+    
         for (int col = 0; col < columnCount; col++) {
             if (col == CAT_ID_COLUMN) {
                 continue; // Skip the CatId column
             }
-
+    
             gbc.gridx = 0;
             gbc.gridy = col;
             gbc.weightx = 0.1;
             JLabel label = new JLabel(getTable().getColumnName(col) + ":");
             panel.add(label, gbc);
-
+    
             gbc.gridx = 1;
             gbc.weightx = 0.9;
             if (col == CATEGORY_COLUMN) {
@@ -276,7 +282,7 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
                 }
             }
         }
-
+    
         gbc.gridx = 0;
         gbc.gridy = columnCount;
         gbc.gridwidth = 2;
@@ -284,15 +290,42 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
         gbc.fill = GridBagConstraints.NONE;
         gbc.anchor = GridBagConstraints.CENTER;
         panel.add(new JLabel("Image:"), gbc);
-
-        // Set a fixed size for the image label
-        imageLabel.setPreferredSize(new Dimension(200, 200)); // Adjust the size as needed
-        imageLabel.setHorizontalAlignment(JLabel.CENTER);
-        imageLabel.setVerticalAlignment(JLabel.CENTER);
-
+    
+        // Create a JScrollPane to contain the imageLabel
+        JScrollPane imageScrollPane = new JScrollPane(imageLabel);
+        imageScrollPane.setPreferredSize(new Dimension(400, 400)); // Initial size
+    
+        // Add a ComponentListener to adjust the image size when the window is resized
+        imageScrollPane.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                Dimension size = imageScrollPane.getViewport().getSize();
+                ImageIcon icon = (ImageIcon) imageLabel.getIcon();
+                if (icon != null) {
+                    Image img = icon.getImage();
+                    int imgWidth = img.getWidth(null);
+                    int imgHeight = img.getHeight(null);
+                    double imgAspect = (double) imgWidth / imgHeight;
+                    double containerAspect = (double) size.width / size.height;
+    
+                    int newWidth, newHeight;
+                    if (imgAspect > containerAspect) {
+                        newWidth = size.width;
+                        newHeight = (int) (size.width / imgAspect);
+                    } else {
+                        newWidth = (int) (size.height * imgAspect);
+                        newHeight = size.height;
+                    }
+    
+                    Image resizedImg = img.getScaledInstance(newWidth, newHeight, Image.SCALE_SMOOTH);
+                    imageLabel.setIcon(new ImageIcon(resizedImg));
+                }
+            }
+        });
+    
         gbc.gridy = columnCount + 1;
-        panel.add(imageLabel, gbc);
-
+        panel.add(imageScrollPane, gbc);
+    
         return panel;
     }
 
