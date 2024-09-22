@@ -1,9 +1,3 @@
--- Drop the User if it exists, then create it and grant permissions
-DROP USER IF EXISTS 'admin'@'localhost';
-CREATE USER 'admin'@'localhost' IDENTIFIED BY '1234';
-GRANT ALL PRIVILEGES ON tpi_db.* TO 'admin'@'localhost';
-FLUSH PRIVILEGES;
-
 -- Drop tables if they exist
 DROP TABLE IF EXISTS Items;
 DROP TABLE IF EXISTS Orders;
@@ -95,8 +89,6 @@ CREATE TABLE Items (
 );
 
 -- Create triggers to enforce exclusivity
-DELIMITER //
-
 CREATE TRIGGER check_item_exclusive_before_insert
 BEFORE INSERT ON Items
 FOR EACH ROW
@@ -105,7 +97,7 @@ BEGIN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Cannot have both cart_id and order_id set at the same time.';
     END IF;
-END//
+END;
 
 CREATE TRIGGER check_item_exclusive_before_update
 BEFORE UPDATE ON Items
@@ -115,7 +107,7 @@ BEGIN
         SIGNAL SQLSTATE '45000'
         SET MESSAGE_TEXT = 'Cannot have both cart_id and order_id set at the same time.';
     END IF;
-END//
+END;
 
 -- Trigger to update Payments.amount when an item is inserted
 CREATE TRIGGER update_payment_amount_after_insert
@@ -135,7 +127,7 @@ BEGIN
     UPDATE Payments
     SET amount = total_amount
     WHERE payment_id = (SELECT payment_id FROM Orders WHERE order_id = NEW.order_id);
-END//
+END;
 
 -- Trigger to update Payments.amount when an item is updated
 CREATE TRIGGER update_payment_amount_after_update
@@ -155,7 +147,7 @@ BEGIN
     UPDATE Payments
     SET amount = total_amount
     WHERE payment_id = (SELECT payment_id FROM Orders WHERE order_id = NEW.order_id);
-END//
+END;
 
 -- Trigger to update Payments.amount when an item is deleted
 CREATE TRIGGER update_payment_amount_after_delete
@@ -175,6 +167,4 @@ BEGIN
     UPDATE Payments
     SET amount = total_amount
     WHERE payment_id = (SELECT payment_id FROM Orders WHERE order_id = OLD.order_id);
-END//
-
-DELIMITER ;
+END;
