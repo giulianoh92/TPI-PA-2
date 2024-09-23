@@ -139,6 +139,14 @@ public abstract class AbstractView<T, C> extends JPanel {
             }
         };
     
+        tableModel.addTableModelListener(e -> {
+            if (checkForChanges(initialTableData)) {
+                resetButton.setEnabled(true);
+            } else {
+                resetButton.setEnabled(false);
+            }
+        });
+    
         table = new JTable(tableModel);
         styleTable(table);
     
@@ -413,6 +421,9 @@ public abstract class AbstractView<T, C> extends JPanel {
     public boolean checkForChanges(Object[][] beforeEditData) {
         int rowCount = table.getRowCount();
         int columnCount = table.getColumnCount();
+        if (beforeEditData.length != rowCount || (rowCount > 0 && beforeEditData[0].length != columnCount)) {
+            return true; // If the dimensions don't match, consider it as changed
+        }
         for (int i = 0; i < rowCount; i++) {
             for (int j = 0; j < columnCount; j++) {
                 Object before = beforeEditData[i][j];

@@ -61,7 +61,7 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
     public void showPanel(AdminOperationsController controller, JPanel panel) {
         setController(controller);
     
-        String[] columnNames = {"ID", "Name", "Description", "Unit Price", "Stock", "CatId", "Category", "Image Path"};
+        String[] columnNames = {"ID", "Name", "Description", "Unit Price", "Stock", "CatId", "Category", "Image Path", "Is Active"};
     
         Function<Product, Object[]> rowMapper = product -> new Object[]{
             product.getProductId(),
@@ -71,7 +71,8 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
             product.getStock(),
             product.getCategory().getCategoryId(),
             product.getCategory().getCategory(),
-            product.getImagePath() // Assuming getImagePath() method exists in Product class
+            product.getImagePath(),
+            product.isActive() // Include isActive value
         };
     
         products = controller.getProductService().getAllProducts();
@@ -91,6 +92,7 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
             configureTableSorter(table);
             hideColumn(table, CAT_ID_COLUMN);
             hideColumn(table, IMAGE_PATH_COLUMN);
+            hideColumn(table, 8); // Hide the isActive column
         }
     }
 
@@ -118,21 +120,113 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
             }
             System.out.println();
         }
-
+    
         // Update the product list in memory
         updateProductsInMemory(data);
-
+    
         // Commit to the database
-        controller.commitProductData(products);
-
+        for (Product product : products) {
+            System.out.println("Committing product: " + product.getProductId() + " isActive: " + product.isActive());
+            if (product.getProductId() == 0) {
+                controller.getProductService().addProduct(product); // Add new product
+            } else {
+                controller.getProductService().updateProduct(product); // Update product (including is_active status)
+            }
+        }
+    
         // Disable the commit button
         commitButton.setEnabled(false);
-
+    
         // Refresh the table data
         refreshTableData();
     }
-
-
+    
+    private void updateProductsInMemory(Object[][] data) {
+        for (int i = 0; i < data.length; i++) {
+            int productId = (int) data[i][ID_COLUMN];
+            for (Product product : products) {
+                if (product.getProductId() == productId) {
+                    product.setName((String) data[i][1]);
+                    product.setDescription((String) data[i][2]);
+                    product.setUnitPrice(Float.parseFloat(data[i][3].toString()));
+                    product.setStock(Integer.parseInt(data[i][4].toString()));
+                    product.getCategory().setCategoryId(Integer.parseInt(data[i][5].toString()));
+                    product.getCategory().setCategory((String) data[i][6]);
+                    product.setImagePath((String) data[i][7]);
+                    product.setActive(data[i][8] != null && Boolean.parseBoolean(data[i][8].toString())); // Update isActive value
+                    System.out.println("Updated product in memory: " + product.getProductId() + " isActive: " + product.isActive());
+                    break;
+                }
+            }
+        }
+    }
+    
+    private void refreshTableData() {
+        products = controller.getProductService().getAllProducts();
+        DefaultTableModel model = (DefaultTableModel) getTable().getModel();
+        model.setRowCount(0); // Clear existing rows
+    
+        for (Product product : products) {
+            System.out.println("Refreshing table data for product: " + product.getProductId() + " isActive: " + product.isActive());
+            model.addRow(new Object[]{
+                product.getProductId(),
+                product.getName(),
+                product.getDescription(),
+                product.getUnitPrice(),
+                product.getStock(),
+                product.getCategory().getCategoryId(),
+                product.getCategory().getCategory(),
+                product.getImagePath(),
+                product.isActive() // Include isActive value
+            });
+        }
+    }
+    
+    @Override
+    protected void onDelete() {
+        int row = getTable().getSelectedRow();
+        if (row == -1) {
+            JOptionPane.showMessageDialog(this, "Please select a row to delete.", "Error", JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+    
+        int result = JOptionPane.showConfirmDialog(this, "Are you sure you want to delete the selected row?", "Delete Row", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+        if (result == JOptionPane.YES_OPTION) {
+            int productId = (int) getTable().getValueAt(row, ID_COLUMN);
+            for (Product product : products) {
+                if (product.getProductId() == productId) {
+                    product.setActive(false); // Mark as inactive in memory
+                    System.out.println("Marked product as inactive: " + product.getProductId() + " isActive: " + product.isActive());
+                    break;
+                }
+            }
+            updateTableModel(); // Update the table model directly
+            commitButton.setEnabled(true); // Enable the commit button
+        }
+    }
+    
+    private void updateTableModel() {
+        DefaultTableModel model = (DefaultTableModel) getTable().getModel();
+        model.setRowCount(0); // Clear existing rows
+    
+        for (Product product : products) {
+            if (product.isActive()) {
+                System.out.println("Updating table model for product: " + product.getProductId() + " isActive: " + product.isActive());
+                model.addRow(new Object[]{
+                    product.getProductId(),
+                    product.getName(),
+                    product.getDescription(),
+                    product.getUnitPrice(),
+                    product.getStock(),
+                    product.getCategory().getCategoryId(),
+                    product.getCategory().getCategory(),
+                    product.getImagePath(),
+                    product.isActive() // Include isActive value
+                });
+            }
+        }
+    }
+    
     @Override
     protected void onEditRow() {
         int row = getTable().getSelectedRow();
@@ -163,7 +257,7 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
                 getTable().setValueAt(uploadedImagePath, row, IMAGE_PATH_COLUMN);
             }
             if (checkForChanges(beforeEditData)) {
-                commitButton.setEnabled(true);
+                commitButton.setEnabled(true); // Enable the commit button
             }
         }
     }
@@ -327,22 +421,6 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
         }
     }
 
-    private void updateProductsInMemory(Object[][] data) {
-        for (Product product : products) {
-            for (Object[] row : data) {
-                if (product.getProductId() == Integer.parseInt(row[ID_COLUMN].toString())) {
-                    product.setName((String) row[1]);
-                    product.setDescription((String) row[2]);
-                    product.setUnitPrice(Float.parseFloat(row[3].toString()));
-                    product.setStock(Integer.parseInt(row[4].toString()));
-                    product.getCategory().setCategoryId(Integer.parseInt(row[CAT_ID_COLUMN].toString()));
-                    product.getCategory().setCategory((String) row[CATEGORY_COLUMN]);
-                    product.setImagePath((String) row[IMAGE_PATH_COLUMN]);
-                }
-            }
-        }
-    }
-
     private Object[] getRowData(int row, int columnCount) {
         Object[] rowData = new Object[columnCount];
         for (int col = 0; col < columnCount; col++) {
@@ -370,40 +448,41 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
     }
 
     @Override
-    protected void onDelete() {
-        int row = getTable().getSelectedRow();
-        if (row == -1) {
-            JOptionPane.showMessageDialog(this, "Please select a row to delete.", "No Row Selected", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-
-        int result = JOptionPane.showConfirmDialog(this, "Are you sure you want to delete the selected row?", "Delete Row", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
-        if (result == JOptionPane.YES_OPTION) {
-            Product product = products.get(row);
-            product.setActive(false);
-            controller.getProductService().updateProduct(product);
-            refreshTableData();
-        }
-    }
-
-    @Override
     protected void onAdd() {
         JTextField nameField = new JTextField();
         JTextField descriptionField = new JTextField();
         JTextField unitPriceField = new JTextField();
         JTextField stockField = new JTextField();
         JComboBox<ProductCategory> categoryComboBox = new JComboBox<>();
-
+        
         JPanel panel = createAddPanel(nameField, descriptionField, unitPriceField, stockField, categoryComboBox);
-
+        
         populateComboBox(categoryComboBox, categories);
-
+        
         int result = JOptionPane.showConfirmDialog(this, panel, "Add Product", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
         if (result == JOptionPane.OK_OPTION) {
             Product newProduct = createNewProduct(nameField, descriptionField, unitPriceField, stockField, categoryComboBox);
-            controller.getProductService().addProduct(newProduct);
-            refreshTableData();
+            products.add(newProduct); // Add to the in-memory list
+            addProductToTable(newProduct); // Add to the table
+            System.out.println("Added new product to memory: " + newProduct);
+            commitButton.setEnabled(true); // Enable the commit button
         }
+    }
+    
+    private void addProductToTable(Product product) {
+        DefaultTableModel model = (DefaultTableModel) getTable().getModel();
+        model.addRow(new Object[]{
+            product.getProductId(),
+            product.getName(),
+            product.getDescription(),
+            product.getUnitPrice(),
+            product.getStock(),
+            product.getCategory().getCategoryId(),
+            product.getCategory().getCategory(),
+            product.getImagePath(),
+            product.isActive() // Include isActive value
+        });
+        products.add(product); // Add to the in-memory list
     }
 
     private Product createNewProduct(JTextField nameField, JTextField descriptionField, JTextField unitPriceField, JTextField stockField, JComboBox<ProductCategory> categoryComboBox) {
@@ -412,26 +491,7 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
         float unitPrice = Float.parseFloat(unitPriceField.getText());
         int stock = Integer.parseInt(stockField.getText());
         ProductCategory selectedCategory = (ProductCategory) categoryComboBox.getSelectedItem();
-
-        return new Product(0, name, description, unitPrice, stock, true, selectedCategory);
-    }
-
-    private void refreshTableData() {
-        products = controller.getProductService().getAllProducts();
-        DefaultTableModel model = (DefaultTableModel) getTable().getModel();
-        model.setRowCount(0); // Clear existing rows
     
-        for (Product product : products) {
-            model.addRow(new Object[]{
-                product.getProductId(),
-                product.getName(),
-                product.getDescription(),
-                product.getUnitPrice(),
-                product.getStock(),
-                product.getCategory().getCategoryId(),
-                product.getCategory().getCategory(),
-                product.getImagePath()
-            });
-        }
+        return new Product(0, name, description, unitPrice, stock, true, selectedCategory); // Default isActive to true for new products
     }
 }
