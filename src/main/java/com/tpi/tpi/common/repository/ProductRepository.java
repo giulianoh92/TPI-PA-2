@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.io.File;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
@@ -57,10 +58,16 @@ public class ProductRepository {
     }
 
     public void updateProduct(Product product) {
-        String sql = "UPDATE Products SET name = ?, description = ?, unit_price = ?, stock = ?, category_id = ?, is_active = ? WHERE product_id = ?";
+        String sql = "UPDATE Products SET name = ?, description = ?, unit_price = ?, stock = ?, category_id = ?, is_active = ?, image_path = ? WHERE product_id = ?";
         try {
-            System.out.println("Updating product: " + product.getProductId() + product.getCategory().getCategory() + product.getCategory().getCategoryId()); // Log the product being updated
-            jdbcTemplate.update(sql, product.getName(), product.getDescription(), product.getUnitPrice(), product.getStock(), product.getCategory().getCategoryId(), product.isActive(), product.getProductId());
+            // Log the product being updated
+            System.out.println("Updating product: " + product.getProductId() + product.getCategory().getCategory() + product.getCategory().getCategoryId());
+            // Ensure the image path is relative
+            String relativeImagePath = product.getImagePath().replace(new File("").getAbsolutePath() + "/", "");
+            if (relativeImagePath.startsWith("src/main/resources/")) {
+                relativeImagePath = relativeImagePath.replace("src/main/resources/", "images/");
+            }
+            jdbcTemplate.update(sql, product.getName(), product.getDescription(), product.getUnitPrice(), product.getStock(), product.getCategory().getCategoryId(), product.isActive(), relativeImagePath, product.getProductId());
         } catch (Exception e) {
             // Log the exception and rethrow it or handle it accordingly
             throw new RuntimeException("Error updating product", e);

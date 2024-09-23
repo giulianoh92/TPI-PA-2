@@ -415,7 +415,13 @@ public abstract class AbstractView<T, C> extends JPanel {
         int columnCount = table.getColumnCount();
         for (int i = 0; i < rowCount; i++) {
             for (int j = 0; j < columnCount; j++) {
-                if (!beforeEditData[i][j].toString().equals(table.getValueAt(i, j).toString())) {
+                Object before = beforeEditData[i][j];
+                Object current = table.getValueAt(i, j);
+                if (before == null && current != null) {
+                    return true;
+                } else if (before != null && current == null) {
+                    return true;
+                } else if (before != null && current != null && !before.toString().equals(current.toString())) {
                     return true;
                 }
             }
