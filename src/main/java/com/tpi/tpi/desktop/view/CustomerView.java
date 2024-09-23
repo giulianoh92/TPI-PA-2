@@ -35,7 +35,7 @@ public class CustomerView extends AbstractView<Customer, AdminOperationsControll
     @Override
     public void showPanel(AdminOperationsController controller, JPanel panel) {
         setController(controller);
-
+    
         String[] columnNames = {"ID", "Username", "Email", "Password", "Address", "Registered At"};
         Function<Customer, Object[]> rowMapper = customer -> new Object[]{
             customer.getUserId(),
@@ -46,10 +46,10 @@ public class CustomerView extends AbstractView<Customer, AdminOperationsControll
             customer.getRegisterDate().toString()
         };
         customers = controller.getCustomerService().getAllCustomerList();
-
-        JScrollPane tableScrollPane = createTable(customers, columnNames, rowMapper);
-        panel.add(tableScrollPane, BorderLayout.CENTER);
-
+    
+        JPanel tablePanel = createTable(customers, columnNames, rowMapper);
+        panel.add(tablePanel, BorderLayout.CENTER);
+    
         // Add the button panel
         if (shouldShowDefaultButtons()) {
             JPanel buttonPanel = createButtonPanel();

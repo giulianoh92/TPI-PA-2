@@ -35,7 +35,7 @@ public class UserView extends AbstractView<User, AdminOperationsController> impl
     @Override
     public void showPanel(AdminOperationsController controller, JPanel panel) {
         setController(controller);
-
+    
         String[] columnNames = {"ID", "Username", "Password", "Registered At"};
         Function<User, Object[]> rowMapper = user -> new Object[]{
             user.getUserId(),
@@ -44,10 +44,10 @@ public class UserView extends AbstractView<User, AdminOperationsController> impl
             user.getRegisterDate()
         };
         users = controller.getUserService().getAllUserList();
-
-        JScrollPane tableScrollPane = createTable(users, columnNames, rowMapper);
-        panel.add(tableScrollPane, BorderLayout.CENTER);
-
+    
+        JPanel tablePanel = createTable(users, columnNames, rowMapper);
+        panel.add(tablePanel, BorderLayout.CENTER);
+    
         // Add the button panel
         if (shouldShowDefaultButtons()) {
             JPanel buttonPanel = createButtonPanel();

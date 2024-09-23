@@ -60,7 +60,7 @@ public class OrderView extends AbstractView<Order, AdminOperationsController> im
         orders = controller.getOrderService().getAllOrders();
         statuses = controller.getOrderService().getAllStatuses();
 
-        JScrollPane ordersScrollPane = createTable(orders, columnNames, rowMapper);
+        JPanel ordersScrollPane = createTable(orders, columnNames, rowMapper);
         itemsTable = new JTable();
         JScrollPane itemsScrollPane = new JScrollPane(itemsTable);
 
@@ -83,13 +83,20 @@ public class OrderView extends AbstractView<Order, AdminOperationsController> im
         frame.pack();
         frame.setVisible(true);
 
+        JTable table = getTable();
         if (table != null) {
+            configureTableSorter(table);
             table.getSelectionModel().addListSelectionListener(e -> {
                 if (!e.getValueIsAdjusting() && table.getSelectedRow() != -1) {
-                    Order selectedOrder = orders.get(table.getSelectedRow());
+                    Order selectedOrder = orders.get(table.convertRowIndexToModel(table.getSelectedRow()));
                     updateItemsTable(selectedOrder);
                 }
             });
+        }
+
+        // Call updateItemsTable with the first order if available
+        if (!orders.isEmpty()) {
+            updateItemsTable(orders.get(0));
         }
     }
 
@@ -110,7 +117,7 @@ public class OrderView extends AbstractView<Order, AdminOperationsController> im
         orders = controller.getOrderService().getAllOrders();
         statuses = controller.getOrderService().getAllStatuses();
 
-        JScrollPane ordersScrollPane = createTable(orders, columnNames, rowMapper);
+        JPanel ordersScrollPane = createTable(orders, columnNames, rowMapper);
         itemsTable = new JTable();
         JScrollPane itemsScrollPane = new JScrollPane(itemsTable);
 
@@ -135,6 +142,11 @@ public class OrderView extends AbstractView<Order, AdminOperationsController> im
                     updateItemsTable(selectedOrder);
                 }
             });
+        }
+
+        // Call updateItemsTable with the first order if available
+        if (!orders.isEmpty()) {
+            updateItemsTable(orders.get(0));
         }
     }
 

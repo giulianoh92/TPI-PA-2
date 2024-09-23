@@ -53,9 +53,9 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
     @Override
     public void showPanel(AdminOperationsController controller, JPanel panel) {
         setController(controller);
-
+    
         String[] columnNames = {"ID", "Name", "Description", "Unit Price", "Stock", "CatId", "Category", "Image Path"};
-
+    
         Function<Product, Object[]> rowMapper = product -> new Object[]{
             product.getProductId(),
             product.getName(),
@@ -66,19 +66,19 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
             product.getCategory().getCategory(),
             product.getImagePath() // Assuming getImagePath() method exists in Product class
         };
-
+    
         products = controller.getProductService().getAllProducts();
         categories = controller.getProductService().getAllCategories();
-
-        JScrollPane tableScrollPane = createTable(products, columnNames, rowMapper);
-        panel.add(tableScrollPane, BorderLayout.CENTER);
-
+    
+        JPanel tablePanel = createTable(products, columnNames, rowMapper);
+        panel.add(tablePanel, BorderLayout.CENTER);
+    
         // Add the button panel
         if (shouldShowDefaultButtons()) {
             JPanel buttonPanel = createButtonPanel();
             panel.add(buttonPanel, BorderLayout.SOUTH);
         }
-
+    
         JTable table = getTable();
         if (table != null) {
             configureTableSorter(table);
@@ -275,10 +275,12 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
                 JTextField textField = new JTextField(rowData[col] != null ? rowData[col].toString() : "");
                 textFields[col] = textField;
                 panel.add(textField, gbc);
-                if (col == IMAGE_PATH_COLUMN) {
-                    label.setVisible(false);
-                    textField.setVisible(false);
+                if (col == ID_COLUMN || col == IMAGE_PATH_COLUMN) {
                     textField.setEditable(false);
+                    if (col == IMAGE_PATH_COLUMN) {
+                        label.setVisible(false);
+                        textField.setVisible(false);
+                    }
                 }
             }
         }
@@ -326,6 +328,21 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
         gbc.gridy = columnCount + 1;
         panel.add(imageScrollPane, gbc);
     
+        return panel;
+    }
+    
+    private JPanel createAddPanel(JTextField nameField, JTextField descriptionField, JTextField unitPriceField, JTextField stockField, JComboBox<ProductCategory> categoryComboBox) {
+        JPanel panel = new JPanel(new GridLayout(5, 2));
+        panel.add(new JLabel("Name:"));
+        panel.add(nameField);
+        panel.add(new JLabel("Description:"));
+        panel.add(descriptionField);
+        panel.add(new JLabel("Unit Price:"));
+        panel.add(unitPriceField);
+        panel.add(new JLabel("Stock:"));
+        panel.add(stockField);
+        panel.add(new JLabel("Category:"));
+        panel.add(categoryComboBox);
         return panel;
     }
 
@@ -431,21 +448,6 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
             controller.getProductService().addProduct(newProduct);
             refreshTableData();
         }
-    }
-
-    private JPanel createAddPanel(JTextField nameField, JTextField descriptionField, JTextField unitPriceField, JTextField stockField, JComboBox<ProductCategory> categoryComboBox) {
-        JPanel panel = new JPanel(new GridLayout(5, 2));
-        panel.add(new JLabel("Name:"));
-        panel.add(nameField);
-        panel.add(new JLabel("Description:"));
-        panel.add(descriptionField);
-        panel.add(new JLabel("Unit Price:"));
-        panel.add(unitPriceField);
-        panel.add(new JLabel("Stock:"));
-        panel.add(stockField);
-        panel.add(new JLabel("Category:"));
-        panel.add(categoryComboBox);
-        return panel;
     }
 
     private Product createNewProduct(JTextField nameField, JTextField descriptionField, JTextField unitPriceField, JTextField stockField, JComboBox<ProductCategory> categoryComboBox) {

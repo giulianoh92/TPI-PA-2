@@ -105,26 +105,26 @@ public abstract class AbstractView<T, C> extends JPanel {
         if (GraphicsEnvironment.isHeadless()) {
             return;
         }
-
+    
         JFrame frame = new JFrame(getFrameTitle());
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-
+    
         JPanel panel = new JPanel(new BorderLayout());
-
-        JScrollPane tableScrollPane = createTable(data, columnNames, rowMapper);
-        panel.add(tableScrollPane, BorderLayout.CENTER);
-
+    
+        JPanel tablePanel = createTable(data, columnNames, rowMapper);
+        panel.add(tablePanel, BorderLayout.CENTER);
+    
         if (shouldShowDefaultButtons()) {
             JPanel buttonPanel = createButtonPanel();
             panel.add(buttonPanel, BorderLayout.SOUTH);
         }
-
+    
         frame.add(panel);
         frame.pack();
         frame.setVisible(true);
     }
 
-    protected JScrollPane createTable(List<T> data, String[] columnNames, Function<T, Object[]> rowMapper) {
+    protected JPanel createTable(List<T> data, String[] columnNames, Function<T, Object[]> rowMapper) {
         initialTableData = storeInitialData(data, columnNames, rowMapper);
     
         Object[][] tableData = Arrays.copyOf(initialTableData, initialTableData.length);
@@ -166,7 +166,7 @@ public abstract class AbstractView<T, C> extends JPanel {
         containerPanel.add(searchPanel, BorderLayout.NORTH);
         containerPanel.add(scrollPane, BorderLayout.CENTER);
     
-        return new JScrollPane(containerPanel);
+        return containerPanel;
     }
 
     private JPanel createSearchPanel(String[] columnNames) {
