@@ -118,7 +118,9 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
 
     private void updateProductsInMemory(Object[][] data) {
         for (Object[] row : data) {
-            int productId = (int) row[ID_COLUMN];
+            int productId;
+            if (row[ID_COLUMN] instanceof String) productId = Integer.parseInt((String) row[ID_COLUMN]);
+            else productId = (int) row[ID_COLUMN];
             for (Product product : products) {
                 if (product.getProductId() == productId) {
                     updateProductFromRow(product, row);
@@ -291,7 +293,7 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
         for (int col = 0; col < columnCount; col++) {
             if (col == CATEGORY_COLUMN) {
                 addCategoryField(panel, gbc, categoryComboBox);
-            } else if (col == IMAGE_PATH_COLUMN || col == IS_ACTIVE_COLUMN) {
+            } else if (col == IMAGE_PATH_COLUMN || col == IS_ACTIVE_COLUMN || col == CAT_ID_COLUMN) {
                 // Skip adding these fields to the panel
                 continue;
             } else {

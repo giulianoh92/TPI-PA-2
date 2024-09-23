@@ -232,6 +232,7 @@ public abstract class AbstractView<T, C> extends JPanel {
 
     protected void onCommit() {
         handleCommit(getCurrentTableData());
+        resetButton.setEnabled(false);
     }
 
     protected abstract void handleCommit(Object[][] data);
