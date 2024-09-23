@@ -5,16 +5,15 @@ import com.tpi.tpi.common.model.Item;
 import com.tpi.tpi.common.model.Order;
 import com.tpi.tpi.common.model.Status;
 
-import java.sql.Date;
-import java.util.List;
-import java.util.function.Function;
-import java.util.logging.Logger;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
-
 import java.awt.*;
+import java.sql.Date;
+import java.util.List;
+import java.util.function.Function;
+import java.util.logging.Logger;
 
 public class OrderView extends AbstractView<Order, AdminOperationsController> implements PanelView<AdminOperationsController> {
 
@@ -46,16 +45,18 @@ public class OrderView extends AbstractView<Order, AdminOperationsController> im
     @Override
     public void showPanel(AdminOperationsController controller) {
         setController(controller);
+        setupPanel(controller);
+    }
 
+    @Override
+    public void showPanel(AdminOperationsController controller, JPanel panel) {
+        setController(controller);
+        setupPanel(controller, panel);
+    }
+
+    private void setupPanel(AdminOperationsController controller) {
         String[] columnNames = {"ID", "Customer", "Status", "Date", "Payment Method", "Total"};
-        Function<Order, Object[]> rowMapper = order -> new Object[]{
-            order.getOrderId(),
-            controller.getCustomerService().getCustomerByOrderId(order.getOrderId()).getUsername(),
-            order.getStatus().getStatus(),
-            order.getPayment().getPaymentDate(),
-            order.getPayment().getPaymentMethod(),
-            order.getPayment().getAmount()
-        };
+        Function<Order, Object[]> rowMapper = createRowMapper(controller);
 
         orders = controller.getOrderService().getAllOrders();
         statuses = controller.getOrderService().getAllStatuses();
@@ -65,13 +66,12 @@ public class OrderView extends AbstractView<Order, AdminOperationsController> im
         JScrollPane itemsScrollPane = new JScrollPane(itemsTable);
 
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, ordersScrollPane, itemsScrollPane);
-        splitPane.setDividerSize(0); // Remove the divider gap
-        splitPane.setResizeWeight(0.5); // Distribute space equally
+        splitPane.setDividerSize(0);
+        splitPane.setResizeWeight(0.5);
 
         JPanel panel = new JPanel(new BorderLayout());
         panel.add(splitPane, BorderLayout.CENTER);
 
-        // Add the button panel
         if (shouldShowDefaultButtons()) {
             JPanel buttonPanel = createButtonPanel();
             panel.add(buttonPanel, BorderLayout.SOUTH);
@@ -83,36 +83,12 @@ public class OrderView extends AbstractView<Order, AdminOperationsController> im
         frame.pack();
         frame.setVisible(true);
 
-        JTable table = getTable();
-        if (table != null) {
-            configureTableSorter(table);
-            table.getSelectionModel().addListSelectionListener(e -> {
-                if (!e.getValueIsAdjusting() && table.getSelectedRow() != -1) {
-                    Order selectedOrder = orders.get(table.convertRowIndexToModel(table.getSelectedRow()));
-                    updateItemsTable(selectedOrder);
-                }
-            });
-        }
-
-        // Call updateItemsTable with the first order if available
-        if (!orders.isEmpty()) {
-            updateItemsTable(orders.get(0));
-        }
+        configureTableSelectionListener();
     }
 
-    @Override
-    public void showPanel(AdminOperationsController controller, JPanel panel) {
-        setController(controller);
-
+    private void setupPanel(AdminOperationsController controller, JPanel panel) {
         String[] columnNames = {"ID", "Customer", "Status", "Date", "Payment Method", "Total"};
-        Function<Order, Object[]> rowMapper = order -> new Object[]{
-            order.getOrderId(),
-            controller.getCustomerService().getCustomerByOrderId(order.getOrderId()).getUsername(),
-            order.getStatus().getStatus(),
-            order.getPayment().getPaymentDate(),
-            order.getPayment().getPaymentMethod(),
-            order.getPayment().getAmount()
-        };
+        Function<Order, Object[]> rowMapper = createRowMapper(controller);
 
         orders = controller.getOrderService().getAllOrders();
         statuses = controller.getOrderService().getAllStatuses();
@@ -122,17 +98,31 @@ public class OrderView extends AbstractView<Order, AdminOperationsController> im
         JScrollPane itemsScrollPane = new JScrollPane(itemsTable);
 
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, ordersScrollPane, itemsScrollPane);
-        splitPane.setDividerSize(0); // Remove the divider gap
-        splitPane.setResizeWeight(0.5); // Distribute space equally
+        splitPane.setDividerSize(0);
+        splitPane.setResizeWeight(0.5);
 
         panel.add(splitPane, BorderLayout.CENTER);
 
-        // Add the button panel
         if (shouldShowDefaultButtons()) {
             JPanel buttonPanel = createButtonPanel();
             panel.add(buttonPanel, BorderLayout.SOUTH);
         }
 
+        configureTableSelectionListener();
+    }
+
+    private Function<Order, Object[]> createRowMapper(AdminOperationsController controller) {
+        return order -> new Object[]{
+            order.getOrderId(),
+            controller.getCustomerService().getCustomerByOrderId(order.getOrderId()).getUsername(),
+            order.getStatus().getStatus(),
+            order.getPayment().getPaymentDate(),
+            order.getPayment().getPaymentMethod(),
+            order.getPayment().getAmount()
+        };
+    }
+
+    private void configureTableSelectionListener() {
         JTable table = getTable();
         if (table != null) {
             configureTableSorter(table);
@@ -144,7 +134,6 @@ public class OrderView extends AbstractView<Order, AdminOperationsController> im
             });
         }
 
-        // Call updateItemsTable with the first order if available
         if (!orders.isEmpty()) {
             updateItemsTable(orders.get(0));
         }
@@ -194,7 +183,6 @@ public class OrderView extends AbstractView<Order, AdminOperationsController> im
         }
 
         controller.commitOrderData(orders);
-
         commitButton.setEnabled(false);
     }
 
@@ -228,14 +216,6 @@ public class OrderView extends AbstractView<Order, AdminOperationsController> im
                 commitButton.setEnabled(true);
             }
         }
-    }
-
-    private Object[] getRowData(int row, int columnCount) {
-        Object[] rowData = new Object[columnCount];
-        for (int col = 0; col < columnCount; col++) {
-            rowData[col] = getTable().getValueAt(row, col);
-        }
-        return rowData;
     }
 
     private JPanel createEditPanel(int columnCount, Object[] rowData, JTextField[] textFields, JComboBox<Status> statusComboBox) {

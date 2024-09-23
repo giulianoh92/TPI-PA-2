@@ -12,6 +12,8 @@ import java.util.logging.Logger;
 public class AdminView extends AbstractView<Object, AdminOperationsController> implements PanelView<AdminOperationsController> {
 
     private static final Logger LOGGER = Logger.getLogger(AdminView.class.getName());
+    private static final int FRAME_WIDTH = 1200;
+    private static final int FRAME_HEIGHT = 800;
 
     private JTabbedPane tabbedPane;
 
@@ -39,33 +41,27 @@ public class AdminView extends AbstractView<Object, AdminOperationsController> i
 
     @Override
     public void showPanel(AdminOperationsController controller) {
-        // Set the FlatLaf dark theme
-        FlatDarkLaf.setup();
-        FlatLaf.setUseNativeWindowDecorations(false);
-
+        setupLookAndFeel();
         setController(controller);
-        JFrame frame = new JFrame(getFrameTitle());
-        frame.setSize(1200, 800); // Increased size to fit tabs properly
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.getContentPane().setLayout(new BorderLayout()); // Ensure content pane uses BorderLayout
-        frame.getContentPane().setBackground(UIManager.getColor("Panel.background")); // Set background color to match dark theme
-
+        JFrame frame = createFrame();
         frame.add(this, BorderLayout.CENTER); // Add the main panel to the center of the content pane
         frame.setVisible(true);
 
         // Add tabs for different views
-        addTab(ViewType.PRODUCT, "Products");
-        addTab(ViewType.USER, "Users");
-        addTab(ViewType.ORDER, "Orders");
-        addTab(ViewType.CUSTOMER, "Customers");
+        addTabs();
     }
 
     @Override
     public void showPanel(AdminOperationsController controller, JPanel panel) {
         setController(controller);
-        panel.setLayout(new BorderLayout()); // Ensure panel uses BorderLayout
-        panel.add(this, BorderLayout.CENTER); // Add the main panel to the center of the panel
-        panel.setBackground(UIManager.getColor("Panel.background")); // Set background color to match dark theme
+        configurePanel(panel);
+    }
+
+    private void addTabs() {
+        addTab(ViewType.PRODUCT, "Products");
+        addTab(ViewType.USER, "Users");
+        addTab(ViewType.ORDER, "Orders");
+        addTab(ViewType.CUSTOMER, "Customers");
     }
 
     private void addTab(ViewType viewType, String title) {
@@ -86,5 +82,25 @@ public class AdminView extends AbstractView<Object, AdminOperationsController> i
         }
 
         controller.commitAdminData(data);
+    }
+
+    private void setupLookAndFeel() {
+        FlatDarkLaf.setup();
+        FlatLaf.setUseNativeWindowDecorations(false);
+    }
+
+    private JFrame createFrame() {
+        JFrame frame = new JFrame(getFrameTitle());
+        frame.setSize(FRAME_WIDTH, FRAME_HEIGHT); // Increased size to fit tabs properly
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.getContentPane().setLayout(new BorderLayout()); // Ensure content pane uses BorderLayout
+        frame.getContentPane().setBackground(UIManager.getColor("Panel.background")); // Set background color to match dark theme
+        return frame;
+    }
+
+    private void configurePanel(JPanel panel) {
+        panel.setLayout(new BorderLayout()); // Ensure panel uses BorderLayout
+        panel.add(this, BorderLayout.CENTER); // Add the main panel to the center of the panel
+        panel.setBackground(UIManager.getColor("Panel.background")); // Set background color to match dark theme
     }
 }

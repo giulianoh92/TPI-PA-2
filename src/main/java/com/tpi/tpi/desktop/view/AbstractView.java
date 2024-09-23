@@ -4,18 +4,14 @@ import javax.swing.*;
 import javax.swing.table.*;
 import java.awt.*;
 import java.awt.event.*;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
-import java.util.logging.Logger;
-import java.util.stream.Collectors;
 
 public abstract class AbstractView<T, C> extends JPanel {
     private static final Color BUTTON_BACKGROUND_COLOR = new Color(70, 130, 180);
     private static final Color BUTTON_FOREGROUND_COLOR = Color.WHITE;
     private static final Font BUTTON_FONT = new Font("Tahoma", Font.BOLD, 12);
-    private static final Logger LOGGER = Logger.getLogger(AbstractView.class.getName());
 
     protected C controller;
     protected JTable table;
@@ -26,9 +22,6 @@ public abstract class AbstractView<T, C> extends JPanel {
     protected JButton addRowButton;
     protected JButton deleteRowButton;
     private JTextField searchField;
-    private List<JComboBox<String>> filterComboBoxes = new ArrayList<>(); // Ensure this is declared here
-
-    private boolean commitMade = false;
 
     public AbstractView() {
         initComponents();
@@ -36,10 +29,8 @@ public abstract class AbstractView<T, C> extends JPanel {
 
     private void initComponents() {
         setLayout(new BorderLayout());
-
         if (shouldShowDefaultButtons()) {
-            JPanel buttonPanel = createButtonPanel();
-            add(buttonPanel, BorderLayout.SOUTH);
+            add(createButtonPanel(), BorderLayout.SOUTH);
         }
     }
 
@@ -63,7 +54,6 @@ public abstract class AbstractView<T, C> extends JPanel {
         buttonPanel.add(resetButton);
         buttonPanel.add(commitButton);
         buttonPanel.add(editRowButton);
-
         if (isFieldEditable()) {
             buttonPanel.add(addRowButton);
             buttonPanel.add(deleteRowButton);
@@ -105,40 +95,41 @@ public abstract class AbstractView<T, C> extends JPanel {
         if (GraphicsEnvironment.isHeadless()) {
             return;
         }
-    
+
         JFrame frame = new JFrame(getFrameTitle());
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-    
+
         JPanel panel = new JPanel(new BorderLayout());
-    
-        JPanel tablePanel = createTable(data, columnNames, rowMapper);
-        panel.add(tablePanel, BorderLayout.CENTER);
-    
+        panel.add(createTable(data, columnNames, rowMapper), BorderLayout.CENTER);
+
         if (shouldShowDefaultButtons()) {
-            JPanel buttonPanel = createButtonPanel();
-            panel.add(buttonPanel, BorderLayout.SOUTH);
+            panel.add(createButtonPanel(), BorderLayout.SOUTH);
         }
-    
+
         frame.add(panel);
         frame.pack();
         frame.setVisible(true);
+
+        // Add a component listener to adjust column sizes when the frame is resized
+        frame.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                adjustColumnSizes();
+            }
+        });
     }
 
     protected JPanel createTable(List<T> data, String[] columnNames, Function<T, Object[]> rowMapper) {
         initialTableData = storeInitialData(data, columnNames, rowMapper);
-    
         Object[][] tableData = Arrays.copyOf(initialTableData, initialTableData.length);
-        for (int i = 0; i < tableData.length; i++) {
-            tableData[i] = rowMapper.apply(data.get(i));
-        }
-    
+
         DefaultTableModel tableModel = new DefaultTableModel(tableData, columnNames) {
             @Override
             public boolean isCellEditable(int row, int column) {
-                return false;
+                return false; // Make all cells uneditable
             }
         };
-    
+
         tableModel.addTableModelListener(e -> {
             if (checkForChanges(initialTableData)) {
                 resetButton.setEnabled(true);
@@ -146,13 +137,13 @@ public abstract class AbstractView<T, C> extends JPanel {
                 resetButton.setEnabled(false);
             }
         });
-    
+
         table = new JTable(tableModel);
         styleTable(table);
-    
+
         TableRowSorter<TableModel> sorter = new TableRowSorter<>(tableModel);
         table.setRowSorter(sorter);
-    
+
         table.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
@@ -161,283 +152,165 @@ public abstract class AbstractView<T, C> extends JPanel {
                 }
             }
         });
-    
-        adjustColumnSizes();
-    
+
         JScrollPane scrollPane = new JScrollPane(table);
         Dimension tablePreferredSize = table.getPreferredSize();
         scrollPane.setPreferredSize(new Dimension(tablePreferredSize.width + 20, tablePreferredSize.height + 20));
-    
-        // Add search and filter components
+
         JPanel searchPanel = createSearchPanel(columnNames);
         JPanel containerPanel = new JPanel(new BorderLayout());
         containerPanel.add(searchPanel, BorderLayout.NORTH);
         containerPanel.add(scrollPane, BorderLayout.CENTER);
-    
+
         return containerPanel;
     }
 
     private JPanel createSearchPanel(String[] columnNames) {
         searchField = new JTextField();
-        searchField.setToolTipText("Search...");
         searchField.addKeyListener(new KeyAdapter() {
             @Override
             public void keyReleased(KeyEvent e) {
                 filterTable();
             }
         });
-        
-        JPanel filterPanel = new JPanel(new BorderLayout());
-        JComboBox<String> comboBox = new JComboBox<>();
-        filterComboBoxes.add(comboBox);
-        filterComboBoxes.get(0).addItem("All");
-        
-        // Populate combo box with unique values from the "Category" column
-        final int categoryColumnIndex = getCategoryColumnIndex(columnNames);
-        
-        if (categoryColumnIndex != -1) {
-            List<String> uniqueValues = Arrays.stream(initialTableData)
-                    .map(row -> row[categoryColumnIndex] != null ? row[categoryColumnIndex].toString() : "")
-                    .distinct()
-                    .sorted()
-                    .collect(Collectors.toList());
-            for (String value : uniqueValues) {
-                filterComboBoxes.get(0).addItem(value);
-            }
-        
-            filterComboBoxes.get(0).addActionListener(e -> filterTable());
-            filterPanel.add(filterComboBoxes.get(0), BorderLayout.EAST);
-        }
-    
-        JPanel searchPanel = new JPanel(new BorderLayout());
-        searchPanel.add(searchField, BorderLayout.CENTER);
-        searchPanel.add(filterPanel, BorderLayout.EAST);
-    
-        return searchPanel;
-    }
 
-    private int getCategoryColumnIndex(String[] columnNames) {
-        for (int i = 0; i < columnNames.length; i++) {
-            if ("Category".equals(columnNames[i])) {
-                return i;
-            }
-        }
-        return -1;
+        JPanel searchPanel = new JPanel(new BorderLayout());
+        searchPanel.add(new JLabel("Search: "), BorderLayout.WEST);
+        searchPanel.add(searchField, BorderLayout.CENTER);
+
+        return searchPanel;
     }
 
     private void filterTable() {
         RowSorter<? extends TableModel> rowSorter = table.getRowSorter();
         if (rowSorter instanceof TableRowSorter) {
-            TableRowSorter<? extends TableModel> sorter = (TableRowSorter<? extends TableModel>) rowSorter;
-            List<RowFilter<Object, Object>> filters = new ArrayList<>();
-    
-            if (filterComboBoxes.get(0).getSelectedIndex() > 0) {
-                filters.add(RowFilter.regexFilter(filterComboBoxes.get(0).getSelectedItem().toString(), table.getColumnModel().getColumnIndex("Category")));
+            @SuppressWarnings("unchecked")
+            TableRowSorter<TableModel> sorter = (TableRowSorter<TableModel>) rowSorter;
+            String text = searchField.getText();
+            if (text.trim().length() == 0) {
+                sorter.setRowFilter(null);
+            } else {
+                sorter.setRowFilter(RowFilter.regexFilter("(?i)" + text));
             }
-            if (!searchField.getText().trim().isEmpty()) {
-                filters.add(RowFilter.regexFilter("(?i)" + searchField.getText().trim()));
-            }
-    
-            sorter.setRowFilter(RowFilter.andFilter(filters));
         }
     }
 
     private void adjustColumnSizes() {
-        for (int col = 0; col < table.getColumnCount(); col++) {
-            TableColumn column = table.getColumnModel().getColumn(col);
-            int width = 15; // Min width
+        TableColumnModel columnModel = table.getColumnModel();
+        for (int column = 0; column < table.getColumnCount(); column++) {
+            TableColumn tableColumn = columnModel.getColumn(column);
+            int preferredWidth = tableColumn.getMinWidth();
+            int maxWidth = tableColumn.getMaxWidth();
+
             for (int row = 0; row < table.getRowCount(); row++) {
-                TableCellRenderer renderer = table.getCellRenderer(row, col);
-                Component comp = table.prepareRenderer(renderer, row, col);
-                width = Math.max(comp.getPreferredSize().width + 1, width);
+                TableCellRenderer cellRenderer = table.getCellRenderer(row, column);
+                Component c = table.prepareRenderer(cellRenderer, row, column);
+                int width = c.getPreferredSize().width + table.getIntercellSpacing().width;
+                preferredWidth = Math.max(preferredWidth, width);
+
+                if (preferredWidth >= maxWidth) {
+                    preferredWidth = maxWidth;
+                    break;
+                }
             }
-            column.setPreferredWidth(width);
+
+            tableColumn.setPreferredWidth(preferredWidth);
         }
     }
 
     private void styleTable(JTable table) {
         table.setFillsViewportHeight(true);
-        table.setRowHeight(25);
-        table.setFont(new Font("Tahoma", Font.PLAIN, 12));
-        table.setSelectionBackground(BUTTON_BACKGROUND_COLOR);
-        table.setSelectionForeground(BUTTON_FOREGROUND_COLOR);
-
-        JTableHeader header = table.getTableHeader();
-        header.setFont(new Font("Tahoma", Font.BOLD, 12));
-        header.setBackground(BUTTON_BACKGROUND_COLOR);
-        header.setForeground(BUTTON_FOREGROUND_COLOR);
-
-        DefaultTableCellRenderer centerRenderer = new DefaultTableCellRenderer();
-        centerRenderer.setHorizontalAlignment(JLabel.CENTER);
-        table.setDefaultRenderer(Object.class, centerRenderer);
+        table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
     }
 
     private Object[][] storeInitialData(List<T> data, String[] columnNames, Function<T, Object[]> rowMapper) {
-        Object[][] dataCopy = new Object[data.size()][columnNames.length];
-        for (int i = 0; i < data.size(); i++) {
-            dataCopy[i] = rowMapper.apply(data.get(i));
-        }
-        return dataCopy;
+        return data.stream().map(rowMapper).toArray(Object[][]::new);
     }
 
     protected abstract String getFrameTitle();
 
     protected void onCommit() {
-        int rowCount = table.getRowCount();
-        int columnCount = table.getColumnCount();
-
-        Object[][] currentData = new Object[rowCount][columnCount];
-        for (int row = 0; row < rowCount; row++) {
-            for (int col = 0; col < columnCount; col++) {
-                currentData[row][col] = table.getValueAt(row, col);
-            }
-        }
-
-        handleCommit(currentData);
-        commitMade = true;
+        handleCommit(getCurrentTableData());
     }
 
     protected abstract void handleCommit(Object[][] data);
 
     protected void onReset() {
-        if (initialTableData == null) {
-            return;
-        }
-
-        LOGGER.info("Resetting table values to initial state");
-
-        int currentRowCount = table.getRowCount();
-        int initialRowCount = initialTableData.length;
-        int columnCount = table.getColumnCount();
-
-        adjustTableRowCount(currentRowCount, initialRowCount, columnCount);
-
-        updateTableValues(initialRowCount, columnCount);
-
-        if (checkForChanges(initialTableData) || commitMade) {
-            resetButton.setEnabled(false);
-            commitButton.setEnabled(false);
-        } else {
-            resetButton.setEnabled(true);
-            commitButton.setEnabled(true);
-        }
-    }
-
-    private void adjustTableRowCount(int currentRowCount, int initialRowCount, int columnCount) {
         DefaultTableModel model = (DefaultTableModel) table.getModel();
-        if (currentRowCount < initialRowCount) {
-            for (int i = currentRowCount; i < initialRowCount; i++) {
-                model.addRow(new Object[columnCount]);
-            }
-        } else if (currentRowCount > initialRowCount) {
-            for (int i = currentRowCount - 1; i >= initialRowCount; i--) {
-                model.removeRow(i);
-            }
+        model.setRowCount(0);
+        for (Object[] row : initialTableData) {
+            model.addRow(row);
         }
-    }
-
-    private void updateTableValues(int initialRowCount, int columnCount) {
-        for (int row = 0; row < initialRowCount; row++) {
-            for (int col = 0; col < columnCount; col++) {
-                table.setValueAt(initialTableData[row][col], row, col);
-            }
-        }
+        resetButton.setEnabled(false);
+        commitButton.setEnabled(false);
     }
 
     protected void onEditRow() {
         int row = table.getSelectedRow();
-
         if (row == -1) {
-            JOptionPane.showMessageDialog(this, "Please select a row to edit.", "No Row Selected", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(this, "No row selected", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
         int columnCount = table.getColumnCount();
-        Object[] rowData = new Object[columnCount];
-        for (int col = 0; col < columnCount; col++) {
-            rowData[col] = table.getValueAt(row, col);
-        }
-
+        Object[] rowData = getRowData(row, columnCount);
         JTextField[] textFields = createTextFields(columnCount, rowData);
+        JPanel panel = createEditPanel(columnCount, textFields);
 
-        Object[][] beforeEditData = getCurrentTableData();
-
-        int result = JOptionPane.showConfirmDialog(this, createEditPanel(columnCount, textFields), "Edit Row", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+        int result = JOptionPane.showConfirmDialog(this, panel, "Edit Row", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
         if (result == JOptionPane.OK_OPTION) {
             updateTableData(row, columnCount, textFields);
-
-            boolean hasChanges = checkForChanges(beforeEditData);
-
-            if (hasChanges) {
-                resetButton.setEnabled(true);
-                commitButton.setEnabled(true);
-            }
         }
     }
 
     private JTextField[] createTextFields(int columnCount, Object[] rowData) {
         JTextField[] textFields = new JTextField[columnCount];
-        for (int col = 0; col < columnCount; col++) {
-            textFields[col] = new JTextField(rowData[col] != null ? rowData[col].toString() : "");
-            if (isNonEditableColumn(col)) {
-                textFields[col].setEditable(false);
-            }
+        for (int i = 0; i < columnCount; i++) {
+            textFields[i] = new JTextField(rowData[i].toString());
         }
         return textFields;
     }
 
     private JPanel createEditPanel(int columnCount, JTextField[] textFields) {
         JPanel panel = new JPanel(new GridLayout(columnCount, 2));
-        for (int col = 0; col < columnCount; col++) {
-            panel.add(new JLabel(table.getColumnName(col)));
-            panel.add(textFields[col]);
+        for (int i = 0; i < columnCount; i++) {
+            panel.add(new JLabel(table.getColumnName(i)));
+            panel.add(textFields[i]);
         }
         return panel;
     }
 
-    private boolean isNonEditableColumn(int col) {
-        String columnName = table.getColumnName(col);
-        return col == 0 || "Registered At".equals(columnName) || "Date".equals(columnName) || "Total".equals(columnName) || "Payment Method".equals(columnName) || "Username".equals(columnName) || "Password".equals(columnName) || "Email".equals(columnName) || "Address".equals(columnName);
+    protected Object[] getRowData(int row, int columnCount) {
+        Object[] rowData = new Object[columnCount];
+        for (int i = 0; i < columnCount; i++) {
+            rowData[i] = table.getValueAt(row, i);
+        }
+        return rowData;
+    }
+
+    private void updateTableData(int row, int columnCount, JTextField[] textFields) {
+        for (int i = 0; i < columnCount; i++) {
+            table.setValueAt(textFields[i].getText(), row, i);
+        }
     }
 
     protected Object[][] getCurrentTableData() {
-        int rowCount = table.getRowCount();
-        int columnCount = table.getColumnCount();
+        DefaultTableModel model = (DefaultTableModel) table.getModel();
+        int rowCount = model.getRowCount();
+        int columnCount = model.getColumnCount();
         Object[][] data = new Object[rowCount][columnCount];
         for (int i = 0; i < rowCount; i++) {
             for (int j = 0; j < columnCount; j++) {
-                data[i][j] = table.getValueAt(i, j);
+                data[i][j] = model.getValueAt(i, j);
             }
         }
         return data;
     }
 
-    private void updateTableData(int row, int columnCount, JTextField[] textFields) {
-        for (int col = 0; col < columnCount; col++) {
-            table.setValueAt(textFields[col].getText(), row, col);
-        }
-    }
-
     public boolean checkForChanges(Object[][] beforeEditData) {
-        int rowCount = table.getRowCount();
-        int columnCount = table.getColumnCount();
-        if (beforeEditData.length != rowCount || (rowCount > 0 && beforeEditData[0].length != columnCount)) {
-            return true; // If the dimensions don't match, consider it as changed
-        }
-        for (int i = 0; i < rowCount; i++) {
-            for (int j = 0; j < columnCount; j++) {
-                Object before = beforeEditData[i][j];
-                Object current = table.getValueAt(i, j);
-                if (before == null && current != null) {
-                    return true;
-                } else if (before != null && current == null) {
-                    return true;
-                } else if (before != null && current != null && !before.toString().equals(current.toString())) {
-                    return true;
-                }
-            }
-        }
-        return false;
+        Object[][] currentData = getCurrentTableData();
+        return !Arrays.deepEquals(beforeEditData, currentData);
     }
 
     public JTable getTable() {
@@ -449,6 +322,7 @@ public abstract class AbstractView<T, C> extends JPanel {
     }
 
     protected <E> void populateComboBox(JComboBox<E> comboBox, List<E> items) {
+        comboBox.removeAllItems();
         for (E item : items) {
             comboBox.addItem(item);
         }
