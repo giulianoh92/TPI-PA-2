@@ -277,6 +277,7 @@ public abstract class AbstractView<T, C> extends JPanel {
         JPanel panel = new JPanel(new GridLayout(columnCount, 2));
         for (int i = 0; i < columnCount; i++) {
             panel.add(new JLabel(table.getColumnName(i)));
+            textFields[i].setEditable(false);;
             panel.add(textFields[i]);
         }
         return panel;

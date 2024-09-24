@@ -289,7 +289,7 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.fill = GridBagConstraints.HORIZONTAL;
         gbc.insets = new Insets(5, 5, 5, 5);
-
+    
         for (int col = 0; col < columnCount; col++) {
             if (col == CATEGORY_COLUMN) {
                 addCategoryField(panel, gbc, categoryComboBox);
@@ -300,9 +300,14 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
                 addTextField(panel, gbc, col, rowData, textFields);
             }
         }
-
+    
+        // Set the ID column text field to uneditable
+        if (textFields[ID_COLUMN] != null) {
+            textFields[ID_COLUMN].setEditable(false);
+        }
+    
         addImageUploadButton(panel, gbc, imageLabel, columnCount);
-
+    
         return panel;
     }
 
