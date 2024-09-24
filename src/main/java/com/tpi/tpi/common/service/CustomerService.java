@@ -6,12 +6,25 @@ import com.tpi.tpi.common.repository.CustomerRepository;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 @Service
 public class CustomerService {
     @Autowired
     private CustomerRepository customerRepository;
+        @Autowired
+    private PasswordEncoder passwordEncoder;
+
+    // Example method to authenticate user
+    public boolean authenticate(String email, String password) {
+        // Fetch user from the database (pseudo code)
+        Customer customer = customerRepository.findByEmail(email);
+        if (customer != null) {
+            return passwordEncoder.matches(password, customer.getPassword());
+        }
+        return false;
+    }
 
     public List<Customer> getAllCustomerList() {
         try {
