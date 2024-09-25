@@ -43,17 +43,26 @@ public class CustomerService {
         }
     }
 
-    public void registerCustomer(String username, String email, String password, String address) {
-        String encodedPassword = passwordEncoder.encode(password);
+    public void registerCustomer(String username, String email, String password, String address) throws Exception {
+        if (customerRepository.findByEmail(email) != null) {
+            throw new Exception("Email already in use");
+        }
+        if (customerRepository.findByUsername(username) != null) {
+            throw new Exception("Username already in use");
+        }
         Customer customer = new Customer(
             0, // userId will be auto-generated
             username,
             email,
-            encodedPassword,
+            passwordEncoder.encode(password),
             address,
             new Date(System.currentTimeMillis())
         );
-        customerRepository.save(customer);
+        try {
+            customerRepository.save(customer);
+        } catch (Exception e) {
+            throw new Exception("Error saving customer: " + e.getMessage());
+        }
     }
 
     public Customer getCustomerByOrderId(int orderId) {

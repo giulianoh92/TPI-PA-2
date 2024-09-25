@@ -4,6 +4,8 @@ import com.tpi.tpi.common.model.Customer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -11,6 +13,8 @@ import java.util.List;
 
 @Repository
 public class CustomerRepository {
+
+    private static final Logger logger = LoggerFactory.getLogger(CustomerRepository.class);
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
@@ -77,16 +81,33 @@ public class CustomerRepository {
 
     public void save(Customer customer) {
         String sqlUsers = "INSERT INTO Users (username, password, is_admin, reg_date) VALUES (?, ?, false, CURRENT_DATE)";
-        String sqlCustomers = "INSERT INTO Customers (customer_id, email, address) VALUES (?, ?, ?)";
+        String sqlCart = "INSERT INTO Carts () VALUES ()";
+        String sqlCustomers = "INSERT INTO Customers (customer_id, email, address, cart_id) VALUES (?, ?, ?, ?)";
     
         try {
+            // Insert user
+            logger.debug("Inserting user with username: {}", customer.getUsername());
             jdbcTemplate.update(sqlUsers, customer.getUsername(), customer.getPassword());
             Integer userId = jdbcTemplate.queryForObject("SELECT LAST_INSERT_ID()", Integer.class);
             if (userId == null) {
                 throw new RuntimeException("Failed to retrieve last inserted user ID");
             }
-            jdbcTemplate.update(sqlCustomers, userId, customer.getEmail(), customer.getAddress());
+            logger.debug("Inserted user with ID: {}", userId);
+    
+            // Insert cart
+            logger.debug("Inserting cart");
+            jdbcTemplate.update(sqlCart);
+            Integer cartId = jdbcTemplate.queryForObject("SELECT LAST_INSERT_ID()", Integer.class);
+            if (cartId == null) {
+                throw new RuntimeException("Failed to retrieve last inserted cart ID");
+            }
+            logger.debug("Inserted cart with ID: {}", cartId);
+    
+            // Insert customer with the user ID and cart ID
+            logger.debug("Inserting customer with user ID: {} and cart ID: {}", userId, cartId);
+            jdbcTemplate.update(sqlCustomers, userId, customer.getEmail(), customer.getAddress(), cartId);
         } catch (Exception e) {
+            logger.error("Error saving customer: {}", e.getMessage());
             throw new RuntimeException("Error saving customer", e);
         }
     }
@@ -97,6 +118,15 @@ public class CustomerRepository {
             return jdbcTemplate.query(sql, this::mapRowToCustomer, email).stream().findFirst().orElse(null);
         } catch (Exception e) {
             throw new RuntimeException("Error fetching customer by email", e);
+        }
+    }
+
+    public Customer findByUsername(String username) {
+        String sql = "SELECT c.*, u.* FROM Customers c JOIN Users u ON c.customer_id = u.user_id WHERE u.username = ?";
+        try {
+            return jdbcTemplate.query(sql, this::mapRowToCustomer, username).stream().findFirst().orElse(null);
+        } catch (Exception e) {
+            throw new RuntimeException("Error fetching customer by username", e);
         }
     }
 }

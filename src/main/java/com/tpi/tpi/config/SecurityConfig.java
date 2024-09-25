@@ -30,26 +30,30 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            .csrf(csrf -> csrf.disable())  // Disable CSRF protection for simplicity
-            .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/login", "/register", "/favicon.ico", "/error").permitAll() // Ensure /register is excluded from authentication
-                .anyRequest().authenticated()
-            )
-            .formLogin(form -> form
-                .loginPage("/login")
-                .loginProcessingUrl("/login")
-                .defaultSuccessUrl("/home", true)
-                .failureHandler((request, response, exception) -> {
-                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                    response.setContentType("application/json");
-                    response.getWriter().write("{\"success\": false, \"message\": \"Invalid email or password\"}");
-                })
-                .permitAll()
-            )
-            .logout(logout -> logout
-                .permitAll()
-            );
-
+        .csrf(csrf -> csrf // CSRF protection is enabled by default
+                .disable()
+        )
+        .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/login", "/register", "/favicon.ico", "/error").permitAll()
+                        .anyRequest().authenticated()
+        )
+        .formLogin(form -> form
+                        .loginPage("/login")
+                        .loginProcessingUrl("/login")
+                        .defaultSuccessUrl("/home", true)
+                        .failureHandler((request, response, exception) -> {
+                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                            response.setContentType("application/json");
+                            response.getWriter().write("{\"success\": false, \"message\": \"Invalid email or password\"}");
+                        })
+                        .permitAll()
+        )
+        .logout(logout -> logout
+                        .invalidateHttpSession(true)
+                        .deleteCookies("JSESSIONID")
+                        .permitAll()
+        );
+    
         return http.build();
     }
 

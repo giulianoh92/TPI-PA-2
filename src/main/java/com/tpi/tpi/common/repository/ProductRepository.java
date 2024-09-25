@@ -60,8 +60,8 @@ public class ProductRepository {
             String relativeImagePath = product.getImagePath();
             if (relativeImagePath != null) {
                 relativeImagePath = relativeImagePath.replace(new File("").getAbsolutePath() + "/", "");
-                if (relativeImagePath.startsWith("src/main/resources/")) {
-                    relativeImagePath = relativeImagePath.replace("src/main/resources/", "images/");
+                if (relativeImagePath.startsWith("src/main/resources/static/images/")) {
+                    relativeImagePath = relativeImagePath.replace("src/main/resources/static/images/", "");
                 }
             }
             

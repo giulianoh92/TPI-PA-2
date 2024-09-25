@@ -9,6 +9,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
+
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
@@ -28,6 +29,7 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
     private static final int CATEGORY_COLUMN = 6;
     private static final int IMAGE_PATH_COLUMN = 7;
     private static final int IS_ACTIVE_COLUMN = 8;
+
 
     private String uploadedImagePath;
     private List<ProductCategory> categories;
@@ -253,6 +255,8 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
 
     private void loadImage(int row, JLabel imageLabel) {
         Object imagePathObj = getTable().getValueAt(row, IMAGE_PATH_COLUMN);
+        System.out.println("Image path: " + imagePathObj);
+        
         if (imagePathObj instanceof String) {
             String imagePath = (String) imagePathObj;
             if (imagePath != null && !imagePath.isEmpty()) {
@@ -260,7 +264,12 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
                 if (imgURL != null) {
                     imageLabel.setIcon(new ImageIcon(getScaledImage(new ImageIcon(imgURL).getImage(), 400, 400)));
                 } else {
-                    imageLabel.setText("Image not found");
+                    File imgFile = new File("src/main/resources/static/images/" + imagePath);
+                    if (imgFile.exists()) {
+                        imageLabel.setIcon(new ImageIcon(getScaledImage(new ImageIcon(imgFile.getAbsolutePath()).getImage(), 400, 400)));
+                    } else {
+                        imageLabel.setText("Image not found");
+                    }
                 }
             } else {
                 imageLabel.setText("No image path provided");
@@ -367,13 +376,12 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
             File selectedFile = fileChooser.getSelectedFile();
             try {
                 String projectDir = new File("").getAbsolutePath();
-                File destDir = new File(projectDir, "src/main/resources/images");
+                File destDir = new File(projectDir, "src/main/resources/static/images/");
                 if (!destDir.exists()) {
                     destDir.mkdirs();
                 }
                 File destFile = new File(destDir, selectedFile.getName());
                 Files.copy(selectedFile.toPath(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
-                uploadedImagePath = "images/" + selectedFile.getName();
                 ImageIcon imageIcon = new ImageIcon(destFile.getPath());
                 imageLabel.setIcon(new ImageIcon(getScaledImage(imageIcon.getImage(), 400, 400)));
             } catch (IOException ex) {
