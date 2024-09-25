@@ -2,23 +2,24 @@ package com.tpi.tpi.common.service;
 
 import com.tpi.tpi.common.model.Customer;
 import com.tpi.tpi.common.repository.CustomerRepository;
-
-import java.util.List;
-
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.sql.Date;
+import java.util.List;
+
 @Service
 public class CustomerService {
-    @Autowired
-    private CustomerRepository customerRepository;
-        @Autowired
-    private PasswordEncoder passwordEncoder;
 
-    // Example method to authenticate user
+    private final CustomerRepository customerRepository;
+    private final PasswordEncoder passwordEncoder;
+
+    public CustomerService(CustomerRepository customerRepository, PasswordEncoder passwordEncoder) {
+        this.customerRepository = customerRepository;
+        this.passwordEncoder = passwordEncoder;
+    }
+
     public boolean authenticate(String email, String password) {
-        // Fetch user from the database (pseudo code)
         Customer customer = customerRepository.findByEmail(email);
         if (customer != null) {
             return passwordEncoder.matches(password, customer.getPassword());
@@ -30,7 +31,6 @@ public class CustomerService {
         try {
             return customerRepository.findAll();
         } catch (Exception e) {
-            // Log the exception and rethrow it or handle it accordingly
             throw new RuntimeException("Error fetching all customers", e);
         }
     }
@@ -39,26 +39,40 @@ public class CustomerService {
         try {
             customerRepository.updateCustomer(customer);
         } catch (Exception e) {
-            // Log the exception and rethrow it or handle it accordingly
             throw new RuntimeException("Error updating customer", e);
         }
+    }
+
+    public void registerCustomer(String username, String email, String password, String address) {
+        String encodedPassword = passwordEncoder.encode(password);
+        Customer customer = new Customer(
+            0, // userId will be auto-generated
+            username,
+            email,
+            encodedPassword,
+            address,
+            new Date(System.currentTimeMillis())
+        );
+        customerRepository.save(customer);
     }
 
     public Customer getCustomerByOrderId(int orderId) {
         try {
             return customerRepository.getCustomerByOrderId(orderId);
         } catch (Exception e) {
-            // Log the exception and rethrow it or handle it accordingly
             throw new RuntimeException("Error fetching customer by order id", e);
         }
     }
 
     public void saveCustomer(Customer customer) {
-        // Logic to save customer, e.g., customerRepository.save(customer);
+        try {
+            customerRepository.save(customer);
+        } catch (Exception e) {
+            throw new RuntimeException("Error saving customer", e);
+        }
     }
 
     public boolean authenticateCustomer(String email, String password) {
-        // Logic to authenticate customer, e.g., check email and password in the database
-        return true; // Replace with actual authentication logic
+        return authenticate(email, password);
     }
 }
