@@ -124,7 +124,7 @@ public class ProductRepository {
             SELECT p.product_id, p.name, p.description, p.unit_price, p.stock, p.image_path, p.is_active, c.category_id, c.name as category_name
             FROM Products p
             JOIN Prod_categories c ON p.category_id = c.category_id
-            WHERE p.is_active = 1
+            WHERE p.is_active = 1 AND p.stock > 0
         """);
     
         if (categoryId != null) {

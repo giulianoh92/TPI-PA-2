@@ -64,6 +64,7 @@ body {
     width: 257px; /* Set a specific width for the card */
     height: 300px; /* Set a specific height for the card to make it taller */
     background-color: white; /* Set card background color */
+    overflow: hidden; /* Hide overflow content */
 }
 
 .card-img-top {
@@ -139,8 +140,6 @@ body {
     margin-bottom: 5px;
     height: auto;
 }
-
-
 
 /* My Orders panel styles */
 .order-panel {
