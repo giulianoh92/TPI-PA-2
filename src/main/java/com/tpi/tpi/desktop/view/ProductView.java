@@ -366,12 +366,12 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
         panel.add(imageScrollPane, gbc);
 
         JButton uploadButton = new JButton("Upload Image");
-        uploadButton.addActionListener(e -> uploadImage(imageLabel));
+        uploadButton.addActionListener(e -> uploadImage(imageLabel, getTable().getSelectedRow()));
         gbc.gridy = columnCount + 2;
         panel.add(uploadButton, gbc);
     }
 
-    private void uploadImage(JLabel imageLabel) {
+    private void uploadImage(JLabel imageLabel, int row) {
         JFileChooser fileChooser = new JFileChooser();
         fileChooser.setFileFilter(new FileNameExtensionFilter("Image files", "jpg", "jpeg", "png", "gif"));
         int result = fileChooser.showOpenDialog(this);
@@ -387,6 +387,7 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
                 Files.copy(selectedFile.toPath(), destFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
                 ImageIcon imageIcon = new ImageIcon(destFile.getPath());
                 imageLabel.setIcon(new ImageIcon(getScaledImage(imageIcon.getImage(), 400, 400)));
+                table.setValueAt(selectedFile.getName(), row, IMAGE_PATH_COLUMN);
             } catch (IOException ex) {
                 ex.printStackTrace();
                 JOptionPane.showMessageDialog(this, "Error uploading image: " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
@@ -415,7 +416,7 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
                 ProductCategory selectedCategory = (ProductCategory) categoryComboBox.getSelectedItem();
                 getTable().setValueAt(selectedCategory.getCategory(), row, col);
                 getTable().setValueAt(selectedCategory.getCategoryId(), row, CAT_ID_COLUMN);
-            } else if (col != IMAGE_PATH_COLUMN && col != IS_ACTIVE_COLUMN && textFields[col] != null) {
+            } else if (col != IS_ACTIVE_COLUMN && textFields[col] != null) {
                 getTable().setValueAt(textFields[col].getText(), row, col);
             }
 
