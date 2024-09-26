@@ -61,6 +61,6 @@ public class Order {
         System.out.println("Status: " + estado.getEstado());
         System.out.println("Payment: " + pago.getMetodoDePago());
         System.out.println("Date: " + pago.getFechaDePago());*/ //in a single line
-        System.out.println(orderId + status.getUserId() + status.getStatus() + payment.getPaymentMethod() + payment.getPaymentDate());
+        System.out.println(orderId + status.getStatusId() + status.getStatus() + payment.getPaymentMethod() + payment.getPaymentDate());
     }
 }

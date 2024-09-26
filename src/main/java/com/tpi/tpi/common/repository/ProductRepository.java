@@ -94,4 +94,50 @@ public class ProductRepository {
         }
     }
 
+    public Product findById(Long id) {
+        String sql = """
+                     SELECT p.product_id, p.name, p.description, p.unit_price, p.stock, p.image_path, p.is_active, c.category_id, c.name as category_name
+                     FROM Products p
+                     JOIN Prod_categories c ON p.category_id = c.category_id
+                     WHERE p.product_id = ?
+                     """;
+        try {
+            return jdbcTemplate.queryForObject(sql, this::mapRowToProduct, id);
+        } catch (Exception e) {
+            // Log the exception and rethrow it or handle it accordingly
+            throw new RuntimeException("Error fetching product by id", e);
+        }
+    }
+
+    public List<Product> findFiltered(Integer categoryId, Float minPrice, Float maxPrice, String searchQuery) {
+        StringBuilder sql = new StringBuilder("""
+            SELECT p.product_id, p.name, p.description, p.unit_price, p.stock, p.image_path, p.is_active, c.category_id, c.name as category_name
+            FROM Products p
+            JOIN Prod_categories c ON p.category_id = c.category_id
+            WHERE p.is_active = 1
+        """);
+    
+        if (categoryId != null) {
+            sql.append(" AND p.category_id = ").append(categoryId);
+        }
+        if (minPrice != null) {
+            sql.append(" AND p.unit_price >= ").append(minPrice);
+        }
+        if (maxPrice != null) {
+            sql.append(" AND p.unit_price <= ").append(maxPrice);
+        }
+        if (searchQuery != null && !searchQuery.isEmpty()) {
+            sql.append(" AND p.name LIKE '%").append(searchQuery).append("%'");
+        }
+    
+        sql.append(" ORDER BY p.product_id");
+    
+        try {
+            return jdbcTemplate.query(sql.toString(), this::mapRowToProduct);
+        } catch (Exception e) {
+            // Log the exception and rethrow it or handle it accordingly
+            throw new RuntimeException("Error fetching filtered products", e);
+        }
+    }
+
 }

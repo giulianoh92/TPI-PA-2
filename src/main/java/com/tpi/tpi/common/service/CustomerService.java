@@ -84,4 +84,20 @@ public class CustomerService {
     public boolean authenticateCustomer(String email, String password) {
         return authenticate(email, password);
     }
+
+    public Customer getCustomerByUsername(String username) {
+        try {
+            return customerRepository.findByUsername(username);
+        } catch (Exception e) {
+            throw new RuntimeException("Error fetching customer by username", e);
+        }
+    }
+
+    public Customer getCustomerByEmail(String email) {
+        try {
+            return customerRepository.findByEmail(email);
+        } catch (Exception e) {
+            throw new RuntimeException("Error fetching customer by email", e);
+        }
+    }
 }

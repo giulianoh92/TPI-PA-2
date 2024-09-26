@@ -4,20 +4,20 @@ package com.tpi.tpi.common.model;
  * Represents the status of an order.
  */
 public class Status {
-    private int userId;
+    private int statusId;
     private String status;
 
-    public Status(int userId, String status) {
-        this.userId = userId;
+    public Status(int statusId, String status) {
+        this.statusId = statusId;
         this.status = status;
     }
 
-    public int getUserId() {
-        return userId;
+    public int getStatusId() {
+        return statusId;
     }
 
-    public void setUserId(int userId) {
-        this.userId = userId;
+    public void setStatusId(int statusId) {
+        this.statusId = statusId;
     }
 
     public String getStatus() {
