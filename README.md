@@ -5,6 +5,17 @@ Este proyecto es un sistema de gestión para una tienda online que consta de dos
 1. **Panel de Administración de Escritorio**: Permite a los administradores gestionar los registros de la base de datos de productos y pedidos, así como ver los datos de los clientes.
 2. **Aplicación Web**: Permite a los usuarios registrarse, iniciar sesión, ver productos disponibles, buscar productos, ver detalles de productos, añadir productos al carrito y finalizar pedidos. Los usuarios también pueden ver los detalles de su cuenta, historial de pedidos y estado, y cerrar sesión.
 
+## Tecnologías Utilizadas
+
+- **Maven**: Para la gestión de dependencias y construcción del proyecto.
+- **Spring Boot**: Para la configuración y desarrollo de la aplicación.
+- **Swing**: Para la interfaz de usuario de la aplicación de escritorio.
+- **JSP**: Para la gestión de la base de datos.
+- **Spring MVC**: Para el manejo de las solicitudes web.
+- **Spring Security**: Para la gestión de la autenticación y autorización.
+- **Thymeleaf**: Para la generación de vistas HTML en la aplicación web.
+- **Jakarta Servlet**: Para el manejo de las solicitudes HTTP.
+
 ## Requisitos Funcionales
 
 ### Registro de Usuarios
@@ -133,25 +144,24 @@ TPI-PA-2
 │   │   │   └── com
 │   │   │       └── tpi
 │   │   │           └── tpi
-│   │   │               ├── common
-│   │   │               │   ├── model
-│   │   │               │   ├── repository
-│   │   │               │   └── service
-│   │   │               ├── config
-│   │   │               ├── desktop
-│   │   │               │   ├── controller
-│   │   │               │   └── view
-│   │   │               ├── exception
-│   │   │               └── web
-│   │   │                   └── controller
-│   │   └── resources
-│   │       ├── META-INF
-│   │       ├── sql
-│   │       ├── static
-│   │       │   ├── css
-│   │       │   └── images
-│   │       └── templates
-│   │           └── fragments
+│   │   │               ├── common              # Clases compartidas entre las aplicaciones
+│   │   │               │   ├── model           # Modelos de datos
+│   │   │               │   ├── repository      # Repositorios para acceso a datos
+│   │   │               │   └── service         # Servicios que manejan la lógica de negocio
+│   │   │               ├── config              # Clases de configuración (Spring, etc.)
+│   │   │               ├── desktop             # Aplicación de escritorio
+│   │   │               │   ├── controller      # Controladores de la aplicación de escritorio
+│   │   │               │   └── view            # Vistas (interfaz gráfica) de escritorio
+│   │   │               ├── exception           # Manejo de excepciones
+│   │   │               └── web                 # Aplicación web
+│   │   │                   └── controller      # Controladores de la aplicación web
+│   │   └── resources                           # Recursos estáticos y plantillas
+│   │       ├── sql                             # Scripts SQL para crear el esquema y datos de prueba
+│   │       ├── static                          # Archivos estáticos de la aplicación web
+│   │       │   ├── css                         # Archivos de estilos CSS
+│   │       │   └── images                      # Imágenes (como productos o logotipos)
+│   │       └── templates                       # Plantillas HTML
+│   │           └── fragments                   # Fragmentos dinámicos reutilizables en las vistas
 ```
 ## Guía de Instalación y Ejecución
 
@@ -170,16 +180,17 @@ mysql -u your_username -p tpi_db < src/main/resources/sql/dml.sql
 ```
 ### Construir y empaquetar la aplicación
 ``` bash
+mvn clean
 mvn clean compile
 mvn clean package
 ```
 ### Ejecutar la aplicación en modo escritorio
 ``` bash
-java -jar target/your-executable.jar --app.mode=desktop
+java -jar target/TPI-1.0-SNAPSHOT.jar --app.mode=desktop
 ```
 ### Ejecutar la aplicación en modo aplicación web
 ``` bash
-java -jar target/your-executable.jar --app.mode=webapp
+java -jar target/TPI-1.0-SNAPSHOT.jar --app.mode=webapp
 ```
 
 Reemplaza your-repo con la URL real del repositorio y your-executable.jar con el nombre real del archivo JAR generado. 
