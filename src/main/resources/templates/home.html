@@ -10,7 +10,7 @@
 <body>
     <!-- Navigation Bar -->
     <nav class="navbar navbar-expand-lg fixed-top">
-        <a class="navbar-brand" href="#">Online Shop</a>
+        <a class="navbar-brand" href="#" id="homeLink">Online Shop</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
         </button>
@@ -26,7 +26,10 @@
                     <a class="nav-link" href="#" id="cartBtn">Cart</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Logout</a>
+                    <a class="nav-link" href="#" id="logoutLink">Logout</a>
+                    <form id="logoutForm" action="/logout" method="post" style="display: none;">
+                        <!-- Hidden form for logout -->
+                    </form>
                 </li>
             </ul>
         </div>
@@ -94,6 +97,15 @@
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script>
         $(document).ready(function() {
+            // Check if the current URL has query parameters
+            if (window.location.search) {
+                // If there are query parameters, set the href to "/home" to reset filters
+                $('#homeLink').attr('href', '/home');
+            } else {
+                // If there are no query parameters, set the href to "#" to stay on the same page
+                $('#homeLink').attr('href', '#');
+            }
+
             // Toggle My Orders panel
             $('#myOrdersBtn').on('click', function(event) {
                 event.preventDefault();
@@ -207,6 +219,12 @@
                 if (!$(event.target).closest('#cartPanel, #cartBtn').length) {
                     $('#cartPanel').removeClass('show');
                 }
+            });
+
+            // Handle logout link click
+            $('#logoutLink').on('click', function(event) {
+                event.preventDefault();
+                $('#logoutForm').submit();
             });
         });
     </script>

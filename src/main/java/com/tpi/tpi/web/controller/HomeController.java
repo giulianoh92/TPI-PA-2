@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.slf4j.Logger;
 
 import java.security.Principal;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -112,6 +113,7 @@ public class HomeController {
 
     private void populateModelWithProductsAndCategories(Integer categoryId, Float minPrice, Float maxPrice, String searchQuery, Model model) {
         List<Product> products = productService.getFilteredProducts(categoryId, minPrice, maxPrice, searchQuery);
+        Collections.shuffle(products); // Shuffle the products list
         List<ProductCategory> categories = productService.getAllCategories();
         model.addAttribute("products", products);
         model.addAttribute("categories", categories);
