@@ -15,6 +15,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
 /**
  * Repository for managing Order entities.
  */
@@ -23,73 +26,55 @@ public class OrderRepository {
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
+    private static final Logger LOGGER = Logger.getLogger(OrderRepository.class.getName());
 
-    /**
-     * Finds all orders.
-     * @return a list of orders.
-     */
     public List<Order> findAll() {
         String sql = """
                 SELECT o.*, s.*, py.*, pm.* FROM Orders o \
                 JOIN Statuses s ON o.status_id = s.status_id \
                 JOIN Payments py ON o.payment_id = py.payment_id \
-                JOIN Payment_methods pm ON py.payment_met_id = pm.payment_met_id\
+                JOIN Payment_methods pm ON py.payment_met_id = pm.payment_met_id \
+                ORDER BY o.order_id DESC \
                 """;
         try {
             List<Order> orders = jdbcTemplate.query(sql, this::mapRowToOrder);
 
-            // Fetch items for each order
             for (Order order : orders) {
-                List<Item> items = null;
                 if (order != null) {
-                    items = findItemsByOrderId(order.getOrderId());
-                    order.addItemList(items);
+                    order.addItemList(findItemsByOrderId(order.getOrderId()));
                 }
             }
 
             return orders;
         } catch (Exception e) {
-            // Log the exception and rethrow it or handle it accordingly
+            LOGGER.log(Level.SEVERE, "Error fetching all orders", e);
             throw new RuntimeException("Error fetching all orders", e);
         }
     }
 
-    /**
-     * Finds orders by user ID.
-     * @param userId the user ID.
-     * @return a list of orders.
-     */
     public List<Order> findByUserId(int userId) {
         String sql = """
                 SELECT o.*, s.*, py.*, pm.* FROM Orders o \
                 JOIN Statuses s ON o.status_id = s.status_id \
                 JOIN Payments py ON o.payment_id = py.payment_id \
                 JOIN Payment_methods pm ON py.payment_met_id = pm.payment_met_id \
-                WHERE o.user_id = ?\
+                WHERE o.customer_id = ? \
+                ORDER BY o.order_id DESC \
                 """;
         try {
             List<Order> orders = jdbcTemplate.query(sql, this::mapRowToOrder, userId);
 
-            // Fetch items for each order
             for (Order order : orders) {
-                List<Item> items = null;
-                if (order != null) {
-                    items = findItemsByOrderId(order.getOrderId());
-                    order.addItemList(items);
-                }
+                order.addItemList(findItemsByOrderId(order.getOrderId()));
             }
 
             return orders;
         } catch (Exception e) {
-            // Log the exception and rethrow it or handle it accordingly
+            LOGGER.log(Level.SEVERE, "Error fetching orders by user ID", e);
             throw new RuntimeException("Error fetching orders by user ID", e);
         }
     }
 
-    /**
-     * Finds all statuses.
-     * @return a list of statuses.
-     */
     public List<Status> findAllStatuses() {
         String sql = "SELECT * FROM Statuses";
         try {
@@ -98,16 +83,11 @@ public class OrderRepository {
                     rs.getString("name")
             ));
         } catch (Exception e) {
-            // Log the exception and rethrow it or handle it accordingly
+            LOGGER.log(Level.SEVERE, "Error fetching all statuses", e);
             throw new RuntimeException("Error fetching all statuses", e);
         }
     }
 
-    /**
-     * Finds an order by its ID.
-     * @param orderId the order ID.
-     * @return the order.
-     */
     public Order findOrderById(int orderId) {
         String sql = """
                 SELECT o.*, s.*, py.*, pm.* FROM Orders o \
@@ -120,38 +100,63 @@ public class OrderRepository {
             Order order = jdbcTemplate.queryForObject(sql, this::mapRowToOrder, orderId);
         
             if (order != null) {
-                // Fetch items for the order
-                List<Item> items = findItemsByOrderId(order.getOrderId());
-                order.addItemList(items);
+                order.addItemList(findItemsByOrderId(order.getOrderId()));
             }
         
             return order;
         } catch (Exception e) {
-            // Log the exception and rethrow it or handle it accordingly
+            LOGGER.log(Level.SEVERE, "Error fetching order by ID", e);
             throw new RuntimeException("Error fetching order by ID", e);
         }
     }
 
-    /**
-     * Updates an order.
-     * @param order the order to update.
-     */
     public void updateOrder(Order order) {
         String sql = "UPDATE Orders SET status_id = ? WHERE order_id = ?";
         try {
-            jdbcTemplate.update(sql, order.getStatus().getUserId(), order.getOrderId());
+            jdbcTemplate.update(sql, order.getStatus().getStatusId(), order.getOrderId());
         } catch (Exception e) {
-            // Log the exception and rethrow it or handle it accordingly
+            LOGGER.log(Level.SEVERE, "Error updating order", e);
             throw new RuntimeException("Error updating order", e);
         }
     }
 
-    /**
-     * Finds items by order ID.
-     * @param orderId the order ID.
-     * @return a list of items.
-     */
-    private List<Item> findItemsByOrderId(int orderId) {
+    public List<Payment> findAllPaymentMethods() {
+        String sql = "SELECT * FROM Payment_methods";
+        try {
+            return jdbcTemplate.query(sql, (rs, rowNum) -> new Payment(
+                    rs.getInt("payment_met_id"),
+                    null,
+                    rs.getString("name"),
+                    0
+            ));
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error fetching all payment methods", e);
+            throw new RuntimeException("Error fetching all payment methods", e);
+        }
+    }
+    
+    public void addOrder(Order order, int userId) {
+        String sql = "INSERT INTO Orders (status_id, payment_id, customer_id) VALUES (?, ?, ?)";
+        try {
+            jdbcTemplate.update(sql, order.getStatus().getStatusId(), order.getPayment().getPaymentId(), userId);
+            Integer orderId = jdbcTemplate.queryForObject("SELECT LAST_INSERT_ID()", Integer.class);
+            if (orderId != null) {
+                order.setOrderId(orderId);
+            } else {
+                throw new RuntimeException("Failed to retrieve the last inserted order ID");
+            }
+    
+            for (Item item : order.getItems()) {
+                String itemSql = "INSERT INTO Items (order_id, product_id, amount) VALUES (?, ?, ?)";
+                jdbcTemplate.update(itemSql, orderId, item.getProduct().getProductId(), item.getAmount());
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error adding order", e);
+            throw new RuntimeException("Error adding order", e);
+        }
+    }
+
+    public List<Item> findItemsByOrderId(int orderId) {
         String sql = """
                 SELECT i.*, p.*, pc.* FROM Items i \
                 JOIN Products p ON i.product_id = p.product_id \
@@ -161,18 +166,11 @@ public class OrderRepository {
         try {
             return jdbcTemplate.query(sql, this::mapRowToItem, orderId);
         } catch (Exception e) {
-            // Log the exception and rethrow it or handle it accordingly
+            LOGGER.log(Level.SEVERE, "Error fetching items by order ID", e);
             throw new RuntimeException("Error fetching items by order ID", e);
         }
     }
 
-    /**
-     * Maps a row from the ResultSet to an Order object.
-     * @param rs the ResultSet.
-     * @param rowNum the row number.
-     * @return an Order object.
-     * @throws SQLException if a database access error occurs.
-     */
     private Order mapRowToOrder(ResultSet rs, int rowNum) throws SQLException {
         Status status = new Status(
                 rs.getInt("s.status_id"),
@@ -191,13 +189,6 @@ public class OrderRepository {
         );
     }
 
-    /**
-     * Maps a row from the ResultSet to an Item object.
-     * @param rs the ResultSet.
-     * @param rowNum the row number.
-     * @return an Item object.
-     * @throws SQLException if a database access error occurs.
-     */
     private Item mapRowToItem(ResultSet rs, int rowNum) throws SQLException {
         ProductCategory productCategory = new ProductCategory(
                 rs.getInt("pc.category_id"),

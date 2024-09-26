@@ -29,15 +29,48 @@ public class CustomerView extends AbstractView<Customer, AdminOperationsControll
 
     @Override
     public void showPanel(AdminOperationsController controller) {
-        // This method can remain empty or call the other showPanel method with a default panel
+        setController(controller);
+        setupPanel(controller);
     }
 
     @Override
     public void showPanel(AdminOperationsController controller, JPanel panel) {
         setController(controller);
+        setupPanel(controller, panel);
+    }
 
+    private void setupPanel(AdminOperationsController controller) {
         String[] columnNames = {"ID", "Username", "Email", "Password", "Address", "Registered At"};
-        Function<Customer, Object[]> rowMapper = customer -> new Object[]{
+        Function<Customer, Object[]> rowMapper = createRowMapper();
+
+        customers = controller.getCustomerService().getAllCustomerList();
+
+        JPanel tablePanel = createTable(customers, columnNames, rowMapper);
+        add(tablePanel, BorderLayout.CENTER);
+
+        if (shouldShowDefaultButtons()) {
+            JPanel buttonPanel = createButtonPanel();
+            add(buttonPanel, BorderLayout.SOUTH);
+        }
+    }
+
+    private void setupPanel(AdminOperationsController controller, JPanel panel) {
+        String[] columnNames = {"ID", "Username", "Email", "Password", "Address", "Registered At"};
+        Function<Customer, Object[]> rowMapper = createRowMapper();
+
+        customers = controller.getCustomerService().getAllCustomerList();
+
+        JPanel tablePanel = createTable(customers, columnNames, rowMapper);
+        panel.add(tablePanel, BorderLayout.CENTER);
+
+        if (shouldShowDefaultButtons()) {
+            JPanel buttonPanel = createButtonPanel();
+            panel.add(buttonPanel, BorderLayout.SOUTH);
+        }
+    }
+
+    private Function<Customer, Object[]> createRowMapper() {
+        return customer -> new Object[]{
             customer.getUserId(),
             customer.getUsername(),
             customer.getEmail(),
@@ -45,16 +78,6 @@ public class CustomerView extends AbstractView<Customer, AdminOperationsControll
             customer.getAddress(),
             customer.getRegisterDate().toString()
         };
-        customers = controller.getCustomerService().getAllCustomerList();
-
-        JScrollPane tableScrollPane = createTable(customers, columnNames, rowMapper);
-        panel.add(tableScrollPane, BorderLayout.CENTER);
-
-        // Add the button panel
-        if (shouldShowDefaultButtons()) {
-            JPanel buttonPanel = createButtonPanel();
-            panel.add(buttonPanel, BorderLayout.SOUTH);
-        }
     }
 
     @Override

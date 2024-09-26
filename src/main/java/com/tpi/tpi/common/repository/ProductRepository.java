@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
 
+import java.io.File;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
@@ -18,16 +19,17 @@ public class ProductRepository {
 
     public List<Product> findAll() {
         String sql = """
-                     SELECT p.product_id, p.name, p.description, p.unit_price, p.stock, p.image_path, c.category_id, c.name as category_name
+                     SELECT p.product_id, p.name, p.description, p.unit_price, p.stock, p.image_path, p.is_active, c.category_id, c.name as category_name
                      FROM Products p
                      JOIN Prod_categories c ON p.category_id = c.category_id
-                     WHERE p.is_active = true
+                     WHERE p.is_active = 1
                      ORDER BY p.product_id
                      """;
-
-        return jdbcTemplate.query(sql, this::mapRowToProduct);
+    
+        List<Product> products = jdbcTemplate.query(sql, this::mapRowToProduct);
+        return products;
     }
-
+    
     private Product mapRowToProduct(ResultSet rs, int rowNum) throws SQLException {
         ProductCategory category = new ProductCategory(
             rs.getInt("category_id"),
@@ -39,12 +41,58 @@ public class ProductRepository {
                 rs.getString("description"),
                 rs.getFloat("unit_price"),
                 rs.getInt("stock"),
-                true,
+                rs.getBoolean("is_active"),
                 category
         );
         product.setImagePath(rs.getString("image_path"));
         return product;
     }
+
+    public void updateProduct(Product product) {
+        if (product.getProductId() == 0) {
+            addProduct(product);
+            return;
+        }
+    
+        String sql = "UPDATE Products SET name = ?, description = ?, unit_price = ?, stock = ?, category_id = ?, is_active = ?, image_path = ? WHERE product_id = ?";
+        try {            
+            // Ensure the image path is relative
+            String relativeImagePath = product.getImagePath();
+            if (relativeImagePath != null) {
+                relativeImagePath = relativeImagePath.replace(new File("").getAbsolutePath() + "/", "");
+                if (relativeImagePath.startsWith("src/main/resources/static/images/")) {
+                    relativeImagePath = relativeImagePath.replace("src/main/resources/static/images/", "");
+                }
+            }
+            
+            jdbcTemplate.update(sql, product.getName(), product.getDescription(), product.getUnitPrice(), product.getStock(), product.getCategory().getCategoryId(), product.isActive(), relativeImagePath, product.getProductId());
+        } catch (Exception e) {
+            // Log the exception and rethrow it or handle it accordingly
+            throw new RuntimeException("Error updating product", e);
+        }
+    }
+
+    public void addProduct(Product product) {
+        String sql = "INSERT INTO Products (name, description, unit_price, stock, category_id, is_active, image_path) VALUES (?, ?, ?, ?, ?, ?, ?)";
+        try {
+            // Log the product being added
+            jdbcTemplate.update(sql, product.getName(), product.getDescription(), product.getUnitPrice(), product.getStock(), product.getCategory().getCategoryId(), product.isActive(), product.getImagePath());
+        } catch (Exception e) {
+            // Log the exception and rethrow it or handle it accordingly
+            throw new RuntimeException("Error adding product", e);
+        }
+    }
+
+    public void updateStock(Product product) {
+        String sql = "UPDATE Products SET stock = ? WHERE product_id = ?";
+        try {
+            jdbcTemplate.update(sql, product.getStock(), product.getProductId());
+        } catch (Exception e) {
+            // Log the exception and rethrow it or handle it accordingly
+            throw new RuntimeException("Error updating product stock", e);
+        }
+    }
+
 
     public List<ProductCategory> findAllCategories() {
         String sql = "SELECT category_id, name FROM Prod_categories";
@@ -56,24 +104,50 @@ public class ProductRepository {
         }
     }
 
-    public void updateProduct(Product product) {
-        String sql = "UPDATE Products SET name = ?, description = ?, unit_price = ?, stock = ?, category_id = ?, is_active = ? WHERE product_id = ?";
+    public Product findById(Long id) {
+        String sql = """
+                     SELECT p.product_id, p.name, p.description, p.unit_price, p.stock, p.image_path, p.is_active, c.category_id, c.name as category_name
+                     FROM Products p
+                     JOIN Prod_categories c ON p.category_id = c.category_id
+                     WHERE p.product_id = ?
+                     """;
         try {
-            System.out.println("Updating product: " + product.getProductId() + product.getCategory().getCategory() + product.getCategory().getCategoryId()); // Log the product being updated
-            jdbcTemplate.update(sql, product.getName(), product.getDescription(), product.getUnitPrice(), product.getStock(), product.getCategory().getCategoryId(), product.isActive(), product.getProductId());
+            return jdbcTemplate.queryForObject(sql, this::mapRowToProduct, id);
         } catch (Exception e) {
             // Log the exception and rethrow it or handle it accordingly
-            throw new RuntimeException("Error updating product", e);
+            throw new RuntimeException("Error fetching product by id", e);
         }
     }
 
-    public void addProduct(Product product) {
-        String sql = "INSERT INTO Products (name, description, unit_price, stock, category_id) VALUES (?, ?, ?, ?, ?)";
+    public List<Product> findFiltered(Integer categoryId, Float minPrice, Float maxPrice, String searchQuery) {
+        StringBuilder sql = new StringBuilder("""
+            SELECT p.product_id, p.name, p.description, p.unit_price, p.stock, p.image_path, p.is_active, c.category_id, c.name as category_name
+            FROM Products p
+            JOIN Prod_categories c ON p.category_id = c.category_id
+            WHERE p.is_active = 1
+        """);
+    
+        if (categoryId != null) {
+            sql.append(" AND p.category_id = ").append(categoryId);
+        }
+        if (minPrice != null) {
+            sql.append(" AND p.unit_price >= ").append(minPrice);
+        }
+        if (maxPrice != null) {
+            sql.append(" AND p.unit_price <= ").append(maxPrice);
+        }
+        if (searchQuery != null && !searchQuery.isEmpty()) {
+            sql.append(" AND p.name LIKE '%").append(searchQuery).append("%'");
+        }
+    
+        sql.append(" ORDER BY p.product_id");
+    
         try {
-            jdbcTemplate.update(sql, product.getName(), product.getDescription(), product.getUnitPrice(), product.getStock(), product.getCategory().getCategoryId());
+            return jdbcTemplate.query(sql.toString(), this::mapRowToProduct);
         } catch (Exception e) {
             // Log the exception and rethrow it or handle it accordingly
-            throw new RuntimeException("Error adding product", e);
+            throw new RuntimeException("Error fetching filtered products", e);
         }
     }
+
 }

@@ -10,7 +10,7 @@ public class Order {
     private int orderId;
     private Status status;
     private Payment payment;
-    private final List<Item> items;
+    private List<Item> items;
 
     public Order(int orderId, Status status, Payment payment) {
         this.orderId = orderId;
@@ -18,6 +18,7 @@ public class Order {
         this.payment = payment;
         this.items = new ArrayList<>();
     }
+    
 
     public int getOrderId() {
         return orderId;
@@ -55,12 +56,12 @@ public class Order {
         this.items.addAll(items);
     }
 
+    public void setItems(List<Item> items) {
+        this.items = items;
+    }
+
+
     public void printAttributes() {
-        /*System.out.println("Order ID: " + idPedido);
-        System.out.println("Status ID: " + estado.getId());
-        System.out.println("Status: " + estado.getEstado());
-        System.out.println("Payment: " + pago.getMetodoDePago());
-        System.out.println("Date: " + pago.getFechaDePago());*/ //in a single line
-        System.out.println(orderId + status.getUserId() + status.getStatus() + payment.getPaymentMethod() + payment.getPaymentDate());
+        System.out.println("ID: " + orderId + ", Status: " + status.getStatus() + ", Payment: " + payment.getPaymentMethod());
     }
 }

@@ -5,16 +5,15 @@ import com.tpi.tpi.common.model.Item;
 import com.tpi.tpi.common.model.Order;
 import com.tpi.tpi.common.model.Status;
 
-import java.sql.Date;
-import java.util.List;
-import java.util.function.Function;
-import java.util.logging.Logger;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableModel;
 import javax.swing.table.TableRowSorter;
-
 import java.awt.*;
+import java.sql.Date;
+import java.util.List;
+import java.util.function.Function;
+import java.util.logging.Logger;
 
 public class OrderView extends AbstractView<Order, AdminOperationsController> implements PanelView<AdminOperationsController> {
 
@@ -46,32 +45,33 @@ public class OrderView extends AbstractView<Order, AdminOperationsController> im
     @Override
     public void showPanel(AdminOperationsController controller) {
         setController(controller);
+        setupPanel(controller);
+    }
 
+    @Override
+    public void showPanel(AdminOperationsController controller, JPanel panel) {
+        setController(controller);
+        setupPanel(controller, panel);
+    }
+
+    private void setupPanel(AdminOperationsController controller) {
         String[] columnNames = {"ID", "Customer", "Status", "Date", "Payment Method", "Total"};
-        Function<Order, Object[]> rowMapper = order -> new Object[]{
-            order.getOrderId(),
-            controller.getCustomerService().getCustomerByOrderId(order.getOrderId()).getUsername(),
-            order.getStatus().getStatus(),
-            order.getPayment().getPaymentDate(),
-            order.getPayment().getPaymentMethod(),
-            order.getPayment().getAmount()
-        };
+        Function<Order, Object[]> rowMapper = createRowMapper(controller);
 
         orders = controller.getOrderService().getAllOrders();
         statuses = controller.getOrderService().getAllStatuses();
 
-        JScrollPane ordersScrollPane = createTable(orders, columnNames, rowMapper);
+        JPanel ordersScrollPane = createTable(orders, columnNames, rowMapper);
         itemsTable = new JTable();
         JScrollPane itemsScrollPane = new JScrollPane(itemsTable);
 
         JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, ordersScrollPane, itemsScrollPane);
-        splitPane.setDividerSize(0); // Remove the divider gap
-        splitPane.setResizeWeight(0.5); // Distribute space equally
+        splitPane.setDividerSize(0);
+        splitPane.setResizeWeight(0.5);
 
         JPanel panel = new JPanel(new BorderLayout());
         panel.add(splitPane, BorderLayout.CENTER);
 
-        // Add the button panel
         if (shouldShowDefaultButtons()) {
             JPanel buttonPanel = createButtonPanel();
             panel.add(buttonPanel, BorderLayout.SOUTH);
@@ -83,22 +83,36 @@ public class OrderView extends AbstractView<Order, AdminOperationsController> im
         frame.pack();
         frame.setVisible(true);
 
-        if (table != null) {
-            table.getSelectionModel().addListSelectionListener(e -> {
-                if (!e.getValueIsAdjusting() && table.getSelectedRow() != -1) {
-                    Order selectedOrder = orders.get(table.getSelectedRow());
-                    updateItemsTable(selectedOrder);
-                }
-            });
-        }
+        configureTableSelectionListener();
     }
 
-    @Override
-    public void showPanel(AdminOperationsController controller, JPanel panel) {
-        setController(controller);
-
+    private void setupPanel(AdminOperationsController controller, JPanel panel) {
         String[] columnNames = {"ID", "Customer", "Status", "Date", "Payment Method", "Total"};
-        Function<Order, Object[]> rowMapper = order -> new Object[]{
+        Function<Order, Object[]> rowMapper = createRowMapper(controller);
+
+        orders = controller.getOrderService().getAllOrders();
+        statuses = controller.getOrderService().getAllStatuses();
+
+        JPanel ordersScrollPane = createTable(orders, columnNames, rowMapper);
+        itemsTable = new JTable();
+        JScrollPane itemsScrollPane = new JScrollPane(itemsTable);
+
+        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, ordersScrollPane, itemsScrollPane);
+        splitPane.setDividerSize(0);
+        splitPane.setResizeWeight(0.5);
+
+        panel.add(splitPane, BorderLayout.CENTER);
+
+        if (shouldShowDefaultButtons()) {
+            JPanel buttonPanel = createButtonPanel();
+            panel.add(buttonPanel, BorderLayout.SOUTH);
+        }
+
+        configureTableSelectionListener();
+    }
+
+    private Function<Order, Object[]> createRowMapper(AdminOperationsController controller) {
+        return order -> new Object[]{
             order.getOrderId(),
             controller.getCustomerService().getCustomerByOrderId(order.getOrderId()).getUsername(),
             order.getStatus().getStatus(),
@@ -106,26 +120,9 @@ public class OrderView extends AbstractView<Order, AdminOperationsController> im
             order.getPayment().getPaymentMethod(),
             order.getPayment().getAmount()
         };
+    }
 
-        orders = controller.getOrderService().getAllOrders();
-        statuses = controller.getOrderService().getAllStatuses();
-
-        JScrollPane ordersScrollPane = createTable(orders, columnNames, rowMapper);
-        itemsTable = new JTable();
-        JScrollPane itemsScrollPane = new JScrollPane(itemsTable);
-
-        JSplitPane splitPane = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, ordersScrollPane, itemsScrollPane);
-        splitPane.setDividerSize(0); // Remove the divider gap
-        splitPane.setResizeWeight(0.5); // Distribute space equally
-
-        panel.add(splitPane, BorderLayout.CENTER);
-
-        // Add the button panel
-        if (shouldShowDefaultButtons()) {
-            JPanel buttonPanel = createButtonPanel();
-            panel.add(buttonPanel, BorderLayout.SOUTH);
-        }
-
+    private void configureTableSelectionListener() {
         JTable table = getTable();
         if (table != null) {
             configureTableSorter(table);
@@ -135,6 +132,10 @@ public class OrderView extends AbstractView<Order, AdminOperationsController> im
                     updateItemsTable(selectedOrder);
                 }
             });
+        }
+
+        if (!orders.isEmpty()) {
+            updateItemsTable(orders.get(0));
         }
     }
 
@@ -182,48 +183,39 @@ public class OrderView extends AbstractView<Order, AdminOperationsController> im
         }
 
         controller.commitOrderData(orders);
-
         commitButton.setEnabled(false);
     }
 
     @Override
     protected void onEditRow() {
-        int row = getTable().getSelectedRow();
-        if (row == -1) {
+        int viewRow = getTable().getSelectedRow();
+        if (viewRow == -1) {
             JOptionPane.showMessageDialog(this, "Please select a row to edit.", "No Row Selected", JOptionPane.WARNING_MESSAGE);
             return;
         }
-
+    
+        int modelRow = getTable().convertRowIndexToModel(viewRow);
         int columnCount = getTable().getColumnCount();
-        Object[] rowData = getRowData(row, columnCount);
+        Object[] rowData = getRowData(modelRow, columnCount);
         JTextField[] textFields = new JTextField[columnCount];
         JComboBox<Status> statusComboBox = new JComboBox<>();
         JPanel panel = createEditPanel(columnCount, rowData, textFields, statusComboBox);
-
+    
         populateComboBox(statusComboBox, statuses);
-        selectCurrentStatus(row, statusComboBox);
-
+        selectCurrentStatus(modelRow, statusComboBox);
+    
         Object[][] beforeEditData = getCurrentTableData();
-
+    
         int result = JOptionPane.showConfirmDialog(this, panel, "Edit Row", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
         if (result == JOptionPane.OK_OPTION) {
-            updateTableData(row, columnCount, textFields, statusComboBox);
-
+            updateTableData(modelRow, columnCount, textFields, statusComboBox);
+    
             boolean hasChanges = checkForChanges(beforeEditData);
-
+    
             if (hasChanges) {
-                resetButton.setEnabled(true);
                 commitButton.setEnabled(true);
             }
         }
-    }
-
-    private Object[] getRowData(int row, int columnCount) {
-        Object[] rowData = new Object[columnCount];
-        for (int col = 0; col < columnCount; col++) {
-            rowData[col] = getTable().getValueAt(row, col);
-        }
-        return rowData;
     }
 
     private JPanel createEditPanel(int columnCount, Object[] rowData, JTextField[] textFields, JComboBox<Status> statusComboBox) {
@@ -243,8 +235,8 @@ public class OrderView extends AbstractView<Order, AdminOperationsController> im
         return panel;
     }
 
-    private void selectCurrentStatus(int row, JComboBox<Status> statusComboBox) {
-        String currentStatusValue = (String) getTable().getValueAt(row, STATUS_COLUMN);
+    private void selectCurrentStatus(int modelRow, JComboBox<Status> statusComboBox) {
+        String currentStatusValue = (String) getTable().getValueAt(modelRow, STATUS_COLUMN);
         Status currentStatus = statuses.stream()
                 .filter(status -> status.getStatus().equals(currentStatusValue))
                 .findFirst()
@@ -252,23 +244,19 @@ public class OrderView extends AbstractView<Order, AdminOperationsController> im
         selectCurrentItem(statusComboBox, currentStatus);
     }
 
-    private void updateTableData(int row, int columnCount, JTextField[] textFields, JComboBox<Status> statusComboBox) {
-        Order order = orders.get(row);
+    private void updateTableData(int modelRow, int columnCount, JTextField[] textFields, JComboBox<Status> statusComboBox) {
+        Order order = orders.get(modelRow);
         for (int col = 0; col < columnCount; col++) {
-            if (col != ID_COLUMN) {
-                if (col == STATUS_COLUMN) {
-                    Status selectedStatus = (Status) statusComboBox.getSelectedItem();
-                    if (selectedStatus != null) {
-                        order.setStatus(selectedStatus);
-                        getTable().setValueAt(selectedStatus.getStatus(), row, STATUS_COLUMN);
-                    }
-                } else {
-                    if (textFields[col] != null) {
-                        updateOrderField(order, col, textFields[col].getText());
-                        getTable().setValueAt(textFields[col].getText(), row, col);
-                    }
-                }
+            if (col == STATUS_COLUMN) {
+                Status selectedStatus = (Status) statusComboBox.getSelectedItem();
+                order.setStatus(selectedStatus);
+                getTable().setValueAt(selectedStatus.getStatus(), modelRow, col);
+            } else if (col != ID_COLUMN) {
+                String value = textFields[col].getText();
+                getTable().setValueAt(value, modelRow, col);
+                updateOrderField(order, col, value);
             }
+            LOGGER.info("Updated column " + getTable().getColumnName(col) + " for Order ID " + order.getOrderId() + " to " + getTable().getValueAt(modelRow, col));
         }
     }
 

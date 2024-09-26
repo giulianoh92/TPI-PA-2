@@ -29,30 +29,53 @@ public class UserView extends AbstractView<User, AdminOperationsController> impl
 
     @Override
     public void showPanel(AdminOperationsController controller) {
-        // This method can remain empty or call the other showPanel method with a default panel
+        setController(controller);
+        setupPanel(controller);
     }
 
     @Override
     public void showPanel(AdminOperationsController controller, JPanel panel) {
         setController(controller);
+        setupPanel(controller, panel);
+    }
 
+    private void setupPanel(AdminOperationsController controller) {
         String[] columnNames = {"ID", "Username", "Password", "Registered At"};
-        Function<User, Object[]> rowMapper = user -> new Object[]{
+        Function<User, Object[]> rowMapper = createRowMapper();
+
+        users = controller.getUserService().getAllUserList();
+
+        JPanel tablePanel = createTable(users, columnNames, rowMapper);
+        add(tablePanel, BorderLayout.CENTER);
+
+        if (shouldShowDefaultButtons()) {
+            JPanel buttonPanel = createButtonPanel();
+            add(buttonPanel, BorderLayout.SOUTH);
+        }
+    }
+
+    private void setupPanel(AdminOperationsController controller, JPanel panel) {
+        String[] columnNames = {"ID", "Username", "Password", "Registered At"};
+        Function<User, Object[]> rowMapper = createRowMapper();
+
+        users = controller.getUserService().getAllUserList();
+
+        JPanel tablePanel = createTable(users, columnNames, rowMapper);
+        panel.add(tablePanel, BorderLayout.CENTER);
+
+        if (shouldShowDefaultButtons()) {
+            JPanel buttonPanel = createButtonPanel();
+            panel.add(buttonPanel, BorderLayout.SOUTH);
+        }
+    }
+
+    private Function<User, Object[]> createRowMapper() {
+        return user -> new Object[]{
             user.getUserId(),
             user.getUsername(),
             "******",
             user.getRegisterDate()
         };
-        users = controller.getUserService().getAllUserList();
-
-        JScrollPane tableScrollPane = createTable(users, columnNames, rowMapper);
-        panel.add(tableScrollPane, BorderLayout.CENTER);
-
-        // Add the button panel
-        if (shouldShowDefaultButtons()) {
-            JPanel buttonPanel = createButtonPanel();
-            panel.add(buttonPanel, BorderLayout.SOUTH);
-        }
     }
 
     @Override
