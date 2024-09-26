@@ -193,4 +193,3 @@ java -jar target/TPI-1.0-SNAPSHOT.jar --app.mode=desktop
 java -jar target/TPI-1.0-SNAPSHOT.jar --app.mode=webapp
 ```
 
-Reemplaza your-repo con la URL real del repositorio y your-executable.jar con el nombre real del archivo JAR generado. 
