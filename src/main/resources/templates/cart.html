@@ -24,7 +24,7 @@
                 <tr th:each="item : ${cartItems}">
                     <td th:text="${item.product.name}">Product Name</td>
                     <td>
-                        <input type="number" class="form-control quantity-input" th:value="${item.amount}" min="1" th:data-product-id="${item.product.productId}">
+                        <input type="number" class="form-control quantity-input" th:value="${item.amount}" min="1" th:max="${item.product.stock}" th:data-product-id="${item.product.productId}">
                     </td>
                     <td th:text="${item.product.unitPrice}">Product Price</td>
                     <td th:text="${item.product.unitPrice * item.amount}">Total Price</td>
@@ -40,6 +40,14 @@
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script>
         $(document).ready(function() {
+            $('.quantity-input').on('input', function() {
+                var maxStock = parseInt($(this).attr('max'), 10);
+                var currentValue = parseInt($(this).val(), 10);
+                if (currentValue > maxStock) {
+                    $(this).val(maxStock);
+                }
+            });
+
             $('.quantity-input').on('change', function() {
                 var productId = $(this).data('product-id');
                 var quantity = $(this).val();
@@ -57,7 +65,7 @@
                     }
                 });
             });
-    
+
             $('.remove-from-cart-btn').on('click', function() {
                 var productId = $(this).data('product-id');
                 var row = $(this).closest('tr');
@@ -75,7 +83,7 @@
                     }
                 });
             });
-    
+
             $('#buyBtn').on('click', function() {
                 window.location.href = '/order/summary';
             });
