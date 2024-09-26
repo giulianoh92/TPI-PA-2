@@ -140,6 +140,8 @@ body {
     height: auto;
 }
 
+
+
 /* My Orders panel styles */
 .order-panel {
     position: fixed;
@@ -152,13 +154,18 @@ body {
     z-index: 1050;
     padding: 20px;
     overflow-y: auto;
-    transition: right 0.4s ease, opacity 0.4s ease;
-    opacity: 0;
+    transition: right 0.4s ease-in-out, opacity 0.4s ease-in-out; /* Smooth slide-in and opacity change */
+    opacity: 0; /* Start as invisible */
+}
+
+.order-panel .card {
+    width: 100%;
+    height: auto;
 }
 
 .order-panel.show {
     right: 0; /* Slide in from the right */
-    opacity: 1;
+    opacity: 1; /* Become fully visible */
 }
 
 /* Account panel styles */
@@ -173,12 +180,32 @@ body {
     z-index: 1050;
     padding: 20px;
     overflow-y: auto;
-    transition: right 0.4s ease, opacity 0.4s ease;
-    opacity: 0;
+    transition: right 0.4s ease-in-out, opacity 0.4s ease-in-out; /* Smooth slide-in and opacity change */
+    opacity: 0; /* Start as invisible */
 }
 
 .account-panel.show {
     right: 0; /* Slide in from the right */
-    opacity: 1;
+    opacity: 1; /* Become fully visible */
 }
 
+/* Add this to home.css */
+.cart-panel {
+    position: fixed;
+    top: 56px; /* Adjust based on the height of the navbar */
+    right: -600px; /* Start off-screen */
+    width: 600px; /* Increase width for better fit */
+    height: calc(100% - 56px); /* Adjust height to not cover the navbar */
+    background-color: white;
+    border-left: 1px solid #ddd;
+    z-index: 1050;
+    padding: 20px;
+    overflow-y: auto;
+    transition: right 0.4s ease-in-out, opacity 0.4s ease-in-out; /* Smooth slide-in and opacity change */
+    opacity: 0; /* Start as invisible */
+}
+
+.cart-panel.show {
+    right: 0; /* Slide in from the right */
+    opacity: 1; /* Become fully visible */
+}

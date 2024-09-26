@@ -10,7 +10,7 @@ import java.util.List;
 public class Customer extends User {
     private String address;
     private String email;
-    private final Cart cart;
+    private Cart cart;
     private final List<Order> orders;
 
     public Customer(int userId, String username, String email, String password, String address, Date registerDate) {
@@ -41,7 +41,11 @@ public class Customer extends User {
         return cart;
     }
 
-    public void addToCarrito(Item item) {
+    public void setCart(Cart cart) {
+        this.cart = cart;
+    }
+
+    public void addToCart(Item item) {
         cart.addItem(item);
     }
 

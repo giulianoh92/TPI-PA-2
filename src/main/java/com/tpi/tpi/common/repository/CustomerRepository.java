@@ -1,6 +1,11 @@
 package com.tpi.tpi.common.repository;
 
 import com.tpi.tpi.common.model.Customer;
+import com.tpi.tpi.common.model.Cart;
+import com.tpi.tpi.common.model.Item;
+import com.tpi.tpi.common.model.Product;
+import com.tpi.tpi.common.model.ProductCategory;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Repository;
@@ -31,7 +36,7 @@ public class CustomerRepository {
     public Customer findById(int id) {
         String sql = "SELECT c.*, u.* FROM Customers c JOIN Users u ON c.customer_id = u.user_id WHERE c.customer_id = ?";
         try {
-            return jdbcTemplate.queryForObject(sql, this::mapRowToCustomer, id);
+            return jdbcTemplate.query(sql, this::mapRowToCustomer, id).stream().findFirst().orElse(null);
         } catch (Exception e) {
             throw new RuntimeException("Error fetching customer by ID", e);
         }
@@ -62,14 +67,14 @@ public class CustomerRepository {
             WHERE o.order_id = ?
             """;
         try {
-            return jdbcTemplate.queryForObject(sql, this::mapRowToCustomer, orderId);
+            return jdbcTemplate.query(sql, this::mapRowToCustomer, orderId).stream().findFirst().orElse(null);
         } catch (Exception e) {
             throw new RuntimeException("Error fetching customer by order ID", e);
         }
     }
 
     private Customer mapRowToCustomer(ResultSet rs, int rowNum) throws SQLException {
-        return new Customer(
+        Customer customer = new Customer(
             rs.getInt("customer_id"),
             rs.getString("username"),
             rs.getString("email"),
@@ -77,6 +82,53 @@ public class CustomerRepository {
             rs.getString("address"),
             rs.getDate("reg_date")
         );
+
+        // Fetch the cart for the customer
+        Cart cart = getCartByCustomerId(customer.getUserId());
+        customer.setCart(cart);
+
+        return customer;
+    }
+
+    private Cart getCartByCustomerId(int customerId) {
+        String sql = "SELECT * FROM Carts INNER JOIN Customers ON Carts.cart_id = Customers.cart_id WHERE customer_id = ?";
+        return jdbcTemplate.query(sql, this::mapRowToCart, customerId).stream().findFirst().orElse(null);
+    }
+
+    private Cart mapRowToCart(ResultSet rs, int rowNum) throws SQLException {
+        Cart cart = new Cart();
+        cart.setCartId(rs.getInt("cart_id"));
+
+        // Fetch items for the cart
+        String sql = "SELECT * FROM Items WHERE cart_id = ?";
+        List<Item> items = jdbcTemplate.query(sql, this::mapRowToItem, cart.getCartId());
+        items.forEach(cart::addItem);
+
+        return cart;
+    }
+
+    private Item mapRowToItem(ResultSet rs, int rowNum) throws SQLException {
+        String sql = "SELECT * FROM Products WHERE product_id = ?";
+        Product product = jdbcTemplate.query(sql, this::mapRowToProduct, rs.getInt("product_id")).stream().findFirst().orElse(null);
+        return new Item(rs.getInt("amount"), product);
+    }
+
+    private Product mapRowToProduct(ResultSet rs, int rowNum) throws SQLException {
+        String sql = "SELECT * FROM Prod_categories WHERE category_id = ?";
+        ProductCategory category = jdbcTemplate.query(sql, this::mapRowToProductCategory, rs.getInt("category_id")).stream().findFirst().orElse(null);
+        return new Product(
+                rs.getInt("product_id"),
+                rs.getString("name"),
+                rs.getString("description"),
+                rs.getFloat("unit_price"),
+                rs.getInt("stock"),
+                true,
+                category
+        );
+    }
+
+    private ProductCategory mapRowToProductCategory(ResultSet rs, int rowNum) throws SQLException {
+        return new ProductCategory(rs.getInt("category_id"), rs.getString("name"));
     }
 
     public void save(Customer customer) {

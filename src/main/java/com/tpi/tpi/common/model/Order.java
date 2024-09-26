@@ -10,7 +10,7 @@ public class Order {
     private int orderId;
     private Status status;
     private Payment payment;
-    private final List<Item> items;
+    private List<Item> items;
 
     public Order(int orderId, Status status, Payment payment) {
         this.orderId = orderId;
@@ -54,6 +54,11 @@ public class Order {
     public void addItemList(List<Item> items) {
         this.items.addAll(items);
     }
+
+    public void setItems(List<Item> items) {
+        this.items = items;
+    }
+
 
     public void printAttributes() {
         /*System.out.println("Order ID: " + idPedido);

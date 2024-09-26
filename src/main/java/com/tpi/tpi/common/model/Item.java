@@ -27,4 +27,8 @@ public class Item {
     public void setProduct(Product product) {
         this.product = product;
     }
+
+    public Object getTotal() {
+        return amount * product.getUnitPrice();
+    }
 }

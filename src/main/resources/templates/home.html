@@ -23,7 +23,7 @@
                     <a class="nav-link" href="#" id="myOrdersBtn">My Orders</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">Cart</a>
+                    <a class="nav-link" href="#" id="cartBtn">Cart</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="#">Logout</a>
@@ -84,34 +84,16 @@
         <!-- The content will be dynamically loaded here by the AJAX call -->
     </div>
 
+    <div id="cartPanel" class="cart-panel collapse">
+        <!-- The content will be dynamically loaded here by the AJAX call -->
+    </div>
+
     <!-- Bootstrap JS and dependencies -->
     <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script>
         $(document).ready(function() {
-            $('#filterForm').on('submit', function(event) {
-                event.preventDefault();
-                $.ajax({
-                    url: '/home',
-                    type: 'get',
-                    data: $(this).serialize() + '&searchQuery=' + $('#searchQuery').val(),
-                    success: function(response) {
-                        $('#productGrid').html($(response).find('#productGrid').html());
-                    },
-                    error: function(xhr) {
-                        console.error('Error fetching filtered products:', xhr);
-                    }
-                });
-            });
-
-            $('#searchQuery').on('keypress', function(event) {
-                if (event.which === 13) { // Enter key pressed
-                    event.preventDefault();
-                    $('#filterForm').submit();
-                }
-            });
-
             // Toggle My Orders panel
             $('#myOrdersBtn').on('click', function(event) {
                 event.preventDefault();
@@ -164,6 +146,34 @@
                 });
             }
 
+            $(document).ready(function() {
+                // Toggle Cart panel
+                $('#cartBtn').on('click', function(event) {
+                    event.preventDefault();
+                    var panel = $('#cartPanel');
+                    if (panel.hasClass('show')) {
+                        panel.removeClass('show');
+                    } else {
+                        panel.addClass('show');
+                        fetchCart(); // Fetch cart when the panel is opened
+                    }
+                });
+
+                // Fetch Cart
+                function fetchCart() {
+                    $.ajax({
+                        url: '/cart', // Ensure this points to the correct endpoint
+                        type: 'get',
+                        success: function(response) {
+                            $('#cartPanel').html(response); // Update the Cart panel with the response
+                        },
+                        error: function(xhr) {
+                            console.error('Error fetching cart:', xhr);
+                        }
+                    });
+                }
+            });
+
             // Close the panels by clicking outside of them (optional)
             $(document).on('click', function(event) {
                 if (!$(event.target).closest('#myOrdersPanel, #myOrdersBtn').length) {
@@ -171,6 +181,9 @@
                 }
                 if (!$(event.target).closest('#accountPanel, #accountBtn').length) {
                     $('#accountPanel').removeClass('show');
+                }
+                if (!$(event.target).closest('#cartPanel, #cartBtn').length) {
+                    $('#cartPanel').removeClass('show');
                 }
             });
         });
