@@ -8,6 +8,8 @@ import com.tpi.tpi.desktop.controller.ViewType;
 import javax.swing.*;
 import java.awt.*;
 import java.util.logging.Logger;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
 
 public class AdminView extends AbstractView<Object, AdminOperationsController> implements PanelView<AdminOperationsController> {
 
@@ -16,6 +18,7 @@ public class AdminView extends AbstractView<Object, AdminOperationsController> i
     private static final int FRAME_HEIGHT = 800;
 
     private JTabbedPane tabbedPane;
+    private JButton refreshButton;
 
     public AdminView() {
         initComponents();
@@ -27,6 +30,18 @@ public class AdminView extends AbstractView<Object, AdminOperationsController> i
         add(tabbedPane, BorderLayout.CENTER);
         setBorder(null); // Remove any border to eliminate padding
         setBackground(UIManager.getColor("Panel.background")); // Set background color to match dark theme
+
+        // Add refresh button
+        refreshButton = createStyledButton("↻");
+        refreshButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                refreshData();
+            }
+        });
+        JPanel buttonPanel = new JPanel(new BorderLayout());
+        buttonPanel.add(refreshButton, BorderLayout.WEST);
+        add(buttonPanel, BorderLayout.NORTH);
     }
 
     @Override
@@ -102,5 +117,43 @@ public class AdminView extends AbstractView<Object, AdminOperationsController> i
         panel.setLayout(new BorderLayout()); // Ensure panel uses BorderLayout
         panel.add(this, BorderLayout.CENTER); // Add the main panel to the center of the panel
         panel.setBackground(UIManager.getColor("Panel.background")); // Set background color to match dark theme
+    }
+
+    private void refreshData() {
+        LOGGER.info("Refreshing data from the database...");
+        for (int i = 0; i < tabbedPane.getTabCount(); i++) {
+            JPanel panel = (JPanel) tabbedPane.getComponentAt(i);
+            ViewType viewType = getViewTypeByTitle(tabbedPane.getTitleAt(i));
+            panel.removeAll();
+            controller.displayViewInPanel(viewType, panel);
+            panel.revalidate();
+            panel.repaint();
+        }
+    }
+
+    private ViewType getViewTypeByTitle(String title) {
+        switch (title) {
+            case "Products":
+                return ViewType.PRODUCT;
+            case "Users":
+                return ViewType.USER;
+            case "Orders":
+                return ViewType.ORDER;
+            case "Customers":
+                return ViewType.CUSTOMER;
+            default:
+                throw new IllegalArgumentException("Unknown tab title: " + title);
+        }
+    }
+
+    @Override
+    protected JButton createStyledButton(String text) {
+        JButton button = new JButton("<html>&#8635;</html>"); // HTML entity for U+21BB
+        button.setPreferredSize(new Dimension(30, 30));
+        button.setFont(new Font("Segoe UI", Font.PLAIN, 18)); // Font that supports basic Unicode
+        button.setFocusPainted(false);
+        button.setBorderPainted(false);
+        button.setContentAreaFilled(false);
+        return button;
     }
 }
