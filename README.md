@@ -1,6 +1,9 @@
-# Sistema de Gestión de una Tienda Online
+# Online Shop System
 
-Este proyecto es un sistema de gestión para una tienda online que permite a los usuarios interactuar con una variedad de productos, gestionar su carrito de compras, realizar pedidos y administrar su información personal. Además, proporciona funcionalidades para que los administradores gestionen productos, pedidos y usuarios.
+Este proyecto es un sistema de gestión para una tienda online que consta de dos aplicaciones:
+
+1. **Panel de Administración de Escritorio**: Permite a los administradores gestionar los registros de la base de datos de productos y pedidos, así como ver los datos de los clientes.
+2. **Aplicación Web**: Permite a los usuarios registrarse, iniciar sesión, ver productos disponibles, buscar productos, ver detalles de productos, añadir productos al carrito y finalizar pedidos. Los usuarios también pueden ver los detalles de su cuenta, historial de pedidos y estado, y cerrar sesión.
 
 ## Requisitos Funcionales
 
@@ -8,25 +11,35 @@ Este proyecto es un sistema de gestión para una tienda online que permite a los
 - Los usuarios deben poder registrarse proporcionando su nombre, dirección, correo electrónico y contraseña.
 - Los usuarios deben poder iniciar sesión utilizando su correo electrónico y contraseña.
 
-### Gestión de Productos
+### Gestión de Productos (Panel de Administración)
 - Los productos deben tener un nombre, descripción, precio y cantidad en stock.
 - Los productos deben poder añadirse, editarse y eliminarse.
 - Debe ser posible buscar productos por nombre o categoría.
 
-### Carrito de Compras
+### Carrito de Compras (Aplicación Web)
 - Los usuarios deben poder añadir productos al carrito de compras.
 - Los usuarios deben poder ver los productos en su carrito, modificar la cantidad o eliminar productos.
 - Los usuarios deben poder finalizar la compra.
 
-### Gestión de Pedidos
+### Gestión de Pedidos (Panel de Administración)
 - Debe haber una lista de pedidos para cada usuario.
-- Los usuarios deben poder ver el estado de sus pedidos (pendiente, enviado, entregado).
 - Los administradores deben poder ver todos los pedidos y cambiar su estado.
 
-### Interfaz de Administración
+### Gestión de Pedidos (Aplicación Web)
+- Los usuarios deben poder ver el estado de sus pedidos (pendiente, enviado, entregado).
+
+### Interfaz de Administración (Panel de Administración)
 - Debe haber una interfaz de administración para gestionar productos, pedidos y usuarios.
 - Los administradores deben poder agregar, editar y eliminar productos.
 - Los administradores deben poder ver una lista de todos los usuarios y pedidos.
+
+### Interfaz de Usuario (Aplicación Web)
+- Los usuarios deben poder ver los productos disponibles.
+- Los usuarios deben poder buscar productos por nombre o categoría.
+- Los usuarios deben poder ver los detalles de los productos.
+- Los usuarios deben poder ver los detalles de su cuenta.
+- Los usuarios deben poder ver su historial de pedidos y el estado de los mismos.
+- Los usuarios deben poder cerrar sesión.
 
 ## Diagrama Entidad-Relación (ERD)
 El siguiente diagrama muestra la estructura de la base de datos del sistema, destacando las relaciones entre las entidades clave:
@@ -109,5 +122,64 @@ erDiagram
     Items }o--|| Carts : "cart_id"
     Items }o--|| Orders : "order_id"
     Products }o--|| Prod_categories : "category_id"
-
 ```
+
+## Estructura del Proyecto
+``` bash
+TPI-PA-2
+├── src
+│   ├── main
+│   │   ├── java
+│   │   │   └── com
+│   │   │       └── tpi
+│   │   │           └── tpi
+│   │   │               ├── common
+│   │   │               │   ├── model
+│   │   │               │   ├── repository
+│   │   │               │   └── service
+│   │   │               ├── config
+│   │   │               ├── desktop
+│   │   │               │   ├── controller
+│   │   │               │   └── view
+│   │   │               ├── exception
+│   │   │               └── web
+│   │   │                   └── controller
+│   │   └── resources
+│   │       ├── META-INF
+│   │       ├── sql
+│   │       ├── static
+│   │       │   ├── css
+│   │       │   └── images
+│   │       └── templates
+│   │           └── fragments
+```
+## Guía de Instalación y Ejecución
+
+### Clonar el repositorio
+``` bash
+git clone https://github.com/giulianoh92/TPI-PA-2.git
+cd TPI-PA-2
+```
+
+### Configurar la base de datos
+``` bash
+CREATE DATABASE tpi_db;
+
+mysql -u your_username -p tpi_db < src/main/resources/sql/ddl.sql
+mysql -u your_username -p tpi_db < src/main/resources/sql/dml.sql
+```
+### Construir y empaquetar la aplicación
+``` bash
+mvn clean compile
+mvn clean package
+```
+### Ejecutar la aplicación en modo escritorio
+``` bash
+java -jar target/your-executable.jar --app.mode=desktop
+```
+### Ejecutar la aplicación en modo aplicación web
+``` bash
+java -jar target/your-executable.jar --app.mode=webapp
+```
+
+Reemplaza your-repo con la URL real del repositorio y your-executable.jar con el nombre real del archivo JAR generado. 
