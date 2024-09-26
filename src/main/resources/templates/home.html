@@ -146,33 +146,55 @@
                 });
             }
 
-            $(document).ready(function() {
-                // Toggle Cart panel
-                $('#cartBtn').on('click', function(event) {
+            // Handle search query submission on Enter key press
+            $('#searchQuery').on('keypress', function(event) {
+                if (event.which === 13) { // Enter key pressed
                     event.preventDefault();
-                    var panel = $('#cartPanel');
-                    if (panel.hasClass('show')) {
-                        panel.removeClass('show');
-                    } else {
-                        panel.addClass('show');
-                        fetchCart(); // Fetch cart when the panel is opened
-                    }
-                });
-
-                // Fetch Cart
-                function fetchCart() {
-                    $.ajax({
-                        url: '/cart', // Ensure this points to the correct endpoint
-                        type: 'get',
-                        success: function(response) {
-                            $('#cartPanel').html(response); // Update the Cart panel with the response
-                        },
-                        error: function(xhr) {
-                            console.error('Error fetching cart:', xhr);
-                        }
-                    });
+                    var searchQuery = $(this).val();
+                    fetchProducts(searchQuery);
                 }
             });
+
+            // Fetch products based on search query
+            function fetchProducts(searchQuery) {
+                $.ajax({
+                    url: '/home',
+                    type: 'get',
+                    data: { searchQuery: searchQuery },
+                    success: function(response) {
+                        $('.card-container').html($(response).find('.card-container').html());
+                    },
+                    error: function(xhr) {
+                        console.error('Error fetching products:', xhr);
+                    }
+                });
+            }
+
+            // Toggle Cart panel
+            $('#cartBtn').on('click', function(event) {
+                event.preventDefault();
+                var panel = $('#cartPanel');
+                if (panel.hasClass('show')) {
+                    panel.removeClass('show');
+                } else {
+                    panel.addClass('show');
+                    fetchCart(); // Fetch cart when the panel is opened
+                }
+            });
+
+            // Fetch Cart
+            function fetchCart() {
+                $.ajax({
+                    url: '/cart', // Ensure this points to the correct endpoint
+                    type: 'get',
+                    success: function(response) {
+                        $('#cartPanel').html(response); // Update the Cart panel with the response
+                    },
+                    error: function(xhr) {
+                        console.error('Error fetching cart:', xhr);
+                    }
+                });
+            }
 
             // Close the panels by clicking outside of them (optional)
             $(document).on('click', function(event) {

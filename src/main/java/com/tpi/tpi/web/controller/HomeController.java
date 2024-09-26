@@ -55,14 +55,14 @@ public class HomeController {
             Model model,
             HttpServletRequest request,
             Principal principal) {
-
+    
         populateModelWithProductsAndCategories(categoryId, minPrice, maxPrice, searchQuery, model);
         populateModelWithUserDetailsIfPresent(principal, model);
-
+    
         if (isAjaxRequest(request)) {
             return "fragments/product-grid :: productGrid";
         }
-
+    
         return "home";
     }
 

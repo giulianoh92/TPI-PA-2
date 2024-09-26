@@ -34,7 +34,7 @@ public class SecurityConfig {
                 .disable()
         )
         .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/login", "/register", "/favicon.ico", "/error").permitAll()
+                        .requestMatchers("/login", "/register", "/favicon.ico", "/error", "/css/**", "/images/**").permitAll() // Allow access to CSS and images
                         .anyRequest().authenticated()
         )
         .formLogin(form -> form
