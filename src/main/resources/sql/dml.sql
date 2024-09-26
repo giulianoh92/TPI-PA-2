@@ -45,7 +45,8 @@ INSERT INTO Users (password, username, is_admin, reg_date) VALUES
 ('$2b$12$69Qfvzffx80FmxfSLch9ceVLrYUlogLhuQgAosHNOU3H.AsrXOCjS', 'Laura Wilson', TRUE, '2024-05-10'),
 ('$2b$12$VTdsDUA86VmZqjL/JYEkU.3pgjqgGICA5tO1PAYgoralG4dVUYSdi', 'Peter Clark', FALSE, '2024-06-15'),
 ('$2b$12$4HK7xxi6MBvsZohwJ3CBuuEvVYjex4wb44Yjb/vLIOHP8RHKyDMxa', 'Susan Taylor', FALSE, '2024-07-01'),
-('$2b$12$1L9SH.yZH/30o9icAR9.6OapkFZm40MGt7ENpaBZpcGUlBRcVnUN2', 'David White', TRUE, '2024-08-01');
+('$2b$12$1L9SH.yZH/30o9icAR9.6OapkFZm40MGt7ENpaBZpcGUlBRcVnUN2', 'David White', TRUE, '2024-08-01'),
+('$2a$10$nA6UYI99kPxRlO94JjItp.CkqMU/UtAKvUH971KhD2E1lMYkXesd.', 'test', FALSE, '2024-09-01');
 
 -- Insert data into Customers
 INSERT INTO Customers (customer_id, email, address, cart_id) VALUES 
@@ -56,7 +57,8 @@ INSERT INTO Customers (customer_id, email, address, cart_id) VALUES
 (5, 'laura.wilson@example.com', '654 Birch St', 5),
 (6, 'peter.clark@example.com', '987 Maple St', 6),
 (7, 'susan.taylor@example.com', '1010 Walnut St', 7),
-(8, 'david.white@example.com', '1112 Cherry St', 8);
+(8, 'david.white@example.com', '1112 Cherry St', 8),
+(9, 'test@test', '123 Test St', 9);
 
 -- Insert data into Payments
 INSERT INTO Payments (payment_met_id, amount, date) VALUES 
@@ -79,45 +81,47 @@ INSERT INTO Payments (payment_met_id, amount, date) VALUES
 (1, 0, '2024-10-15'),
 (2, 0, '2024-10-20'),
 (3, 0, '2024-10-25'),
-(4, 0, '2024-10-30');
+(4, 0, '2024-10-30'),
+(5, 0, '2024-11-05'),
+(4, 0, '2024-11-07');
 
 -- Insert data into Products with image paths
 INSERT INTO Products (category_id, name, description, unit_price, stock, image_path) VALUES
-(1, 'IPhone 15 Pro Max', '6.7p 512GB 8GB RAM', 699.99, 50, 'images/IPhone_15_Pro_Max.jpg'),
-(1, 'Samsung Galaxy S23', '6.6p 256GB 8GB RAM', 599.99, 45, 'images/Samsung_Galaxy_S23.jpg'),
-(1, 'MacBook Air M2', '13.3p 256GB SSD 8GB RAM', 999.99, 30, 'images/MacBook_Air_M2.jpg'),
-(1, 'Sony WH-1000XM5', 'Wireless Noise Cancelling Headphones', 349.99, 20, 'images/Sony_WH-1000XM5.jpg'),
-(1, 'Apple Watch Series 9', '41mm GPS', 399.99, 40, 'images/Apple_Watch_Series_9.jpg'),
+(1, 'IPhone 15 Pro Max', '6.7p 512GB 8GB RAM', 699.99, 50, 'IPhone_15_Pro_Max.jpg'),
+(1, 'Samsung Galaxy S23', '6.6p 256GB 8GB RAM', 599.99, 45, 'Samsung_Galaxy_S23.jpg'),
+(1, 'MacBook Air M2', '13.3p 256GB SSD 8GB RAM', 999.99, 30, 'MacBook_Air_M2.jpg'),
+(1, 'Sony WH-1000XM5', 'Wireless Noise Cancelling Headphones', 349.99, 20, 'Sony_WH-1000XM5.jpg'),
+(1, 'Apple Watch Series 9', '41mm GPS', 399.99, 40, 'Apple_Watch_Series_9.jpg'),
 
-(3, 'The Catcher in the Rye', 'Paperback by J.D. Salinger', 9.99, 60, 'images/The_Catcher_in_the_Rye.jpg'),
-(3, '1984', 'Paperback by George Orwell', 8.99, 70, 'images/1984.jpg'),
-(3, 'Sapiens', 'Hardcover by Yuval Noah Harari', 18.99, 50, 'images/Sapiens.jpg'),
-(3, 'Educated', 'Paperback by Tara Westover', 11.99, 55, 'images/Educated.jpg'),
-(3, 'Becoming', 'Hardcover by Michelle Obama', 22.99, 40, 'images/Becoming.jpg'),
+(3, 'The Catcher in the Rye', 'Paperback by J.D. Salinger', 9.99, 60, 'The_Catcher_in_the_Rye.jpg'),
+(3, '1984', 'Paperback by George Orwell', 8.99, 70, '1984.jpg'),
+(3, 'Sapiens', 'Hardcover by Yuval Noah Harari', 18.99, 50, 'Sapiens.jpg'),
+(3, 'Educated', 'Paperback by Tara Westover', 11.99, 55, 'Educated.jpg'),
+(3, 'Becoming', 'Hardcover by Michelle Obama', 22.99, 40, 'Becoming.jpg'),
 
-(2, 'Levi\'s 501 Jeans', 'Classic Fit, Blue', 49.99, 100, 'images/Levi\'s_501_Jeans.jpg'),
-(2, 'Nike Air Force 1', 'Men\'s Sneakers, White', 89.99, 75, 'images/Nike_Air_Force_1.jpg'),
-(2, 'Adidas Ultraboost', 'Men\'s Running Shoes, Black', 129.99, 60, 'images/Adidas_Ultraboost.jpg'),
-(2, 'Patagonia Down Jacket', 'Women\'s Puffer Jacket, Black', 199.99, 30, 'images/Patagonia_Down_Jacket.jpg'),
-(2, 'The North Face Backpack', 'Borealis, 28L, Black', 99.99, 50, 'images/The_North_Face_Backpack.jpg'),
+(2, 'Levi\'s 501 Jeans', 'Classic Fit, Blue', 49.99, 100, 'Levi\'s_501_Jeans.jpg'),
+(2, 'Nike Air Force 1', 'Men\'s Sneakers, White', 89.99, 75, 'Nike_Air_Force_1.jpg'),
+(2, 'Adidas Ultraboost', 'Men\'s Running Shoes, Black', 129.99, 60, 'Adidas_Ultraboost.jpg'),
+(2, 'Patagonia Down Jacket', 'Women\'s Puffer Jacket, Black', 199.99, 30, 'Patagonia_Down_Jacket.jpg'),
+(2, 'The North Face Backpack', 'Borealis, 28L, Black', 99.99, 50, 'The_North_Face_Backpack.jpg'),
 
-(4, 'Organic Almonds', '16oz Pack', 12.99, 80, 'images/Organic_Almonds.jpg'),
-(4, 'Quinoa', '16oz Organic White Quinoa', 9.99, 90, 'images/Quinoa.jpg'),
-(4, 'Green Tea', '100 Bags Organic', 7.99, 70, 'images/Green_Tea.jpg'),
-(4, 'Dark Chocolate', '70% Cocoa, 200g', 5.99, 120, 'images/Dark_Chocolate.jpg'),
-(4, 'Honey', 'Raw Organic 500g', 14.99, 50, 'images/Honey.jpg'),
+(4, 'Organic Almonds', '16oz Pack', 12.99, 80, 'Organic_Almonds.jpg'),
+(4, 'Quinoa', '16oz Organic White Quinoa', 9.99, 90, 'Quinoa.jpg'),
+(4, 'Green Tea', '100 Bags Organic', 7.99, 70, 'Green_Tea.jpg'),
+(4, 'Dark Chocolate', '70% Cocoa, 200g', 5.99, 120, 'Dark_Chocolate.jpg'),
+(4, 'Honey', 'Raw Organic 500g', 14.99, 50, 'Honey.jpg'),
 
-(1, 'Lenovo IdeaPad', '15.6p 512GB SSD 16GB RAM', 499.99, 40, 'images/Lenovo_IdeaPad.jpg'),
-(1, 'Dell XPS 13', '13.4p 512GB SSD 16GB RAM', 1199.99, 20, 'images/Dell_XPS_13.jpg'),
-(1, 'GoPro HERO12', 'Action Camera, 5K', 399.99, 35, 'images/GoPro_HERO12.jpg'),
-(1, 'JBL Flip 6', 'Portable Bluetooth Speaker', 129.99, 80, 'images/JBL_Flip_6.jpg'),
-(1, 'Fitbit Charge 5', 'Fitness Tracker, Black', 149.99, 55, 'images/Fitbit_Charge_5.jpg'),
+(1, 'Lenovo IdeaPad', '15.6p 512GB SSD 16GB RAM', 499.99, 40, 'Lenovo_IdeaPad.jpg'),
+(1, 'Dell XPS 13', '13.4p 512GB SSD 16GB RAM', 1199.99, 20, 'Dell_XPS_13.jpg'),
+(1, 'GoPro HERO12', 'Action Camera, 5K', 399.99, 35, 'GoPro_HERO12.jpg'),
+(1, 'JBL Flip 6', 'Portable Bluetooth Speaker', 129.99, 80, 'JBL_Flip_6.jpg'),
+(1, 'Fitbit Charge 5', 'Fitness Tracker, Black', 149.99, 55, 'Fitbit_Charge_5.jpg'),
 
-(3, 'The Subtle Art of Not Giving a F\'ck', 'Paperback by Mark Manson', 12.99, 65, 'images/The_Subtle_Art_of_Not_Giving_a_F\'ck.jpg'),
-(3, 'The Power of Habit', 'Paperback by Charles Duhigg', 10.99, 70, 'images/The_Power_of_Habit.jpg'),
-(3, 'Atomic Habits', 'Hardcover by James Clear', 16.99, 55, 'images/Atomic_Habits.jpg'),
-(3, 'How to Win Friends and Influence People', 'Paperback by Dale Carnegie', 9.99, 75, 'images/How_to_Win_Friends_and_Influence_People.jpg'),
-(3, 'Thinking, Fast and Slow', 'Paperback by Daniel Kahneman', 14.99, 60, 'images/Thinking,_Fast_and_Slow.jpg');
+(3, 'The Subtle Art of Not Giving a F\'ck', 'Paperback by Mark Manson', 12.99, 65, 'The_Subtle_Art_of_Not_Giving_a_F\'ck.jpg'),
+(3, 'The Power of Habit', 'Paperback by Charles Duhigg', 10.99, 70, 'The_Power_of_Habit.jpg'),
+(3, 'Atomic Habits', 'Hardcover by James Clear', 16.99, 55, 'Atomic_Habits.jpg'),
+(3, 'How to Win Friends and Influence People', 'Paperback by Dale Carnegie', 9.99, 75, 'How_to_Win_Friends_and_Influence_People.jpg'),
+(3, 'Thinking, Fast and Slow', 'Paperback by Daniel Kahneman', 14.99, 60, 'Thinking,_Fast_and_Slow.jpg');
 
 -- Insert data into Orders
 INSERT INTO Orders (customer_id, status_id, payment_id) VALUES 
@@ -140,7 +144,9 @@ INSERT INTO Orders (customer_id, status_id, payment_id) VALUES
 (1, 3, 17),
 (2, 1, 18),
 (3, 2, 19),
-(4, 3, 20);
+(4, 3, 20),
+(9, 1, 21),
+(9, 2, 22);
 
 -- Insert data into Items (Cart Items)
 INSERT INTO Items (product_id, amount, cart_id) VALUES 
@@ -195,4 +201,9 @@ INSERT INTO Items (product_id, amount, order_id) VALUES
 (23, 1, 17),
 (24, 3, 18),
 (25, 2, 19),
-(26, 1, 20);
+(26, 1, 20),
+(27, 1, 21),
+(28, 2, 21),
+(29, 1, 22),
+(30, 3, 22),
+(23, 2, 22);

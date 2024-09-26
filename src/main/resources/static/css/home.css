@@ -1,0 +1,211 @@
+/* home.css */
+
+/* Define color palette using CSS variables */
+:root {
+    --first-color: #f5e1da;
+    --second-color: #f1f1f1;
+    --third-color: #49beb7;
+    --fourth-color: #085f63;
+    --text-color: #ffffff;
+    --hover-color: #d1ecf1;
+}
+
+/* General styles for the home page */
+body {
+    background-color: var(--second-color);
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding-top: 56px; /* Adjust based on the height of the navbar */
+}
+
+.navbar {
+    margin-bottom: 20px;
+    background-color: var(--fourth-color); /* Set background color to fourth-color */
+    color: var(--text-color); /* Set text color */
+}
+
+.navbar-brand, .nav-link {
+    color: var(--text-color) !important; /* Ensure text color is white */
+}
+
+.nav-link:hover {
+    color: var(--hover-color) !important; /* Change color on hover */
+}
+
+.content-container {
+    width: 100%;
+    max-width: 1200px; /* Adjust the max-width as needed */
+    margin: 0 auto; /* Center the container */
+}
+
+.search-filter-container {
+    display: flex;
+    justify-content: center; /* Center the search bar and filter button */
+    gap: 10px; /* Add gap between the search bar and filter button */
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.search-filter-container .form-control {
+    flex: 1; /* Allow the search bar to take up available space */
+}
+
+.card-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    padding: 10px;
+    justify-content: flex-start;
+}
+
+.card {
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    padding: 10px; /* Add padding to separate the image from the border */
+    width: 257px; /* Set a specific width for the card */
+    height: 300px; /* Set a specific height for the card to make it taller */
+    background-color: white; /* Set card background color */
+}
+
+.card-img-top {
+    height: 200px;
+    object-fit: contain; /* Change from cover to contain */
+}
+
+.card-title {
+    font-size: 1.25rem;
+    font-weight: bold;
+    color: var(--fourth-color); /* Set title color */
+}
+
+.card-text {
+    font-size: 1rem;
+    color: var(--third-color); /* Set text color */
+}
+
+/* New class for the frame */
+.frame {
+    background-color: white;
+    padding: 20px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    border-radius: 10px;
+}
+
+/* Styles for the quantity input field */
+.input-group .quantity-input {
+    width: 60px; /* Adjust width to fit 3 digits and use !important to override Bootstrap */
+    text-align: center; /* Center align the text */
+}
+
+/* Add margin to the "Add to Cart" button */
+.input-group .add-to-cart-btn {
+    margin-left: 10px; /* Add margin to the left */
+}
+
+/* Add this to home.css */
+.filter-panel {
+    height: auto !important; /* Override the height property */
+}
+
+/* Filter panel transition effect */
+#filterPanel {
+    transition: height 0.2s ease, opacity 0.2s ease; /* Add transition effect for height and opacity */
+    overflow: hidden; /* Ensure content is hidden during collapse */
+}
+
+/* When the filter panel is collapsed */
+#filterPanel.collapsing {
+    opacity: 0; /* Fade out effect during collapse */
+}
+
+#filterPanel.collapse.show {
+    opacity: 1; /* Fully visible when expanded */
+}
+
+#filterPanel .card-body {
+    display: flex;
+    flex-wrap: wrap;
+    padding: 5px;
+    gap: 1rem;
+    width: auto;
+    padding: 10px; /* Adjust padding as needed */
+    margin-left: 10px;
+    margin-right: 10px;
+}
+
+#filterPanel .card-body .form-control,
+#filterPanel .card-body .btn {
+    flex: 1;
+    min-width: 200px;
+    margin-bottom: 5px;
+    height: auto;
+}
+
+
+
+/* My Orders panel styles */
+.order-panel {
+    position: fixed;
+    top: 56px; /* Adjust based on the height of the navbar */
+    right: -600px; /* Start off-screen */
+    width: 600px; /* Increase width for better fit */
+    height: calc(100% - 56px); /* Adjust height to not cover the navbar */
+    background-color: white;
+    border-left: 1px solid #ddd;
+    z-index: 1050;
+    padding: 20px;
+    overflow-y: auto;
+    transition: right 0.4s ease-in-out, opacity 0.4s ease-in-out; /* Smooth slide-in and opacity change */
+    opacity: 0; /* Start as invisible */
+}
+
+.order-panel .card {
+    width: 100%;
+    height: auto;
+}
+
+.order-panel.show {
+    right: 0; /* Slide in from the right */
+    opacity: 1; /* Become fully visible */
+}
+
+/* Account panel styles */
+.account-panel {
+    position: fixed;
+    top: 56px; /* Adjust based on the height of the navbar */
+    right: -400px; /* Start off-screen */
+    width: 400px;
+    height: calc(100% - 56px); /* Adjust height to not cover the navbar */
+    background-color: white;
+    border-left: 1px solid #ddd;
+    z-index: 1050;
+    padding: 20px;
+    overflow-y: auto;
+    transition: right 0.4s ease-in-out, opacity 0.4s ease-in-out; /* Smooth slide-in and opacity change */
+    opacity: 0; /* Start as invisible */
+}
+
+.account-panel.show {
+    right: 0; /* Slide in from the right */
+    opacity: 1; /* Become fully visible */
+}
+
+/* Add this to home.css */
+.cart-panel {
+    position: fixed;
+    top: 56px; /* Adjust based on the height of the navbar */
+    right: -600px; /* Start off-screen */
+    width: 600px; /* Increase width for better fit */
+    height: calc(100% - 56px); /* Adjust height to not cover the navbar */
+    background-color: white;
+    border-left: 1px solid #ddd;
+    z-index: 1050;
+    padding: 20px;
+    overflow-y: auto;
+    transition: right 0.4s ease-in-out, opacity 0.4s ease-in-out; /* Smooth slide-in and opacity change */
+    opacity: 0; /* Start as invisible */
+}
+
+.cart-panel.show {
+    right: 0; /* Slide in from the right */
+    opacity: 1; /* Become fully visible */
+}

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/css/home.css">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cart</title>
+</head>
+<body>
+    <div class="container mt-5 pt-4">
+        <h1>Your Cart</h1>
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Product</th>
+                    <th>Quantity</th>
+                    <th>Price</th>
+                    <th>Total</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody id="cartItems">
+                <tr th:each="item : ${cartItems}">
+                    <td th:text="${item.product.name}">Product Name</td>
+                    <td>
+                        <input type="number" class="form-control quantity-input" th:value="${item.amount}" min="1" th:data-product-id="${item.product.productId}">
+                    </td>
+                    <td th:text="${item.product.unitPrice}">Product Price</td>
+                    <td th:text="${item.product.unitPrice * item.amount}">Total Price</td>
+                    <td>
+                        <button class="btn btn-danger remove-from-cart-btn" th:data-product-id="${item.product.productId}">Remove</button>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <button class="btn btn-primary" id="buyBtn">Buy</button>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            $('.quantity-input').on('change', function() {
+                var productId = $(this).data('product-id');
+                var quantity = $(this).val();
+                $.ajax({
+                    url: '/cart/update',
+                    type: 'post',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ productId: productId, quantity: quantity }),
+                    success: function(response) {
+                        // Optionally, update the total price here without reloading the page
+                        console.log('Cart updated');
+                    },
+                    error: function(xhr) {
+                        console.error('Error updating cart:', xhr);
+                    }
+                });
+            });
+    
+            $('.remove-from-cart-btn').on('click', function() {
+                var productId = $(this).data('product-id');
+                var row = $(this).closest('tr');
+                $.ajax({
+                    url: '/cart/update',
+                    type: 'post',
+                    contentType: 'application/json',
+                    data: JSON.stringify({ productId: productId, quantity: 0 }),
+                    success: function(response) {
+                        row.remove(); // Remove the row from the table
+                        console.log('Product removed from cart');
+                    },
+                    error: function(xhr) {
+                        console.error('Error removing product from cart:', xhr);
+                    }
+                });
+            });
+    
+            $('#buyBtn').on('click', function() {
+                window.location.href = '/order/summary';
+            });
+        });
+    </script>
+</body>
+</html>

@@ -49,4 +49,31 @@ public class ProductService {
             throw new RuntimeException("Error fetching all categories", e);
         }
     }
+
+    public Product getProductById(Long id) {
+        try {
+            return productRepository.findById(id);
+        } catch (Exception e) {
+            // Log the exception and rethrow it or handle it accordingly
+            throw new RuntimeException("Error fetching product by id", e);
+        }
+    }
+
+    public List<Product> getFilteredProducts(Integer categoryId, Float minPrice, Float maxPrice, String searchQuery) {
+        try {
+            return productRepository.findFiltered(categoryId, minPrice, maxPrice, searchQuery);
+        } catch (Exception e) {
+            // Log the exception and rethrow it or handle it accordingly
+            throw new RuntimeException("Error fetching filtered products", e);
+        }
+    }
+
+    public void updateProductStock(Product product) {
+        try {
+            productRepository.updateStock(product);
+        } catch (Exception e) {
+            // Log the exception and rethrow it or handle it accordingly
+            throw new RuntimeException("Error updating product stock", e);
+        }
+    }
 }

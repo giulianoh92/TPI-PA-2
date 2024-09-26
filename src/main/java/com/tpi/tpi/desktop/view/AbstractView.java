@@ -7,11 +7,10 @@ import java.awt.event.*;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
-
 public abstract class AbstractView<T, C> extends JPanel {
-    private static final Color BUTTON_BACKGROUND_COLOR = new Color(70, 130, 180);
-    private static final Color BUTTON_FOREGROUND_COLOR = Color.WHITE;
-    private static final Font BUTTON_FONT = new Font("Tahoma", Font.BOLD, 12);
+    protected static final Color BUTTON_BACKGROUND_COLOR = new Color(70, 130, 180);
+    protected static final Color BUTTON_FOREGROUND_COLOR = Color.WHITE;
+    protected static final Font BUTTON_FONT = new Font("Tahoma", Font.BOLD, 12);
 
     protected C controller;
     protected JTable table;
@@ -70,7 +69,7 @@ public abstract class AbstractView<T, C> extends JPanel {
         return false;
     }
 
-    private JButton createStyledButton(String text) {
+    protected JButton createStyledButton(String text) {
         JButton button = new JButton(text);
         button.setBackground(BUTTON_BACKGROUND_COLOR);
         button.setForeground(BUTTON_FOREGROUND_COLOR);
@@ -307,6 +306,7 @@ public abstract class AbstractView<T, C> extends JPanel {
                 data[i][j] = model.getValueAt(i, j);
             }
         }
+
         return data;
     }
 
