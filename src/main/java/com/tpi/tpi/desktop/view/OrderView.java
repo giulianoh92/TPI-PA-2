@@ -188,31 +188,31 @@ public class OrderView extends AbstractView<Order, AdminOperationsController> im
 
     @Override
     protected void onEditRow() {
-        int row = getTable().getSelectedRow();
-        if (row == -1) {
+        int viewRow = getTable().getSelectedRow();
+        if (viewRow == -1) {
             JOptionPane.showMessageDialog(this, "Please select a row to edit.", "No Row Selected", JOptionPane.WARNING_MESSAGE);
             return;
         }
-
+    
+        int modelRow = getTable().convertRowIndexToModel(viewRow);
         int columnCount = getTable().getColumnCount();
-        Object[] rowData = getRowData(row, columnCount);
+        Object[] rowData = getRowData(modelRow, columnCount);
         JTextField[] textFields = new JTextField[columnCount];
         JComboBox<Status> statusComboBox = new JComboBox<>();
         JPanel panel = createEditPanel(columnCount, rowData, textFields, statusComboBox);
-
+    
         populateComboBox(statusComboBox, statuses);
-        selectCurrentStatus(row, statusComboBox);
-
+        selectCurrentStatus(modelRow, statusComboBox);
+    
         Object[][] beforeEditData = getCurrentTableData();
-
+    
         int result = JOptionPane.showConfirmDialog(this, panel, "Edit Row", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
         if (result == JOptionPane.OK_OPTION) {
-            updateTableData(row, columnCount, textFields, statusComboBox);
-
+            updateTableData(modelRow, columnCount, textFields, statusComboBox);
+    
             boolean hasChanges = checkForChanges(beforeEditData);
-
+    
             if (hasChanges) {
-                resetButton.setEnabled(true);
                 commitButton.setEnabled(true);
             }
         }
@@ -235,8 +235,8 @@ public class OrderView extends AbstractView<Order, AdminOperationsController> im
         return panel;
     }
 
-    private void selectCurrentStatus(int row, JComboBox<Status> statusComboBox) {
-        String currentStatusValue = (String) getTable().getValueAt(row, STATUS_COLUMN);
+    private void selectCurrentStatus(int modelRow, JComboBox<Status> statusComboBox) {
+        String currentStatusValue = (String) getTable().getValueAt(modelRow, STATUS_COLUMN);
         Status currentStatus = statuses.stream()
                 .filter(status -> status.getStatus().equals(currentStatusValue))
                 .findFirst()
@@ -244,23 +244,19 @@ public class OrderView extends AbstractView<Order, AdminOperationsController> im
         selectCurrentItem(statusComboBox, currentStatus);
     }
 
-    private void updateTableData(int row, int columnCount, JTextField[] textFields, JComboBox<Status> statusComboBox) {
-        Order order = orders.get(row);
+    private void updateTableData(int modelRow, int columnCount, JTextField[] textFields, JComboBox<Status> statusComboBox) {
+        Order order = orders.get(modelRow);
         for (int col = 0; col < columnCount; col++) {
-            if (col != ID_COLUMN) {
-                if (col == STATUS_COLUMN) {
-                    Status selectedStatus = (Status) statusComboBox.getSelectedItem();
-                    if (selectedStatus != null) {
-                        order.setStatus(selectedStatus);
-                        getTable().setValueAt(selectedStatus.getStatus(), row, STATUS_COLUMN);
-                    }
-                } else {
-                    if (textFields[col] != null) {
-                        updateOrderField(order, col, textFields[col].getText());
-                        getTable().setValueAt(textFields[col].getText(), row, col);
-                    }
-                }
+            if (col == STATUS_COLUMN) {
+                Status selectedStatus = (Status) statusComboBox.getSelectedItem();
+                order.setStatus(selectedStatus);
+                getTable().setValueAt(selectedStatus.getStatus(), modelRow, col);
+            } else if (col != ID_COLUMN) {
+                String value = textFields[col].getText();
+                getTable().setValueAt(value, modelRow, col);
+                updateOrderField(order, col, value);
             }
+            LOGGER.info("Updated column " + getTable().getColumnName(col) + " for Order ID " + order.getOrderId() + " to " + getTable().getValueAt(modelRow, col));
         }
     }
 

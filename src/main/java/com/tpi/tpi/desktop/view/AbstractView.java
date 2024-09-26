@@ -7,7 +7,6 @@ import java.awt.event.*;
 import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
-
 public abstract class AbstractView<T, C> extends JPanel {
     private static final Color BUTTON_BACKGROUND_COLOR = new Color(70, 130, 180);
     private static final Color BUTTON_FOREGROUND_COLOR = Color.WHITE;
@@ -307,6 +306,7 @@ public abstract class AbstractView<T, C> extends JPanel {
                 data[i][j] = model.getValueAt(i, j);
             }
         }
+
         return data;
     }
 

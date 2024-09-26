@@ -67,4 +67,13 @@ public class ProductService {
             throw new RuntimeException("Error fetching filtered products", e);
         }
     }
+
+    public void updateProductStock(Product product) {
+        try {
+            productRepository.updateStock(product);
+        } catch (Exception e) {
+            // Log the exception and rethrow it or handle it accordingly
+            throw new RuntimeException("Error updating product stock", e);
+        }
+    }
 }

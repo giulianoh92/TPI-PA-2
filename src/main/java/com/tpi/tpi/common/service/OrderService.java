@@ -2,6 +2,7 @@ package com.tpi.tpi.common.service;
 
 import com.tpi.tpi.common.model.Item;
 import com.tpi.tpi.common.model.Order;
+import com.tpi.tpi.common.model.Payment;
 import com.tpi.tpi.common.model.Status;
 import com.tpi.tpi.common.repository.OrderRepository;
 
@@ -59,6 +60,24 @@ public class OrderService {
         } catch (Exception e) {
             LOGGER.severe("Error updating order: " + e.getMessage());
             throw new RuntimeException("Error updating order", e);
+        }
+    }
+
+    public List<Payment> getAllPaymentMethods() {
+        try {
+            return orderRepository.findAllPaymentMethods();
+        } catch (Exception e) {
+            LOGGER.severe("Error fetching all payment methods: " + e.getMessage());
+            throw new RuntimeException("Error fetching all payment methods", e);
+        }
+    }
+
+    public void createOrder(Order order, int userId) {
+        try {
+            orderRepository.addOrder(order, userId);
+        } catch (Exception e) {
+            LOGGER.severe("Error creating order: " + e.getMessage());
+            throw new RuntimeException("Error creating order", e);
         }
     }
 }

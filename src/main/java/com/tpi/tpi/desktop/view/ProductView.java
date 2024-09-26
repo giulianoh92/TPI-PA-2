@@ -21,6 +21,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.Comparator;
 import java.util.List;
 import java.util.function.Function;
+import java.util.logging.Logger;
 
 public class ProductView extends AbstractView<Product, AdminOperationsController> implements PanelView<AdminOperationsController> {
 
@@ -29,6 +30,8 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
     private static final int CATEGORY_COLUMN = 6;
     private static final int IMAGE_PATH_COLUMN = 7;
     private static final int IS_ACTIVE_COLUMN = 8;
+
+    private final static Logger LOGGER = Logger.getLogger(ProductView.class.getName());
 
 
     private String uploadedImagePath;
@@ -412,9 +415,11 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
                 ProductCategory selectedCategory = (ProductCategory) categoryComboBox.getSelectedItem();
                 getTable().setValueAt(selectedCategory.getCategory(), row, col);
                 getTable().setValueAt(selectedCategory.getCategoryId(), row, CAT_ID_COLUMN);
-            } else if (col != IMAGE_PATH_COLUMN && col != IS_ACTIVE_COLUMN) {
+            } else if (col != IMAGE_PATH_COLUMN && col != IS_ACTIVE_COLUMN && textFields[col] != null) {
                 getTable().setValueAt(textFields[col].getText(), row, col);
             }
+
+            LOGGER.info("Updated  Product ID: " + getTable().getValueAt(row, ID_COLUMN) + " Column: " + col + " Value: " + getTable().getValueAt(row, col));
         }
     }
 

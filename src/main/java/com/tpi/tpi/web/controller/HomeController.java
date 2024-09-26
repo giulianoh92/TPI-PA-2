@@ -4,8 +4,10 @@ import com.tpi.tpi.common.model.Cart;
 import com.tpi.tpi.common.model.Customer;
 import com.tpi.tpi.common.model.Item;
 import com.tpi.tpi.common.model.Order;
+import com.tpi.tpi.common.model.Payment;
 import com.tpi.tpi.common.model.Product;
 import com.tpi.tpi.common.model.ProductCategory;
+import com.tpi.tpi.common.model.Status;
 import com.tpi.tpi.common.service.CartService;
 import com.tpi.tpi.common.service.CustomerService;
 import com.tpi.tpi.common.service.OrderService;
@@ -254,6 +256,84 @@ public class HomeController {
         cartService.updateCart(cart);
 
         return "Cart cleared";
+    }
+
+    @GetMapping("/order/summary")
+    public String orderSummary(Model model, Principal principal) {
+        if (principal == null) {
+            return "redirect:/login";
+        }
+
+        String email = principal.getName();
+        Customer customer = customerService.getCustomerByEmail(email);
+        if (customer == null) {
+            return "redirect:/login";
+        }
+
+        Cart cart = customer.getCart();
+        List<Item> cartItems = cart.getItems();
+        List<Payment> paymentMethods = orderService.getAllPaymentMethods();
+
+        model.addAttribute("cartItems", cartItems);
+        model.addAttribute("paymentMethods", paymentMethods);
+        return "order-summary";
+    }
+
+    @PostMapping("/order/confirm")
+    public String confirmOrder(@RequestParam("paymentMethodId") int paymentMethodId, Principal principal) {
+        if (principal == null) {
+            return "error"; // Ensure you have an error.html template
+        }
+    
+        String email = principal.getName();
+        Customer customer = customerService.getCustomerByEmail(email);
+        if (customer == null) {
+            return "error"; // Ensure you have an error.html template
+        }
+    
+        Cart cart = customer.getCart();
+        List<Item> cartItems = cart.getItems();
+    
+        if (cartItems.isEmpty()) {
+            return "error"; // Handle case where cart is empty
+        }
+    
+        // Create a java.sql.Date from java.util.Date
+        java.sql.Date sqlDate = new java.sql.Date(System.currentTimeMillis());
+    
+        Order order = new Order(0, new Status(1, "Pending"), new Payment(paymentMethodId, sqlDate, "", 0.0));
+        order.addItemList(cartItems);
+    
+        // Ensure the order is created successfully
+        try {
+            orderService.createOrder(order, customer.getUserId());
+            cart.clearCart();
+            cartService.updateCart(cart);
+        } catch (Exception e) {
+            logger.error("Failed to create order", e);
+            return "error";
+        }
+        
+        // Update product stock and cart
+        try {
+            for (Item item : cartItems) {
+                Product product = item.getProduct();
+                product.setStock(product.getStock() - item.getAmount());
+                productService.updateProductStock(product);
+            }
+        } catch (Exception e) {
+            logger.error("Failed to update stock or clear cart", e);
+            return "error";
+        }
+    
+        logger.info("Order created successfully for customer: " + email);
+        return "redirect:/order/success";
+    }
+    
+
+    @GetMapping("/order/success")
+    public String orderSuccess() {
+        return "order-success";
     }
     
     

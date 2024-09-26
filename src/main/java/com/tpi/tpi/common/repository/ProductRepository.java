@@ -83,6 +83,16 @@ public class ProductRepository {
         }
     }
 
+    public void updateStock(Product product) {
+        String sql = "UPDATE Products SET stock = ? WHERE product_id = ?";
+        try {
+            jdbcTemplate.update(sql, product.getStock(), product.getProductId());
+        } catch (Exception e) {
+            // Log the exception and rethrow it or handle it accordingly
+            throw new RuntimeException("Error updating product stock", e);
+        }
+    }
+
 
     public List<ProductCategory> findAllCategories() {
         String sql = "SELECT category_id, name FROM Prod_categories";

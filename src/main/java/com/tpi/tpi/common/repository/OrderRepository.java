@@ -33,7 +33,8 @@ public class OrderRepository {
                 SELECT o.*, s.*, py.*, pm.* FROM Orders o \
                 JOIN Statuses s ON o.status_id = s.status_id \
                 JOIN Payments py ON o.payment_id = py.payment_id \
-                JOIN Payment_methods pm ON py.payment_met_id = pm.payment_met_id\
+                JOIN Payment_methods pm ON py.payment_met_id = pm.payment_met_id \
+                ORDER BY o.order_id DESC \
                 """;
         try {
             List<Order> orders = jdbcTemplate.query(sql, this::mapRowToOrder);
@@ -57,7 +58,8 @@ public class OrderRepository {
                 JOIN Statuses s ON o.status_id = s.status_id \
                 JOIN Payments py ON o.payment_id = py.payment_id \
                 JOIN Payment_methods pm ON py.payment_met_id = pm.payment_met_id \
-                WHERE o.customer_id = ?\
+                WHERE o.customer_id = ? \
+                ORDER BY o.order_id DESC \
                 """;
         try {
             List<Order> orders = jdbcTemplate.query(sql, this::mapRowToOrder, userId);
@@ -115,6 +117,42 @@ public class OrderRepository {
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Error updating order", e);
             throw new RuntimeException("Error updating order", e);
+        }
+    }
+
+    public List<Payment> findAllPaymentMethods() {
+        String sql = "SELECT * FROM Payment_methods";
+        try {
+            return jdbcTemplate.query(sql, (rs, rowNum) -> new Payment(
+                    rs.getInt("payment_met_id"),
+                    null,
+                    rs.getString("name"),
+                    0
+            ));
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error fetching all payment methods", e);
+            throw new RuntimeException("Error fetching all payment methods", e);
+        }
+    }
+    
+    public void addOrder(Order order, int userId) {
+        String sql = "INSERT INTO Orders (status_id, payment_id, customer_id) VALUES (?, ?, ?)";
+        try {
+            jdbcTemplate.update(sql, order.getStatus().getStatusId(), order.getPayment().getPaymentId(), userId);
+            Integer orderId = jdbcTemplate.queryForObject("SELECT LAST_INSERT_ID()", Integer.class);
+            if (orderId != null) {
+                order.setOrderId(orderId);
+            } else {
+                throw new RuntimeException("Failed to retrieve the last inserted order ID");
+            }
+    
+            for (Item item : order.getItems()) {
+                String itemSql = "INSERT INTO Items (order_id, product_id, amount) VALUES (?, ?, ?)";
+                jdbcTemplate.update(itemSql, orderId, item.getProduct().getProductId(), item.getAmount());
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error adding order", e);
+            throw new RuntimeException("Error adding order", e);
         }
     }
 

@@ -13,7 +13,6 @@
         <div th:if="${orders != null}">
             <div th:each="order : ${orders}" class="card mb-3">
                 <div class="card-body">
-                    <h5 class="card-title">Order ID: <span th:text="${order.orderId}"></span></h5>
                     <p class="card-text">Status: <span th:text="${order.status.status}"></span></p>
                     <p class="card-text">Payment Method: <span th:text="${order.payment.paymentMethod}"></span></p>
                     <p class="card-text">Total Amount: $<span th:text="${order.payment.amount}"></span></p>

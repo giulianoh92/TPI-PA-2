@@ -57,6 +57,15 @@ public class CartRepository {
         }
     }
 
+    public void clearCart(int cartId) {
+        String sql = "DELETE FROM Cart_items WHERE cart_id = ?";
+        try {
+            jdbcTemplate.update(sql, cartId);
+        } catch (Exception e) {
+            throw new RuntimeException("Error clearing cart", e);
+        }
+    }
+
     private Cart mapRowToCart(ResultSet rs, int rowNum) throws SQLException {
         Cart cart = new Cart();
         cart.setCartId(rs.getInt("cart_id"));
