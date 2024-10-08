@@ -4,37 +4,37 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Order Summary</title>
+    <title>Resumen</title>
 </head>
 <body>
     <div class="container mt-5 pt-4">
-        <h1>Order Summary</h1>
+        <h1>Resumen</h1>
         <table class="table">
             <thead>
                 <tr>
-                    <th>Product</th>
-                    <th>Quantity</th>
-                    <th>Price</th>
+                    <th>Producto</th>
+                    <th>Cantidad</th>
+                    <th>Precio</th>
                     <th>Total</th>
                 </tr>
             </thead>
             <tbody>
                 <tr th:each="item : ${cartItems}">
-                    <td th:text="${item.product.name}">Product Name</td>
-                    <td th:text="${item.amount}">Quantity</td>
-                    <td th:text="${item.product.unitPrice}">Product Price</td>
-                    <td th:text="${item.product.unitPrice * item.amount}">Total Price</td>
+                    <td th:text="${item.product.name}">Nombre</td>
+                    <td th:text="${item.amount}">Cantidad</td>
+                    <td th:text="${item.product.unitPrice}">Precio</td>
+                    <td th:text="${item.product.unitPrice * item.amount}">Total</td>
                 </tr>
             </tbody>
         </table>
         <form action="/order/confirm" method="post">
             <div class="form-group">
-                <label for="paymentMethod">Select Payment Method</label>
+                <label for="paymentMethod">Seleccionar método de pago</label>
                 <select class="form-control" id="paymentMethod" name="paymentMethodId">
-                    <option th:each="payment : ${paymentMethods}" th:value="${payment.paymentId}" th:text="${payment.paymentMethod}">Payment Method</option>
+                    <option th:each="payment : ${paymentMethods}" th:value="${payment.paymentId}" th:text="${payment.paymentMethod}">Método de pago</option>
                 </select>
             </div>
-            <button type="submit" class="btn btn-primary">Confirm Order</button>
+            <button type="submit" class="btn btn-primary">Confirmar Pedido</button>
         </form>
     </div>
 </body>

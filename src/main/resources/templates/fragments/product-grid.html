@@ -5,10 +5,10 @@
         <div id="productGrid" class="card-container">
             <div th:each="product : ${products}" class="card h-100">
                 <a th:href="@{'/product/' + ${product.productId}}" class="stretched-link"></a>
-                <img th:src="@{'/images/' + ${product.imagePath}}" class="card-img-top" alt="Product Image">
+                <img th:src="@{'/images/' + ${product.imagePath}}" class="card-img-top" alt="Imagen">
                 <div class="card-body">
-                    <h5 class="card-title" th:text="${product.name}">Product Name</h5>
-                    <p class="card-text" th:text="${product.unitPrice}">Product Price</p>
+                    <h5 class="card-title" th:text="${product.name}">Nombre</h5>
+                    <p class="card-text" th:text="${product.unitPrice}">Precio</p>
                 </div>
             </div>
         </div> 

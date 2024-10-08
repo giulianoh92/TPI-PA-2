@@ -1,28 +1,28 @@
 -- Insert data into Payment_methods
 INSERT INTO Payment_methods (name) VALUES 
-('Credit Card'),
-('Debit Card'),
+('Tarjeta de Crédito'),
+('Tarjeta de Débito'),
 ('PayPal'),
-('Bank Transfer'),
+('Transferencia Bancaria'),
 ('Apple Pay'),
 ('Google Pay'),
-('Cryptocurrency'),
-('Cash');
+('Criptomoneda'),
+('Efectivo');
 
 -- Insert data into Statuses
 INSERT INTO Statuses (name) VALUES 
-('Pending'),
-('Shipped'),
-('Delivered'),
-('Cancelled'),
-('Returned');
+('Pendiente'),
+('Enviado'),
+('Entregado'),
+('Cancelado'),
+('Devuelto');
 
 -- Insert data into Prod_categories
 INSERT INTO Prod_categories (name) VALUES 
-('Electronics'),
-('Clothing'),
-('Books'),
-('Groceries');
+('Electronicos'),
+('Ropa'),
+('Libros'),
+('Alimentos');
 
 -- Insert data into Carts
 INSERT INTO Carts () VALUES 
@@ -88,38 +88,39 @@ INSERT INTO Products (category_id, name, description, unit_price, stock, image_p
 (1, 'IPhone 15 Pro Max', '6.7p 512GB 8GB RAM', 699.99, 50, 'IPhone_15_Pro_Max.jpg'),
 (1, 'Samsung Galaxy S23', '6.6p 256GB 8GB RAM', 599.99, 45, 'Samsung_Galaxy_S23.jpg'),
 (1, 'MacBook Air M2', '13.3p 256GB SSD 8GB RAM', 999.99, 30, 'MacBook_Air_M2.jpg'),
-(1, 'Sony WH-1000XM5', 'Wireless Noise Cancelling Headphones', 349.99, 20, 'Sony_WH-1000XM5.jpg'),
+(1, 'Sony WH-1000XM5', 'Auriculares Inalámbricos con Cancelación de Ruido', 349.99, 20, 'Sony_WH-1000XM5.jpg'),
 (1, 'Apple Watch Series 9', '41mm GPS', 399.99, 40, 'Apple_Watch_Series_9.jpg'),
 
-(3, 'The Catcher in the Rye', 'Paperback by J.D. Salinger', 9.99, 60, 'The_Catcher_in_the_Rye.jpg'),
-(3, '1984', 'Paperback by George Orwell', 8.99, 70, '1984.jpg'),
-(3, 'Sapiens', 'Hardcover by Yuval Noah Harari', 18.99, 50, 'Sapiens.jpg'),
-(3, 'Educated', 'Paperback by Tara Westover', 11.99, 55, 'Educated.jpg'),
-(3, 'Becoming', 'Hardcover by Michelle Obama', 22.99, 40, 'Becoming.jpg'),
+(3, 'The Catcher in the Rye', 'Tapa blanda, por J.D. Salinger', 9.99, 60, 'The_Catcher_in_the_Rye.jpg'),
+(3, '1984', 'Tapa blanda, por George Orwell', 8.99, 70, '1984.jpg'),
+(3, 'Sapiens', 'Tapa dura, por Yuval Noah Harari', 18.99, 50, 'Sapiens.jpg'),
+(3, 'Educated', 'Tapa blanda, por Tara Westover', 11.99, 55, 'Educated.jpg'),
+(3, 'Becoming', 'Tapa dura, por Michelle Obama', 22.99, 40, 'Becoming.jpg'),
 
-(2, 'Levi\'s 501 Jeans', 'Classic Fit, Blue', 49.99, 100, 'Levi\'s_501_Jeans.jpg'),
+(2, 'Levi\'s 501 Jeans', 'Ajuste Clásico, Azul', 49.99, 100, 'Levi\'s_501_Jeans.jpg'),
 (2, 'Nike Air Force 1', 'Men\'s Sneakers, White', 89.99, 75, 'Nike_Air_Force_1.jpg'),
 (2, 'Adidas Ultraboost', 'Men\'s Running Shoes, Black', 129.99, 60, 'Adidas_Ultraboost.jpg'),
-(2, 'Patagonia Down Jacket', 'Women\'s Puffer Jacket, Black', 199.99, 30, 'Patagonia_Down_Jacket.jpg'),
-(2, 'The North Face Backpack', 'Borealis, 28L, Black', 99.99, 50, 'The_North_Face_Backpack.jpg'),
+(2, 'Patagonia Down Jacket', 'Chaqueta Puffer para Mujeres, Negra', 199.99, 30, 'Patagonia_Down_Jacket.jpg'),
+(2, 'The North Face Backpack', 'Borealis, 28L, Negra', 99.99, 50, 'The_North_Face_Backpack.jpg'),
 
-(4, 'Organic Almonds', '16oz Pack', 12.99, 80, 'Organic_Almonds.jpg'),
-(4, 'Quinoa', '16oz Organic White Quinoa', 9.99, 90, 'Quinoa.jpg'),
-(4, 'Green Tea', '100 Bags Organic', 7.99, 70, 'Green_Tea.jpg'),
-(4, 'Dark Chocolate', '70% Cocoa, 200g', 5.99, 120, 'Dark_Chocolate.jpg'),
-(4, 'Honey', 'Raw Organic 500g', 14.99, 50, 'Honey.jpg'),
+(4, 'Almendras Orgánicas', 'Paquete de 16oz', 12.99, 80, 'Organic_Almonds.jpg'),
+(4, 'Quinoa', 'Quinoa Blanca Orgánica de 16oz', 9.99, 90, 'Quinoa.jpg'),
+(4, 'Té Verde', '100 Bolsitas Orgánicas', 7.99, 70, 'Green_Tea.jpg'),
+(4, 'Chocolate Oscuro', '70% Cacao, 200g', 5.99, 120, 'Dark_Chocolate.jpg'),
+(4, 'Miel', 'Miel Orgánica Cruda 500g', 14.99, 50, 'Honey.jpg'),
 
 (1, 'Lenovo IdeaPad', '15.6p 512GB SSD 16GB RAM', 499.99, 40, 'Lenovo_IdeaPad.jpg'),
 (1, 'Dell XPS 13', '13.4p 512GB SSD 16GB RAM', 1199.99, 20, 'Dell_XPS_13.jpg'),
-(1, 'GoPro HERO12', 'Action Camera, 5K', 399.99, 35, 'GoPro_HERO12.jpg'),
-(1, 'JBL Flip 6', 'Portable Bluetooth Speaker', 129.99, 80, 'JBL_Flip_6.jpg'),
-(1, 'Fitbit Charge 5', 'Fitness Tracker, Black', 149.99, 55, 'Fitbit_Charge_5.jpg'),
+(1, 'GoPro HERO12', 'Cámara de Acción, 5K', 399.99, 35, 'GoPro_HERO12.jpg'),
+(1, 'JBL Flip 6', 'Altavoz Bluetooth Portátil', 129.99, 80, 'JBL_Flip_6.jpg'),
+(1, 'Fitbit Charge 5', 'Rastreador de Actividad, Negro', 149.99, 55, 'Fitbit_Charge_5.jpg'),
 
-(3, 'The Subtle Art of Not Giving a F\'ck', 'Paperback by Mark Manson', 12.99, 65, 'The_Subtle_Art_of_Not_Giving_a_F\'ck.jpg'),
-(3, 'The Power of Habit', 'Paperback by Charles Duhigg', 10.99, 70, 'The_Power_of_Habit.jpg'),
-(3, 'Atomic Habits', 'Hardcover by James Clear', 16.99, 55, 'Atomic_Habits.jpg'),
-(3, 'How to Win Friends and Influence People', 'Paperback by Dale Carnegie', 9.99, 75, 'How_to_Win_Friends_and_Influence_People.jpg'),
-(3, 'Thinking, Fast and Slow', 'Paperback by Daniel Kahneman', 14.99, 60, 'Thinking,_Fast_and_Slow.jpg');
+(3, 'The Subtle Art of Not Giving a F\'ck', 'Tapa blanda, por Mark Manson', 12.99, 65, 'The_Subtle_Art_of_Not_Giving_a_F\'ck.jpg'),
+(3, 'The Power of Habit', 'Tapa blanda, por Charles Duhigg', 10.99, 70, 'The_Power_of_Habit.jpg'),
+(3, 'Atomic Habits', 'Tapa dura, por James Clear', 16.99, 55, 'Atomic_Habits.jpg'),
+(3, 'How to Win Friends and Influence People', 'Tapa blanda, por Dale Carnegie', 9.99, 75, 'How_to_Win_Friends_and_Influence_People.jpg'),
+(3, 'Thinking, Fast and Slow', 'Tapa blanda, por Daniel Kahneman', 14.99, 60, 'Thinking,_Fast_and_Slow.jpg');
+
 
 -- Insert data into Orders
 INSERT INTO Orders (customer_id, status_id, payment_id) VALUES 

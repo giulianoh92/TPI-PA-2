@@ -3,35 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Orders</title>
+    <title>Mis Pedidos</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <link rel="stylesheet" href="/css/home.css">
 </head>
 <body>
     <div class="container mt-5">
-        <h2>My Orders</h2>
+        <h2>Mis Pedidos</h2>
         <div th:if="${orders != null}">
             <div th:each="order : ${orders}" class="card mb-3">
                 <div class="card-body">
-                    <p class="card-text">Status: <span th:text="${order.status.status}"></span></p>
-                    <p class="card-text">Payment Method: <span th:text="${order.payment.paymentMethod}"></span></p>
-                    <p class="card-text">Total Amount: $<span th:text="${order.payment.amount}"></span></p>
+                    <p class="card-text">Estado: <span th:text="${order.status.status}"></span></p>
+                    <p class="card-text">Método de Pago: <span th:text="${order.payment.paymentMethod}"></span></p>
+                    <p class="card-text">Total: $<span th:text="${order.payment.amount}"></span></p>
                     
                     <!-- Display items directly within the card -->
                     <div>
                         <table class="table">
                             <thead>
                                 <tr>
-                                    <th>Product</th>
-                                    <th>Quantity</th>
-                                    <th>Total Price</th>
+                                    <th>Producto</th>
+                                    <th>Cantidad</th>
+                                    <th>Precio total</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr th:each="item : ${order.items}">
-                                    <td th:text="${item.product.name}">Product Name</td>
-                                    <td th:text="${item.amount}">Quantity</td>
-                                    <td th:text="${item.amount * item.product.unitPrice}">Total Price</td>
+                                    <td th:text="${item.product.name}">Nombre</td>
+                                    <td th:text="${item.amount}">Cantidad</td>
+                                    <td th:text="${item.amount * item.product.unitPrice}">Precio total</td>
                                 </tr>
                             </tbody>
                         </table>
@@ -40,7 +40,7 @@
             </div>
         </div>
         <div th:if="${orders == null}">
-            <p>No orders available.</p>
+            <p>Aún no has hecho ningún pedido!.</p>
         </div>
     </div>
 
