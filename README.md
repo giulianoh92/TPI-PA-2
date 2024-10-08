@@ -10,7 +10,7 @@ Este proyecto es un sistema de gestión para una tienda online que consta de dos
 - **Maven**: Para la gestión de dependencias y construcción del proyecto.
 - **Spring Boot**: Para la configuración y desarrollo de la aplicación.
 - **Swing**: Para la interfaz de usuario de la aplicación de escritorio.
-- **JSP**: Para la gestión de la base de datos.
+- **JPA**: Para la gestión de la base de datos.
 - **Spring MVC**: Para el manejo de las solicitudes web.
 - **Spring Security**: Para la gestión de la autenticación y autorización.
 - **Thymeleaf**: Para la generación de vistas HTML en la aplicación web.

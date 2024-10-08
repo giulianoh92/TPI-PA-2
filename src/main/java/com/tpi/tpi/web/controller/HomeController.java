@@ -281,20 +281,35 @@ public class HomeController {
 
     @PostMapping("/order/confirm")
     public String confirmOrder(@RequestParam("paymentMethodId") int paymentMethodId, Principal principal) {
+        logger.debug("Entering confirmOrder method");
+        logger.info("Info message at the start of confirmOrder");
+        logger.warn("Warn message at the start of confirmOrder");
+        logger.error("Error message at the start of confirmOrder");
+    
         if (principal == null) {
+            logger.error("Principal is null");
             return "error"; // Ensure you have an error.html template
         }
     
         String email = principal.getName();
+        logger.info("Principal email: {}", email);
         Customer customer = customerService.getCustomerByEmail(email);
         if (customer == null) {
+            logger.error("Customer not found for email: {}", email);
             return "error"; // Ensure you have an error.html template
         }
     
         Cart cart = customer.getCart();
+        if (cart == null) {
+            logger.error("Cart is null for customer: {}", email);
+            return "error"; // Ensure you have an error.html template
+        }
+    
         List<Item> cartItems = cart.getItems();
+        logger.info("Cart items for customer {}: {}", email, cartItems);
     
         if (cartItems.isEmpty()) {
+            logger.warn("Cart is empty for customer: {}", email);
             return "error"; // Handle case where cart is empty
         }
     
@@ -306,30 +321,62 @@ public class HomeController {
     
         // Ensure the order is created successfully
         try {
+            logger.debug("Calling orderService.createOrder");
             orderService.createOrder(order, customer.getUserId());
-            cart.clearCart();
-            cartService.updateCart(cart);
+            logger.debug("Order created successfully");
+    
         } catch (Exception e) {
             logger.error("Failed to create order", e);
             return "error";
         }
-        
+    
         // Update product stock and cart
         try {
-            for (Item item : cartItems) {
-                Product product = item.getProduct();
-                product.setStock(product.getStock() - item.getAmount());
-                productService.updateProductStock(product);
+            logger.debug("Starting stock update for cart items");
+            if (cartItems.isEmpty()) {
+                logger.warn("Cart items list is empty");
+            } else {
+                cartItems.forEach(item -> {
+                    if (item == null) {
+                        logger.warn("Item in cartItems list is null");
+                        return;
+                    }
+                    logger.debug("Updating stock for item: {}", item);
+                    // Your stock update logic here
+                    // For example:
+                    Product product = item.getProduct();
+                    if (product == null) {
+                        logger.warn("Product in item is null for item: {}", item);
+                        return;
+                    }
+                    int newStock = product.getStock() - item.getAmount();
+                    product.setStock(newStock);
+                    productService.updateProductStock(product);
+                    logger.debug("Updated stock for product {}: new stock = {}", product.getName(), newStock);
+                });
             }
         } catch (Exception e) {
             logger.error("Failed to update stock or clear cart", e);
             return "error";
         }
     
-        logger.info("Order created successfully for customer: " + email);
+        // Clear the cart after updating the stock
+        try {
+            logger.debug("Calling cart.clearCart");
+            cart.clearCart();
+            logger.debug("Cart cleared successfully");
+    
+            logger.debug("Calling cartService.updateCart");
+            cartService.updateCart(cart);
+            logger.debug("Cart updated successfully");
+        } catch (Exception e) {
+            logger.error("Failed to clear cart", e);
+            return "error";
+        }
+    
+        logger.info("Order created successfully for customer: {}", email);
         return "redirect:/order/success";
     }
-    
 
     @GetMapping("/order/success")
     public String orderSuccess() {

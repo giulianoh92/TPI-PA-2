@@ -41,11 +41,7 @@ public class SecurityConfig {
                         .loginPage("/login")
                         .loginProcessingUrl("/login")
                         .defaultSuccessUrl("/home", true)
-                        .failureHandler((request, response, exception) -> {
-                            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                            response.setContentType("application/json");
-                            response.getWriter().write("{\"success\": false, \"message\": \"Invalid email or password\"}");
-                        })
+                        .failureUrl("/login?error=true")
                         .permitAll()
         )
         .logout(logout -> logout

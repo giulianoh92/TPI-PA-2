@@ -87,7 +87,7 @@
                     fetchMyOrders(); // Fetch orders when the panel is opened
                 }
             });
-
+    
             // Toggle Account panel
             $('#accountBtn').on('click', function(event) {
                 event.preventDefault();
@@ -99,7 +99,7 @@
                     fetchAccountDetails(); // Fetch account details when the panel is opened
                 }
             });
-
+    
             // Toggle Cart panel
             $('#cartBtn').on('click', function(event) {
                 event.preventDefault();
@@ -111,7 +111,7 @@
                     fetchCart(); // Fetch cart when the panel is opened
                 }
             });
-
+    
             // Fetch My Orders
             function fetchMyOrders() {
                 $.ajax({
@@ -125,7 +125,7 @@
                     }
                 });
             }
-
+    
             // Fetch Account Details
             function fetchAccountDetails() {
                 $.ajax({
@@ -139,7 +139,7 @@
                     }
                 });
             }
-
+    
             // Fetch Cart
             function fetchCart() {
                 $.ajax({
@@ -153,7 +153,7 @@
                     }
                 });
             }
-
+    
             // Close the panels by clicking outside of them (optional)
             $(document).on('click', function(event) {
                 if (!$(event.target).closest('#myOrdersPanel, #myOrdersBtn').length) {
@@ -166,7 +166,7 @@
                     $('#cartPanel').removeClass('show');
                 }
             });
-
+    
             // Add to Cart functionality
             $('.add-to-cart-btn').on('click', function() {
                 var productId = $(this).data('product-id');
@@ -183,6 +183,15 @@
                         console.error('Error adding product to cart:', xhr);
                     }
                 });
+            });
+    
+            // Ensure quantity does not exceed stock
+            $('#quantity-input').on('input', function() {
+                var maxStock = parseInt($(this).attr('max'), 10);
+                var currentValue = parseInt($(this).val(), 10);
+                if (currentValue > maxStock) {
+                    $(this).val(maxStock);
+                }
             });
         });
     </script>

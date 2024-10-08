@@ -45,8 +45,7 @@ INSERT INTO Users (password, username, is_admin, reg_date) VALUES
 ('$2b$12$69Qfvzffx80FmxfSLch9ceVLrYUlogLhuQgAosHNOU3H.AsrXOCjS', 'Laura Wilson', TRUE, '2024-05-10'),
 ('$2b$12$VTdsDUA86VmZqjL/JYEkU.3pgjqgGICA5tO1PAYgoralG4dVUYSdi', 'Peter Clark', FALSE, '2024-06-15'),
 ('$2b$12$4HK7xxi6MBvsZohwJ3CBuuEvVYjex4wb44Yjb/vLIOHP8RHKyDMxa', 'Susan Taylor', FALSE, '2024-07-01'),
-('$2b$12$1L9SH.yZH/30o9icAR9.6OapkFZm40MGt7ENpaBZpcGUlBRcVnUN2', 'David White', TRUE, '2024-08-01'),
-('$2a$10$nA6UYI99kPxRlO94JjItp.CkqMU/UtAKvUH971KhD2E1lMYkXesd.', 'test', FALSE, '2024-09-01');
+('$2b$12$1L9SH.yZH/30o9icAR9.6OapkFZm40MGt7ENpaBZpcGUlBRcVnUN2', 'David White', TRUE, '2024-08-01');
 
 -- Insert data into Customers
 INSERT INTO Customers (customer_id, email, address, cart_id) VALUES 
@@ -57,8 +56,7 @@ INSERT INTO Customers (customer_id, email, address, cart_id) VALUES
 (5, 'laura.wilson@example.com', '654 Birch St', 5),
 (6, 'peter.clark@example.com', '987 Maple St', 6),
 (7, 'susan.taylor@example.com', '1010 Walnut St', 7),
-(8, 'david.white@example.com', '1112 Cherry St', 8),
-(9, 'test@test', '123 Test St', 9);
+(8, 'david.white@example.com', '1112 Cherry St', 8);
 
 -- Insert data into Payments
 INSERT INTO Payments (payment_met_id, amount, date) VALUES 
@@ -144,9 +142,7 @@ INSERT INTO Orders (customer_id, status_id, payment_id) VALUES
 (1, 3, 17),
 (2, 1, 18),
 (3, 2, 19),
-(4, 3, 20),
-(9, 1, 21),
-(9, 2, 22);
+(4, 3, 20);
 
 -- Insert data into Items (Cart Items)
 INSERT INTO Items (product_id, amount, cart_id) VALUES 
@@ -201,9 +197,4 @@ INSERT INTO Items (product_id, amount, order_id) VALUES
 (23, 1, 17),
 (24, 3, 18),
 (25, 2, 19),
-(26, 1, 20),
-(27, 1, 21),
-(28, 2, 21),
-(29, 1, 22),
-(30, 3, 22),
-(23, 2, 22);
+(26, 1, 20);
