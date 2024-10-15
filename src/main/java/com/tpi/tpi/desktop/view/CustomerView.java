@@ -7,11 +7,9 @@ import javax.swing.*;
 import java.awt.*;
 import java.util.List;
 import java.util.function.Function;
-import java.util.logging.Logger;
 
 public class CustomerView extends AbstractView<Customer, AdminOperationsController> implements PanelView<AdminOperationsController> {
 
-    private static final Logger LOGGER = Logger.getLogger(CustomerView.class.getName());
     private List<Customer> customers;
 
     public CustomerView() {
@@ -24,7 +22,7 @@ public class CustomerView extends AbstractView<Customer, AdminOperationsControll
 
     @Override
     protected String getFrameTitle() {
-        return "Customer Management";
+        return "Gestión de Clientes";
     }
 
     @Override
@@ -40,7 +38,7 @@ public class CustomerView extends AbstractView<Customer, AdminOperationsControll
     }
 
     private void setupPanel(AdminOperationsController controller) {
-        String[] columnNames = {"ID", "Username", "Email", "Password", "Address", "Registered At"};
+        String[] columnNames = {"ID", "Usuario", "Email", "Contraseña", "Dirección", "Fecha de Registro"};
         Function<Customer, Object[]> rowMapper = createRowMapper();
 
         customers = controller.getCustomerService().getAllCustomerList();
@@ -55,7 +53,7 @@ public class CustomerView extends AbstractView<Customer, AdminOperationsControll
     }
 
     private void setupPanel(AdminOperationsController controller, JPanel panel) {
-        String[] columnNames = {"ID", "Username", "Email", "Password", "Address", "Registered At"};
+        String[] columnNames = {"ID", "Usuario", "Email", "Contraseña", "Dirección", "Fecha de Registro"};
         Function<Customer, Object[]> rowMapper = createRowMapper();
 
         customers = controller.getCustomerService().getAllCustomerList();
@@ -82,7 +80,6 @@ public class CustomerView extends AbstractView<Customer, AdminOperationsControll
 
     @Override
     public void handleCommit(Object[][] data) {
-        LOGGER.info("Committing customer data:");
         for (int i = 0; i < getTable().getRowCount(); i++) {
             Customer customer = customers.get(i);
             customer.setUsername((String) getTable().getValueAt(i, 1));
@@ -96,8 +93,6 @@ public class CustomerView extends AbstractView<Customer, AdminOperationsControll
             } else if (dateValue instanceof java.sql.Date date) {
                 customer.setRegisterDate(date);
             }
-
-            LOGGER.info(customer.getAddress());
         }
 
         controller.commitCustomerData(customers);

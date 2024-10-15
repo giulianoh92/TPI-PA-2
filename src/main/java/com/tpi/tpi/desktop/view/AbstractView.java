@@ -35,11 +35,11 @@ public abstract class AbstractView<T, C> extends JPanel {
 
     protected JPanel createButtonPanel() {
         JPanel buttonPanel = new JPanel();
-        resetButton = createStyledButton("Reset");
-        commitButton = createStyledButton("Commit");
-        editRowButton = createStyledButton("Edit Row");
-        addRowButton = createStyledButton("Add Row");
-        deleteRowButton = createStyledButton("Delete Row");
+        resetButton = createStyledButton("Reestablecer");
+        commitButton = createStyledButton("Guardar");
+        editRowButton = createStyledButton("Editar Fila");
+        addRowButton = createStyledButton("Agregar Fila");
+        deleteRowButton = createStyledButton("Eliminar Fila");
 
         resetButton.setEnabled(false);
         commitButton.setEnabled(false);
@@ -174,7 +174,7 @@ public abstract class AbstractView<T, C> extends JPanel {
         });
 
         JPanel searchPanel = new JPanel(new BorderLayout());
-        searchPanel.add(new JLabel("Search: "), BorderLayout.WEST);
+        searchPanel.add(new JLabel("Buscar: "), BorderLayout.WEST);
         searchPanel.add(searchField, BorderLayout.CENTER);
 
         return searchPanel;

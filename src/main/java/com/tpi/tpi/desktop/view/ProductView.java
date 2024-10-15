@@ -21,7 +21,6 @@ import java.nio.file.StandardCopyOption;
 import java.util.Comparator;
 import java.util.List;
 import java.util.function.Function;
-import java.util.logging.Logger;
 
 public class ProductView extends AbstractView<Product, AdminOperationsController> implements PanelView<AdminOperationsController> {
 
@@ -31,7 +30,6 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
     private static final int IMAGE_PATH_COLUMN = 7;
     private static final int IS_ACTIVE_COLUMN = 8;
 
-    private final static Logger LOGGER = Logger.getLogger(ProductView.class.getName());
 
 
     private String uploadedImagePath;
@@ -65,7 +63,7 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
     public void showPanel(AdminOperationsController controller, JPanel panel) {
         setController(controller);
 
-        String[] columnNames = {"ID", "Name", "Description", "Unit Price", "Stock", "CatId", "Category", "Image Path", "Is Active"};
+        String[] columnNames = {"ID", "Nombre", "Descripción", "Precio Unitario", "Stock", "CatId", "Categoría", "Ruta Imagen", "Activo"};
 
         Function<Product, Object[]> rowMapper = product -> new Object[]{
             product.getProductId(),
@@ -184,7 +182,7 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
             return;
         }
 
-        int result = JOptionPane.showConfirmDialog(this, "Are you sure you want to delete the selected row?", "Delete Row", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
+        int result = JOptionPane.showConfirmDialog(this, "Está seguro de que quiere eliminar la fila?", "Eliminar Fila", JOptionPane.YES_NO_OPTION, JOptionPane.WARNING_MESSAGE);
         if (result == JOptionPane.YES_OPTION) {
             markProductAsInactive(row);
             updateTableModel();
@@ -244,7 +242,7 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
 
         Object[][] beforeEditData = getCurrentTableData();
 
-        int result = JOptionPane.showConfirmDialog(this, panel, "Edit Row", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+        int result = JOptionPane.showConfirmDialog(this, panel, "Editar Fila", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
         if (result == JOptionPane.OK_OPTION) {
             updateTableData(row, columnCount, textFields, categoryComboBox);
             if (uploadedImagePath != null) {
@@ -258,7 +256,7 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
 
     private void loadImage(int row, JLabel imageLabel) {
         Object imagePathObj = getTable().getValueAt(row, IMAGE_PATH_COLUMN);
-        System.out.println("Image path: " + imagePathObj);
+        System.out.println("Ruta Imagen: " + imagePathObj);
         
         if (imagePathObj instanceof String) {
             String imagePath = (String) imagePathObj;
@@ -271,14 +269,14 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
                     if (imgFile.exists()) {
                         imageLabel.setIcon(new ImageIcon(getScaledImage(new ImageIcon(imgFile.getAbsolutePath()).getImage(), 400, 400)));
                     } else {
-                        imageLabel.setText("Image not found");
+                        imageLabel.setText("Imagen no encontrada");
                     }
                 }
             } else {
-                imageLabel.setText("No image path provided");
+                imageLabel.setText("Ruta de imagen vacía");
             }
         } else {
-            imageLabel.setText("Invalid image path");
+            imageLabel.setText("Ruta inválida");
         }
     }
 
@@ -326,7 +324,7 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
     private void addCategoryField(JPanel panel, GridBagConstraints gbc, JComboBox<ProductCategory> categoryComboBox) {
         gbc.gridx = 0;
         gbc.gridy = CATEGORY_COLUMN;
-        panel.add(new JLabel("Category:"), gbc);
+        panel.add(new JLabel("Categoría:"), gbc);
         gbc.gridx = 1;
         panel.add(categoryComboBox, gbc);
     }
@@ -365,7 +363,7 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
         gbc.gridy = columnCount + 1;
         panel.add(imageScrollPane, gbc);
 
-        JButton uploadButton = new JButton("Upload Image");
+        JButton uploadButton = new JButton("Subir Imagen");
         uploadButton.addActionListener(e -> uploadImage(imageLabel, getTable().getSelectedRow()));
         gbc.gridy = columnCount + 2;
         panel.add(uploadButton, gbc);
@@ -397,15 +395,15 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
 
     private JPanel createAddPanel(JTextField nameField, JTextField descriptionField, JTextField unitPriceField, JTextField stockField, JComboBox<ProductCategory> categoryComboBox) {
         JPanel panel = new JPanel(new GridLayout(5, 2));
-        panel.add(new JLabel("Name:"));
+        panel.add(new JLabel("Nombre:"));
         panel.add(nameField);
-        panel.add(new JLabel("Description:"));
+        panel.add(new JLabel("Descripción:"));
         panel.add(descriptionField);
-        panel.add(new JLabel("Unit Price:"));
+        panel.add(new JLabel("Precio Unitario:"));
         panel.add(unitPriceField);
         panel.add(new JLabel("Stock:"));
         panel.add(stockField);
-        panel.add(new JLabel("Category:"));
+        panel.add(new JLabel("Categoría:"));
         panel.add(categoryComboBox);
         return panel;
     }
@@ -419,8 +417,6 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
             } else if (col != IS_ACTIVE_COLUMN && textFields[col] != null) {
                 getTable().setValueAt(textFields[col].getText(), row, col);
             }
-
-            LOGGER.info("Updated  Product ID: " + getTable().getValueAt(row, ID_COLUMN) + " Column: " + col + " Value: " + getTable().getValueAt(row, col));
         }
     }
 
@@ -459,7 +455,7 @@ public class ProductView extends AbstractView<Product, AdminOperationsController
 
         populateComboBox(categoryComboBox, categories);
 
-        int result = JOptionPane.showConfirmDialog(this, panel, "Add Product", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+        int result = JOptionPane.showConfirmDialog(this, panel, "Agregar Producto", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
         if (result == JOptionPane.OK_OPTION) {
             Product newProduct = createNewProduct(nameField, descriptionField, unitPriceField, stockField, categoryComboBox);
             products.add(newProduct);

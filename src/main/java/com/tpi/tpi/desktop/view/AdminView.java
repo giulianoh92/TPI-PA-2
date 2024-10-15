@@ -7,13 +7,11 @@ import com.tpi.tpi.desktop.controller.ViewType;
 
 import javax.swing.*;
 import java.awt.*;
-import java.util.logging.Logger;
 import java.awt.event.ActionListener;
 import java.awt.event.ActionEvent;
 
 public class AdminView extends AbstractView<Object, AdminOperationsController> implements PanelView<AdminOperationsController> {
 
-    private static final Logger LOGGER = Logger.getLogger(AdminView.class.getName());
     private static final int FRAME_WIDTH = 1200;
     private static final int FRAME_HEIGHT = 800;
 
@@ -51,7 +49,7 @@ public class AdminView extends AbstractView<Object, AdminOperationsController> i
 
     @Override
     protected String getFrameTitle() {
-        return "Admin Operations";
+        return "Panel de Adminstrador";
     }
 
     @Override
@@ -73,10 +71,10 @@ public class AdminView extends AbstractView<Object, AdminOperationsController> i
     }
 
     private void addTabs() {
-        addTab(ViewType.PRODUCT, "Products");
-        addTab(ViewType.USER, "Users");
-        addTab(ViewType.ORDER, "Orders");
-        addTab(ViewType.CUSTOMER, "Customers");
+        addTab(ViewType.PRODUCT, "Productos");
+        addTab(ViewType.USER, "Usuarios");
+        addTab(ViewType.ORDER, "Pedidos");
+        addTab(ViewType.CUSTOMER, "Clientes");
     }
 
     private void addTab(ViewType viewType, String title) {
@@ -88,14 +86,6 @@ public class AdminView extends AbstractView<Object, AdminOperationsController> i
 
     @Override
     public void handleCommit(Object[][] data) {
-        LOGGER.info("Committing admin data:");
-        for (Object[] row : data) {
-            for (Object value : row) {
-                LOGGER.info(value + "\t");
-            }
-            LOGGER.info("\n");
-        }
-
         controller.commitAdminData(data);
     }
 
@@ -120,7 +110,6 @@ public class AdminView extends AbstractView<Object, AdminOperationsController> i
     }
 
     private void refreshData() {
-        LOGGER.info("Refreshing data from the database...");
         for (int i = 0; i < tabbedPane.getTabCount(); i++) {
             JPanel panel = (JPanel) tabbedPane.getComponentAt(i);
             ViewType viewType = getViewTypeByTitle(tabbedPane.getTitleAt(i));
@@ -133,13 +122,13 @@ public class AdminView extends AbstractView<Object, AdminOperationsController> i
 
     private ViewType getViewTypeByTitle(String title) {
         switch (title) {
-            case "Products":
+            case "Productos":
                 return ViewType.PRODUCT;
-            case "Users":
+            case "Usuarios":
                 return ViewType.USER;
-            case "Orders":
+            case "Pedidos":
                 return ViewType.ORDER;
-            case "Customers":
+            case "Clientes":
                 return ViewType.CUSTOMER;
             default:
                 throw new IllegalArgumentException("Unknown tab title: " + title);

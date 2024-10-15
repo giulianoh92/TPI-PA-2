@@ -13,7 +13,6 @@ import java.awt.*;
 import java.sql.Date;
 import java.util.List;
 import java.util.function.Function;
-import java.util.logging.Logger;
 
 public class OrderView extends AbstractView<Order, AdminOperationsController> implements PanelView<AdminOperationsController> {
 
@@ -23,7 +22,6 @@ public class OrderView extends AbstractView<Order, AdminOperationsController> im
     private static final int DATE_COLUMN = 3;
     private static final int PAYMENT_METHOD_COLUMN = 4;
     private static final int TOTAL_COLUMN = 5;
-    private static final Logger LOGGER = Logger.getLogger(OrderView.class.getName());
 
     private List<Status> statuses;
     private List<Order> orders;
@@ -55,7 +53,7 @@ public class OrderView extends AbstractView<Order, AdminOperationsController> im
     }
 
     private void setupPanel(AdminOperationsController controller) {
-        String[] columnNames = {"ID", "Customer", "Status", "Date", "Payment Method", "Total"};
+        String[] columnNames = {"ID", "Cliente", "Estado", "Fecha", "Metodo de Pago", "Total"};
         Function<Order, Object[]> rowMapper = createRowMapper(controller);
 
         orders = controller.getOrderService().getAllOrders();
@@ -87,7 +85,7 @@ public class OrderView extends AbstractView<Order, AdminOperationsController> im
     }
 
     private void setupPanel(AdminOperationsController controller, JPanel panel) {
-        String[] columnNames = {"ID", "Customer", "Status", "Date", "Payment Method", "Total"};
+        String[] columnNames = {"ID", "Cliente", "Estado", "Fecha", "Metodo de Pago", "Total"};
         Function<Order, Object[]> rowMapper = createRowMapper(controller);
 
         orders = controller.getOrderService().getAllOrders();
@@ -154,7 +152,7 @@ public class OrderView extends AbstractView<Order, AdminOperationsController> im
     }
 
     private void updateItemsTable(Order order) {
-        String[] columnNames = {"Product", "Unit Price", "Amount", "Total Price"};
+        String[] columnNames = {"Producto", "Precio Unitario", "Cantidad", "Precio Total"};
         Object[][] data = new Object[order.getItems().size()][4];
 
         for (int i = 0; i < order.getItems().size(); i++) {
@@ -177,10 +175,6 @@ public class OrderView extends AbstractView<Order, AdminOperationsController> im
 
     @Override
     public void handleCommit(Object[][] data) {
-        LOGGER.info("Committing order data:");
-        for (Order order : orders) {
-            order.printAttributes();
-        }
 
         controller.commitOrderData(orders);
         commitButton.setEnabled(false);
@@ -206,7 +200,7 @@ public class OrderView extends AbstractView<Order, AdminOperationsController> im
     
         Object[][] beforeEditData = getCurrentTableData();
     
-        int result = JOptionPane.showConfirmDialog(this, panel, "Edit Row", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
+        int result = JOptionPane.showConfirmDialog(this, panel, "Editar Fila", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
         if (result == JOptionPane.OK_OPTION) {
             updateTableData(modelRow, columnCount, textFields, statusComboBox);
     
@@ -256,7 +250,6 @@ public class OrderView extends AbstractView<Order, AdminOperationsController> im
                 getTable().setValueAt(value, modelRow, col);
                 updateOrderField(order, col, value);
             }
-            LOGGER.info("Updated column " + getTable().getColumnName(col) + " for Order ID " + order.getOrderId() + " to " + getTable().getValueAt(modelRow, col));
         }
     }
 
@@ -297,16 +290,5 @@ public class OrderView extends AbstractView<Order, AdminOperationsController> im
             }
         }
         return false;
-    }
-
-    public void logCurrentTableData() {
-        int rowCount = getTable().getRowCount();
-        int columnCount = getTable().getColumnCount();
-        for (int i = 0; i < rowCount; i++) {
-            for (int j = 0; j < columnCount; j++) {
-                LOGGER.info(getTable().getValueAt(i, j) + "\t");
-            }
-            LOGGER.info("\n");
-        }
     }
 }
