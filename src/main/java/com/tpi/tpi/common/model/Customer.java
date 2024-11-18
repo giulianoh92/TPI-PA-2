@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Represents a customer in the system.
+ * representa un cliente
  */
 public class Customer extends User {
     private String address;

@@ -1,7 +1,7 @@
 package com.tpi.tpi.common.model;
 
 /**
- * Represents an item in the cart.
+ * representa un item (producto y cantidad)
  */
 public class Item {
     private int amount;

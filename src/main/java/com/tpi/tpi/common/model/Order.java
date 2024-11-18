@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Represents an order.
+ * representa un pedido (lista de items, estado y metodo de pago)
  */
 public class Order {
     private int orderId;

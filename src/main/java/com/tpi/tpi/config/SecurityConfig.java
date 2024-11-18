@@ -17,20 +17,20 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
+
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
-
     private final CustomAuthenticationProvider customAuthenticationProvider;
-
+    // inyectamos el proveedor de autenticación personalizado
     public SecurityConfig(@Lazy CustomAuthenticationProvider customAuthenticationProvider) {
         this.customAuthenticationProvider = customAuthenticationProvider;
     }
-
+    // configuración de seguridad
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-        .csrf(csrf -> csrf // CSRF protection is enabled by default
+        .csrf(csrf -> csrf // proteccion CSRF esta activada por defecto
                 .disable()
         )
         .authorizeHttpRequests(auth -> auth
@@ -58,11 +58,14 @@ public class SecurityConfig {
         auth.authenticationProvider(customAuthenticationProvider);
     }
 
+
+    // encriptación de contraseñas
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
+    // manejador de autenticación personalizado
     @Bean
     public AuthenticationSuccessHandler customAuthenticationSuccessHandler() {
         return new AuthenticationSuccessHandler() {

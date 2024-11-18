@@ -4,7 +4,7 @@ import java.io.Serializable;
 import java.sql.Date;
 
 /**
- * Represents a user in the system.
+ * representa un usuario (puede ser cliente o administrador)
  */
 public class User implements Serializable {
     private int userId;

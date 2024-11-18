@@ -3,7 +3,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Represents a shopping cart.
+ * representa un carro de compras
  */
 public class Cart {
     private int cartId;

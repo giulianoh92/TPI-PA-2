@@ -1,7 +1,7 @@
 package com.tpi.tpi.common.model;
 
 /**
- * Represents a product category.
+ * representa una categoria de producto
  */
 public class ProductCategory {
     private int categoryId;

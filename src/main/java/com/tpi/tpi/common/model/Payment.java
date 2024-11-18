@@ -3,7 +3,7 @@ package com.tpi.tpi.common.model;
 import java.sql.Date;
 
 /**
- * Represents a payment.
+ * representa un pago (fecha, metodo y monto)
  */
 public class Payment {
     private int paymentId;

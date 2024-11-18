@@ -1,7 +1,7 @@
 package com.tpi.tpi.common.model;
 
 /**
- * Represents the status of an order.
+ * representa un estado (de un pedido)
  */
 public class Status {
     private int statusId;

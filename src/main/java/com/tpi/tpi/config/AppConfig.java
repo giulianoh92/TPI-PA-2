@@ -25,7 +25,7 @@ import java.util.Map;
 @Configuration
 public class AppConfig {
 
-    // Define beans for each view
+    // definir los beans para las vistas
     @Bean
     public AdminView adminView() {
         return new AdminView();
@@ -51,7 +51,8 @@ public class AppConfig {
         return new CustomerView();
     }
 
-    // Define a bean for the views map
+    // definir un bean para el mapa de vistas
+    // creamos un mapa de vistas porque necesitamos inyectar todas las vistas en el controlador
     @SuppressWarnings("rawtypes")
     @Bean
     public Map<ViewType, PanelView> views(AdminView adminView, ProductView productView, UserView userView, OrderView orderView, CustomerView customerView) {
@@ -64,11 +65,11 @@ public class AppConfig {
         return views;
     }
 
-    // Define a bean for the AdminOperationsController
+    // definir un bean para el controlador y pasarle las dependencias
     @Bean
     public AdminOperationsController adminOperationsController(AdminService adminService, ProductService productService, UserService userService, OrderService orderService, CustomerService customerService, @SuppressWarnings("rawtypes") Map<ViewType, PanelView> views) {
         AdminOperationsController controller = new AdminOperationsController(adminService, productService, userService, orderService, customerService, views);
-        // Set the controller for the AdminView
+        // asignar el controlador a la vista
         ((AdminView) views.get(ViewType.ADMIN)).setController(controller);
         return controller;
     }   
